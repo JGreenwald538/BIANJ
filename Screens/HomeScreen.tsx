@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Linking } from 'react-native';
-import { Place } from '../components/Place';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Linking, Appearance } from 'react-native';
 import LogoTitle from '../components/LogoTitle';
 import Carousel from '../components/Carousel';
 
+const screenWidth = Dimensions.get('window').width;
+
+const colorScheme = Appearance.getColorScheme();
 
 
 export default function HomeScreen() {
@@ -11,7 +13,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         {/* Logo and Title */}
-        <Text style={[styles.title]}>Welcome to BIANJ Resource Center</Text>
+        <Text style={[styles.title]}>Welcome to the Brain Injury Alliance of New Jersey Resource Center</Text>
       </View>
 
       <Carousel />
@@ -69,9 +71,9 @@ const styles = StyleSheet.create({
   },
   title: {
     // Styles for the title
-    marginTop: 80,
-    color: 'white',
-    fontSize: 23,
+    marginTop: 100,
+    color: colorScheme !== "dark" ? "black" : "white",
+    fontSize: 0.05 * screenWidth,
     textAlign: 'center',
     fontWeight: 'bold',
   },
@@ -79,11 +81,11 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Center menu items horizontally
     flex: 1,
     paddingHorizontal: 40,
-    
+    justifyContent: 'center', // Center menu items vertically
   },
   menuItem: {
     // Styles for menu items
-    backgroundColor: '#3294A8',
+    backgroundColor: '#572c5f',
     width: "100%",
     height: "70%",
     justifyContent: "center",

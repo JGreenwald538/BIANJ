@@ -162,6 +162,9 @@ export default function Markers(data, categoriesEnabled, userLocation) {
                 ), distances[i], typeOfPlace])
         } else {
           const { name, typeOfPlace, streetAddress, state, phone, website, city, lat, long } = data[i];
+          if(!categories.includes(typeOfPlace)) {
+            categories.push(typeOfPlace);
+          }
           markers.push(
             [<Marker
                 coordinate={{ latitude: data[i].lat, longitude: data[i].long }}

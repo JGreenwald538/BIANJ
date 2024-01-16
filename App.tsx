@@ -10,7 +10,9 @@ import ListScreen from "./Screens/ListScreen";
 import SavedScreen from "./Screens/SavedScreen";
 import SettingsScreen from "./Screens/SettingsScreen";
 import { getCurrentLocation } from "./lib/location";
-import { Image, Platform, UIManager } from "react-native";
+import { Image, Platform, UIManager, Appearance } from "react-native";
+
+const colorScheme = Appearance.getColorScheme();
 
 
 SplashScreen.preventAutoHideAsync();
@@ -29,7 +31,7 @@ const MyTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: "#572C5F",
+    background: colorScheme === "dark" ? "black" : "white",
   },
 };
 
@@ -53,7 +55,7 @@ export default function App() {
             if (route.name === "Home") {
               return (
                 <Image
-                  source={focused ? require("./assets/logos/icon2.png") : require("./assets/logos/icon2dark.png")}
+                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon2.png") : require("./assets/logos/icon2black.png")) : require("./assets/logos/icon2dark.png")}
                   alt={"logo"}
                   style={{ height: size, resizeMode: "contain", width: size }}
                 />
@@ -61,7 +63,7 @@ export default function App() {
             } else if (route.name === "Settings") {
               return (
                 <Image
-                  source={focused ? require("./assets/logos/icon10.png") : require("./assets/logos/icon10dark.png")}
+                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon10.png") : require("./assets/logos/icon10black.png")) : require("./assets/logos/icon10dark.png")}
                   alt={"logo"}
                   style={{ height: size, resizeMode: "contain", width: size }}
                 />
@@ -69,7 +71,7 @@ export default function App() {
             } else if (route.name === "Map") {
               return (
                 <Image
-                  source={focused ? require("./assets/logos/icon5.png") : require("./assets/logos/icon5dark.png")}
+                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon5.png") : require("./assets/logos/icon5black.png")) : require("./assets/logos/icon5dark.png")}
                   alt={"logo"}
                   style={{ height: size, resizeMode: "contain", width: size }}
                 />
@@ -77,7 +79,7 @@ export default function App() {
             } else if (route.name === "List") {
               return (
                 <Image
-                  source={focused ? require("./assets/logos/icon4.png") : require("./assets/logos/icon4dark.png")}
+                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon4.png") : require("./assets/logos/icon4black.png")) : require("./assets/logos/icon4dark.png")}
                   alt={"logo"}
                   style={{ height: size, resizeMode: "contain", width: size }}
                 />
@@ -85,7 +87,7 @@ export default function App() {
             } else if (route.name === "Saved") {
               return (
                 <Image
-                  source={focused ? require("./assets/logos/icon7.png") : require("./assets/logos/icon7dark.png")}
+                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon7.png") : require("./assets/logos/icon7black.png")) : require("./assets/logos/icon7dark.png")}
                   alt={"logo"}
                   style={{ height: size, resizeMode: "contain", width: size }}
                 />
@@ -93,14 +95,14 @@ export default function App() {
             }
           },
           tabBarInactiveTintColor: "#63666a",
-          tabBarActiveTintColor: "white",
+          tabBarActiveTintColor: colorScheme !== "dark" ? "black" : "white",
           headerShown: false,
-          tabBarActiveBackgroundColor: "#572C5F",
-          tabBarInactiveBackgroundColor: "#572C5F",
+          // tabBarActiveBackgroundColor: "#572C5F",
+          // tabBarInactiveBackgroundColor: "#572C5F",
           tabBarStyle: {
             borderTopWidth: 0,
             elevation: 0,
-            backgroundColor: "#572C5F",
+            backgroundColor: colorScheme === "dark" ? "black" : "white",
             height: 60,
             paddingBottom: 5,
             paddingHorizontal: 20,

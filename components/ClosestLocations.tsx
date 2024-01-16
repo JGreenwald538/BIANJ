@@ -61,14 +61,14 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
             )}
             <View style={{ paddingHorizontal: 10, paddingVertical: 5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <TouchableOpacity 
-                    style={{ paddingVertical: 5, width: "18%", backgroundColor: "#572C5F", borderRadius: 5 }}
+                    style={{ paddingVertical: 5, backgroundColor: "#572C5F", borderRadius: 5 }}
                     onPress={
                         () => {
                             // @ts-ignore
                            navigation.navigate("List", { sortBy: "Distance" });
                         }
                     }>
-                        <Text style={{ color: 'white', textAlign: "center" }}>See All</Text>
+                        <Text style={{ color: 'white', textAlign: "center", paddingHorizontal: 5  }} numberOfLines={1}>{"See All"}</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -77,7 +77,7 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#e2cbe7',
         marginHorizontal: 20,
         borderRadius: 10,
         padding: 10,

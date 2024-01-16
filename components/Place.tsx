@@ -13,10 +13,12 @@ import {
   Linking,
   Platform,
   Easing,
-  LayoutAnimation
+  LayoutAnimation,
+  Appearance,
 } from "react-native";
 const { width, height } = Dimensions.get("window");
 import Ionicons from "react-native-vector-icons/Ionicons";
+const colorScheme = Appearance.getColorScheme();
 
 
 interface PlaceProps extends React.ComponentPropsWithoutRef<typeof View> {
@@ -28,6 +30,11 @@ interface PlaceProps extends React.ComponentPropsWithoutRef<typeof View> {
   phone?: string;
   website?: string;
 }
+
+let hasNotch = false;
+
+hasNotch = Dimensions.get('window').height > 800;
+
 
 const Place: React.FC<PlaceProps> = ({
   name = "Name",
@@ -45,11 +52,12 @@ const Place: React.FC<PlaceProps> = ({
     container: {
       flexDirection: "column",
       alignItems: "flex-start",
-      backgroundColor: "white",
+      backgroundColor: "#e2cbe7",
       width: width - 40,
       height: "auto",
       borderRadius: 10,
-      marginBottom: 20
+      marginBottom: 20,
+      marginLeft: -2
     },
     logoContainer: {
       width: 60,
@@ -85,6 +93,7 @@ const Place: React.FC<PlaceProps> = ({
     typeText: {
       fontSize: 15,
       color: "black",
+      width: "80%",
     },
     hiddenText: {
       fontSize: 12,
@@ -98,9 +107,9 @@ const Place: React.FC<PlaceProps> = ({
       color: "#333",
     },
     invisible: {
-      backgroundColor: "#572C5F",
+      backgroundColor: colorScheme === "dark" ? "black" : "white",
       width: width - 40,
-      height: 125,
+      height: hasNotch ? 125 : 100,
     },
   });
 
@@ -119,17 +128,6 @@ const Place: React.FC<PlaceProps> = ({
       style={
         {...styles.container,
         }}>
-          <LinearGradient
-        // Start position (x, y)
-        start={{ x: 0, y: 0 }}
-        // End position (x, y)
-        end={{ x: 0, y: 0 }}
-        // Array of color stops
-        colors={['rgba(71,31,125,1)', 'rgba(255,255,255,1)']}
-        // How far along the gradient to start and end the color stops
-        locations={[0.3, 1]}
-        style={{ width: '100%', borderRadius: 10 }}
-              >
         <View style={{ flexDirection: "row"}}>
           <View style={styles.logoContainer}>
             {logoUri ? (
@@ -143,7 +141,6 @@ const Place: React.FC<PlaceProps> = ({
             )}
           </View>
           <View style={{ flexDirection: "column", flex: 1, marginTop: 10 }}>
-            <Text style={styles.nameText}>{}</Text>
             <Text style={styles.nameText}>{name}</Text>
             <Text style={styles.typeText}>{type}</Text>
             <View style={{flexDirection: "row", justifyContent: "space-between", width: "85%", marginTop: 10}}>
@@ -177,8 +174,7 @@ const Place: React.FC<PlaceProps> = ({
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={async () => {
-                  console.log(website)
-                  Linking.openURL(encodeURI(website));
+                  Linking.openURL(website.replaceAll(/[\s]/g, ""));
                 }}
               >
                 <View style={{flexDirection: "column", alignItems: "center", borderRadius: 10, backgroundColor: "#572C5F", paddingHorizontal: 8, display: expanded ? "flex": "none"}}>
@@ -238,7 +234,6 @@ const Place: React.FC<PlaceProps> = ({
             </TouchableOpacity>
           </Animated.View>
         </View>
-        </LinearGradient>
       </Animated.View>
       
     );

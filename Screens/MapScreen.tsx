@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Animated, Dimensions, ScrollView, TouchableOpacity, View, Text, Image, LayoutAnimation, ActivityIndicator } from "react-native";
+import { Animated, Dimensions, ScrollView, TouchableOpacity, View, Text, Image, LayoutAnimation, ActivityIndicator, Appearance } from "react-native";
 import { API_URL } from "../constants";
 import MapView, { Circle, Marker } from "react-native-maps";
 import Markers from "../components/Markers";
@@ -10,6 +10,8 @@ import { LocationContext } from "../App";
 import { AddressInput } from "../components/AddressInput";
 import LogoTitle from "../components/LogoTitle";
 import { StatusBar, Platform } from 'react-native';
+import Ionicons from "react-native-vector-icons/Ionicons";
+const colorScheme = Appearance.getColorScheme();
 let hasNotch = false;
 
 if (Platform.OS === 'android') {
@@ -28,7 +30,6 @@ const colors: string[] = [
 ];
 
 export default function MapScreen() {
-    // console.log("MapScreen");
     const [data, setData] = useState([]);
     const [sliderValue, setSliderValue] = useState<number>(0);
     const currentLocation = useContext(LocationContext);
@@ -41,10 +42,16 @@ export default function MapScreen() {
     const [categoriesEnabled, setCategoriesEnabled] = useState(["", "", "", "", ""]);
     const [nextCategory, setNextCategory] = useState(0);
     const [bottomBarExpanded, setBottomBarExpanded] = useState(true);
+    const rotAnim = React.useRef(new Animated.Value(1)).current;
 
     const handleClose = () => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setBottomBarExpanded(!bottomBarExpanded);
+      Animated.timing(rotAnim, {
+        toValue: +!bottomBarExpanded,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     };
 
     const handleSliderChange = (newValue: number) => {
@@ -162,7 +169,7 @@ export default function MapScreen() {
                     right: 20,
                     width: screenWidth - 40, // 'auto' to fit content, or you could calculate the width based on the content size
                     height: '50%', // Same as width, 'auto' or a calculated value
-                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    backgroundColor: '#e2cbe7',
                     borderRadius: 10,
                     shadowColor: '#171717',
                     shadowOffset: {width: -2, height: 4},
@@ -213,7 +220,7 @@ export default function MapScreen() {
                           right: filtersExpanded ? 20 + (0.01 * screenWidth) : (0.08 * screenWidth),
                           width: 'auto', // 'auto' to fit content, or you could calculate the width based on the content size
                           height: 'auto', // Same as width, 'auto' or a calculated value
-                          backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                          backgroundColor: !filtersExpanded ? 'rgba(255, 255, 255, 0.75)' : "#e2cbe7",
                           paddingHorizontal: (filtersExpanded ? 5 : 10),
                           borderRadius: (filtersExpanded ? 50 : 15),
                           borderColor: '#572C5F',
@@ -229,28 +236,43 @@ export default function MapScreen() {
         <View style={{position: "absolute", top: mapHeight / 2, left: screenWidth / 2}}>
           {markers.length === 0 ? <ActivityIndicator color="#ffffff" /> : null}
         </View>
-        <TouchableOpacity
-          onPress={handleClose}
-          style={{position: 'absolute',
-          right: 10,
-          // @ts-ignore
-          bottom: !bottomBarExpanded ? 10 : !currentLocation[0] ? 100 : 300,
-          backgroundColor: 'gray',
-          width: 30,
-          height: 30,
-          borderRadius: 15,
-          justifyContent: 'center',
-          alignItems: 'center',
-          opacity: 0.5,
-        }}
-          activeOpacity={1}  // Button will be fully opaque when touched
-        >
-          <Text style={{
-            color: 'white',
-            fontWeight: 'bold',
-          }}>X</Text>
-        </TouchableOpacity>
-        
+        <Animated.View
+            style={{
+              position: "absolute",
+              right: 10,
+              bottom: bottomBarExpanded ? 300 : 5,
+              transform: [
+                {
+                  rotate: rotAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ["0deg", "180deg"],
+                  }),
+                },
+              ],
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                setBottomBarExpanded(!bottomBarExpanded);
+                Animated.timing(rotAnim, {
+                  toValue: +!bottomBarExpanded,
+                  duration: 150,
+                  useNativeDriver: true,
+                }).start();
+                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+              }}
+              style={{
+                opacity: 0.8
+              }}
+              activeOpacity={1}
+            >
+              <Image
+                source={require('../assets/logos/ArrowIcon.png')}
+                alt={"logo"}
+                style={{ height: 25, resizeMode: "contain", width: 25 }}
+              />
+            </TouchableOpacity>
+          </Animated.View>
       </View>
     );
   }

@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   menuItem: {
     // Styles for menu items
-    backgroundColor: '#3294A8',
+    backgroundColor: '#572c5f',
     width: "100%",
     height: 45,
     justifyContent: "center",

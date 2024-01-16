@@ -14,7 +14,7 @@ export const AddressInput: React.FC = () => {
 
             if (data && data.length > 0) {
                 const { lat, lon } = data[0];
-                setCurrentLocation({ lat: lat, long: lon });
+                setCurrentLocation({ lat: parseFloat(lat), long: parseFloat(lon) });
                 setIsRealLocation(false)
             } else {
                 throw new Error('No location found');
@@ -35,14 +35,14 @@ export const AddressInput: React.FC = () => {
                   onChangeText={setInput}
                   placeholder="Enter an address"
                   placeholderTextColor={"#6C6C75"}
-                  style={{paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5, borderColor: '#d3d3d3', borderWidth: 1 }}
+                  style={{paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5, borderColor: '#ffffff', borderWidth: 1 }}
               />
             </View>
             <View style={{ paddingHorizontal: 10, paddingTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <TouchableOpacity 
-                    style={{ paddingVertical: 5, width: "18%", backgroundColor: "#572C5F", borderRadius: 5 }}
+                    style={{ paddingVertical: 5, backgroundColor: "#572C5F", borderRadius: 5 }}
                     onPress={fetchCoordinates}>
-                        <Text style={{ color: 'white', textAlign: "center" }}>Submit</Text>
+                        <Text style={{ color: 'white', textAlign: "center", paddingHorizontal: 5 }}>Submit</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -51,7 +51,7 @@ export const AddressInput: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-      backgroundColor: '#ffffff',
+      backgroundColor: '#e2cbe7',
       marginHorizontal: 20,
       borderRadius: 10,
       padding: 10,

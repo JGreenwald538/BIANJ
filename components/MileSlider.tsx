@@ -51,7 +51,7 @@ const MileSlider: React.FC<MileSliderProps> = ({ isEnabled, value, onValueChange
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#e2cbe7',
     marginHorizontal: 20,
     borderRadius: 10,
     padding: 10,

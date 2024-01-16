@@ -86,7 +86,7 @@ export default class App extends React.Component<{}, AppState> {
 
     render() {
         return (
-            <SafeAreaView style={{ flex: 5 }}>
+            <SafeAreaView style={{ flex: 4 }}>
                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
                     <Carousel
                         layout={"default"}

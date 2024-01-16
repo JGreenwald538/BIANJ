@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Animated, Dimensions, ScrollView, TouchableOpacity, View, Text, LayoutAnimation } from "react-native";
+import { Animated, Dimensions, ScrollView, TouchableOpacity, View, Text, LayoutAnimation, Platform } from "react-native";
 import { API_URL } from "../constants";
 import { Place, PlaceList } from "../components/Place";
 import { LocationContext } from "../App";
@@ -7,12 +7,16 @@ import Checkbox  from "../components/Checkbox";
 import { RadioButton } from 'react-native-paper';
 import { AddressInput } from "../components/AddressInput";
 import LogoTitle from "../components/LogoTitle";
+import { useFocusEffect } from "@react-navigation/native";
 
 const sortBys = [
   "Alphabetical",
   "Category",
   "Distance"
 ];
+
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
 
 const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
   // Haversine formula to calculate the distance
@@ -43,14 +47,18 @@ export default function ListScreen(sortBy: object | string= "") {
 
     const onPressFilters = () => {
       // Configure the animation before the state changes.
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setFiltersExpanded(!filtersExpanded); // This would be your state to control the button size.
+      if(!sortByExpanded) {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setFiltersExpanded(!filtersExpanded); // This would be your state to control the button size.
+      }
     };
   
     const onPressSortBy = () => {
       // Configure the animation before the state changes.
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setSortByExpanded(!sortByExpanded); // This would be your state to control the button size.
+      if(!filtersExpanded) {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setSortByExpanded(!sortByExpanded); // This would be your state to control the button size.
+      }
     };
 
     const screenWidth = Dimensions.get('window').width;  
@@ -117,6 +125,14 @@ export default function ListScreen(sortBy: object | string= "") {
 
     }, [sortByEnabled, currentLocation[0], values, data]);
 
+    useFocusEffect(
+      React.useCallback(() => {
+        return () => {
+          setFiltersExpanded(false);
+          setSortByExpanded(false);
+        };
+      }, [])
+    );
 
     return (
       <View>
@@ -131,7 +147,7 @@ export default function ListScreen(sortBy: object | string= "") {
                     right: 20,
                     width: screenWidth - 40, // 'auto' to fit content, or you could calculate the width based on the content size
                     height: '50%', // Same as width, 'auto' or a calculated value
-                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    backgroundColor: '#e2cbe7',
                     borderRadius: 10,
                     shadowColor: '#171717',
                     shadowOffset: {width: -2, height: 4},
@@ -171,8 +187,8 @@ export default function ListScreen(sortBy: object | string= "") {
           style={[
               {
                 position: 'absolute',
-                top: filtersExpanded ? "15%" : "7%",
-                right: filtersExpanded ? 20 + (0.01 * screenWidth) : 40,
+                top: filtersExpanded ? (0.15 * screenHeight) : (0.07 * screenHeight),
+                right: filtersExpanded ? (0.07 * screenWidth) : 40,
                 width: 'auto', // 'auto' to fit content, or you could calculate the width based on the content size
                 height: 'auto', // Same as width, 'auto' or a calculated value
                 backgroundColor: 'rgb(255, 255, 255)',
@@ -194,7 +210,7 @@ export default function ListScreen(sortBy: object | string= "") {
                     top: '14%',
                     right: 20,
                     width: screenWidth - 40, // 'auto' to fit content, or you could calculate the width based on the content size, // Same as width, 'auto' or a calculated value
-                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    backgroundColor: '#e2cbe7',
                     borderRadius: 10,
                     shadowColor: '#171717',
                     shadowOffset: {width: -2, height: 4},
@@ -228,16 +244,15 @@ export default function ListScreen(sortBy: object | string= "") {
               </View>
             </View>
         </Animated.View>
-         { categories.length !== 0 && <TouchableOpacity
+        {categories.length !== 0 && <TouchableOpacity
           onPress={onPressSortBy}
           style={[
               {
                 position: 'absolute',
-                top: sortByExpanded ? "15%" : "7%",
-                left: sortByExpanded ? "auto" : 40,
-                right: sortByExpanded ? 20 + (0.01 * screenWidth) : "auto",
-                width: 'auto', // 'auto' to fit content, or you could calculate the width based on the content size
-                height: 'auto', // Same as width, 'auto' or a calculated value
+                top: sortByExpanded ? 0.15 * screenHeight : 0.07 * screenHeight,
+                left: sortByExpanded ? (0.86 * screenWidth) : 40,
+                // remove the right property
+                height: 'auto',
                 backgroundColor: 'rgb(255, 255, 255)',
                 paddingHorizontal: (sortByExpanded ? 5 : 10),
                 borderRadius: (sortByExpanded ? 50 : 15),
@@ -247,7 +262,7 @@ export default function ListScreen(sortBy: object | string= "") {
               },
           ]}
           >
-          <Text style={{ fontSize: sortByExpanded ? 25 : 19, color: '#572C5F', position: 'relative', lineHeight: sortByExpanded ? 25 : 30 , textAlign: 'center'
+          <Text style={{ fontSize: sortByExpanded ? 25 : 19, color: '#471f7d', lineHeight: sortByExpanded ? 25 : 30 , textAlign: 'center'
               }}>{sortByExpanded ? "×" : "Sort By"}
           </Text>
         </TouchableOpacity>}
