@@ -1,4 +1,4 @@
-import React, {createContext, useEffect} from "react";
+import React, {createContext, useContext, useEffect} from "react";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -10,15 +10,15 @@ import ListScreen from "./Screens/ListScreen";
 import SavedScreen from "./Screens/SavedScreen";
 import SettingsScreen from "./Screens/SettingsScreen";
 import { getCurrentLocation } from "./lib/location";
-import { Image, Platform, UIManager, Appearance } from "react-native";
-
-const colorScheme = Appearance.getColorScheme();
+import { Image, Platform, UIManager, Appearance, useColorScheme } from "react-native";
+import { LocationContext } from "./util/globalvars";
+import { color } from "native-base/lib/typescript/theme/styled-system";
 
 
 SplashScreen.preventAutoHideAsync();
 setTimeout(SplashScreen.hideAsync, 1000);
  
-export const LocationContext = createContext<[{lat: number, long: number}, () => {}, boolean, () => {}] | null>(null);
+
 
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -27,11 +27,19 @@ if (Platform.OS === 'android') {
 }
 
 
-const MyTheme = {
+const lightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: colorScheme === "dark" ? "black" : "white",
+    background: "white",
+  },
+};
+
+const darkTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "black",
   },
 };
 
@@ -40,18 +48,21 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   const [location, setLocation] = React.useState<{lat: number, long: number} | null>(null);
   const [isRealLocation, setIsRealLocation] = React.useState<boolean>(true);
+  const colorScheme = useColorScheme();
   useEffect(() => {
-    (async () => {
+    // Function to update the location and color scheme
+    const updateState = async () => {
       setLocation(await getCurrentLocation());
-    })();
-  }, [])
+    };
+    updateState();
+  }, []);
   return (
-    // @ts-ignore
+    
     <LocationContext.Provider value={[location, setLocation, isRealLocation, setIsRealLocation]}>
-    <NavigationContainer theme={MyTheme}>
+    <NavigationContainer theme={colorScheme === "light" ? lightTheme : darkTheme}>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
+          tabBarIcon: ({ focused, size }) => {
             if (route.name === "Home") {
               return (
                 <Image
@@ -113,11 +124,11 @@ export default function App() {
           headerTransparent: true
         })}
       >
+        <Tab.Screen name="Home" component={HomeScreen} /> 
         <Tab.Screen name="Map" component={MapScreen} /> 
         <Tab.Screen name="List" component={ListScreen} /> 
-        <Tab.Screen name="Home" component={HomeScreen} /> 
         <Tab.Screen name="Saved" component={SavedScreen} /> 
-        <Tab.Screen name="Settings" component={SettingsScreen} /> 
+        {/* <Tab.Screen name="Settings" component={SettingsScreen} />  */}
       </Tab.Navigator>
       </NavigationContainer>
       </LocationContext.Provider>

@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { LocationContext } from "../App";
+import { LocationContext } from "../util/globalvars";
+
 
 export const AddressInput: React.FC = () => {
     const [input, setInput] = useState('');

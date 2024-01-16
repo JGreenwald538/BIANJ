@@ -1,3 +1,4 @@
+import { useTheme } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "native-base";
 import React, { useEffect } from "react";
@@ -18,7 +19,6 @@ import {
 } from "react-native";
 const { width, height } = Dimensions.get("window");
 import Ionicons from "react-native-vector-icons/Ionicons";
-const colorScheme = Appearance.getColorScheme();
 
 
 interface PlaceProps extends React.ComponentPropsWithoutRef<typeof View> {
@@ -48,6 +48,8 @@ const Place: React.FC<PlaceProps> = ({
   const [expanded, setExpanded] = React.useState(false);
   const [expandedText, setExpandedText] = React.useState(false);
   const rotAnim = React.useRef(new Animated.Value(0)).current;
+  const {colors} = useTheme();
+  const colorScheme = colors.background === "white" ? "light" : "dark";
   const styles = StyleSheet.create({
     container: {
       flexDirection: "column",

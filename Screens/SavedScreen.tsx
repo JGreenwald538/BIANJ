@@ -5,9 +5,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Checkbox from "../components/Checkbox";
 import { RadioButton } from 'react-native-paper';
 import { AddressInput } from "../components/AddressInput";
-import { LocationContext } from "../App";
+import { LocationContext } from "../util/globalvars";
 import LogoTitle from "../components/LogoTitle";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useTheme } from "@react-navigation/native";
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -41,8 +41,9 @@ export default function SavedScreen() {
   const [categories, setCategories] = useState([]);
   const [sortByEnabled, setSortByEnabled] = useState("");
   const [places, setPlaces] = useState([]);
-  
-  
+  const {colors} = useTheme();
+  const colorScheme = colors.background === "white" ? "light" : "dark";
+
   const onPressFilters = () => {
     // Configure the animation before the state changes.
     if(!sortByExpanded) {
@@ -118,6 +119,22 @@ export default function SavedScreen() {
       <ScrollView>
         <Place invisible />
         {places}
+        <View style={{paddingHorizontal: 40}}>
+          <TouchableOpacity style={{backgroundColor: '#572c5f',
+                  width: "100%",
+                  height: 45,
+                  justifyContent: "center",
+                  borderRadius: 10,
+                  }} onPress={async () => {
+                  await AsyncStorage.clear()
+                  alert("Cleared");            
+              }}>
+              <Text style={{textAlign: 'center',
+              fontSize: 18,
+              fontWeight: '500',
+              color: 'white',}}>Clear Saved</Text>
+            </TouchableOpacity>
+        </View>
       </ScrollView>
       <Animated.ScrollView
                 style={{
@@ -126,7 +143,7 @@ export default function SavedScreen() {
                     right: 20,
                     width: screenWidth - 40, // 'auto' to fit content, or you could calculate the width based on the content size
                     height: '50%', // Same as width, 'auto' or a calculated value
-                    backgroundColor: '#e2cbe7',
+                    backgroundColor: "white",
                     borderRadius: 10,
                     shadowColor: '#171717',
                     shadowOffset: {width: -2, height: 4},
@@ -170,7 +187,7 @@ export default function SavedScreen() {
                 right: filtersExpanded ? (0.07 * screenWidth) : 40,
                 width: 'auto', // 'auto' to fit content, or you could calculate the width based on the content size
                 height: 'auto', // Same as width, 'auto' or a calculated value
-                backgroundColor: 'rgb(255, 255, 255)',
+                backgroundColor: colorScheme === "light" ? '#e2cbe7' : "white",
                 paddingHorizontal: (filtersExpanded ? 5 : 10),
                 borderRadius: (filtersExpanded ? 50 : 15),
                 borderColor: '#572C5F',
@@ -189,7 +206,7 @@ export default function SavedScreen() {
                     top: 0.14 * screenHeight,
                     right: 20,
                     width: screenWidth - 40, // 'auto' to fit content, or you could calculate the width based on the content size, // Same as width, 'auto' or a calculated value
-                    backgroundColor: '#e2cbe7',
+                    backgroundColor: "white",
                     borderRadius: 10,
                     shadowColor: '#171717',
                     shadowOffset: {width: -2, height: 4},
@@ -232,7 +249,7 @@ export default function SavedScreen() {
               left: sortByExpanded ? (0.86 * screenWidth) : 40,
               // remove the right property
               height: 'auto',
-              backgroundColor: 'rgb(255, 255, 255)',
+              backgroundColor: colorScheme === "light" ? '#e2cbe7' : "white",
               paddingHorizontal: (sortByExpanded ? 5 : 10),
               borderRadius: (sortByExpanded ? 50 : 15),
               borderColor: '#572C5F',

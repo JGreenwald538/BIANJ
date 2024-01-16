@@ -2,13 +2,59 @@ import * as React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Linking, Appearance } from 'react-native';
 import LogoTitle from '../components/LogoTitle';
 import Carousel from '../components/Carousel';
+// import { ColorScheme } from "../util/globalvars";
+// const colorScheme = React.useContext(ColorScheme);
+import { useTheme } from '@react-navigation/native';
+
 
 const screenWidth = Dimensions.get('window').width;
 
-const colorScheme = Appearance.getColorScheme();
+
 
 
 export default function HomeScreen() {
+  const {colors} = useTheme();
+  const colorScheme = colors.background === "white" ? "light" : "dark";
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    header: {
+      alignItems: 'center', // Center items horizontally in the container
+      justifyContent: 'center', // Center items vertically in the container
+      flex: 3, // You can adjust the height as needed
+    },
+    title: {
+      // Styles for the title
+      marginTop: 100,
+      color: colorScheme !== "dark" ? "black" : "white",
+      fontSize: 0.05 * screenWidth,
+      textAlign: 'center',
+      fontWeight: 'bold',
+    },
+    menu: {
+      alignItems: 'center', // Center menu items horizontally
+      flex: 1,
+      paddingHorizontal: 40,
+      justifyContent: 'center', // Center menu items vertically
+    },
+    menuItem: {
+      // Styles for menu items
+      backgroundColor: '#572c5f',
+      width: "100%",
+      height: "70%",
+      justifyContent: "center",
+      borderRadius: 10,
+    },
+    menuText: {
+      // Styles for text inside menu items
+      textAlign: 'center',
+      fontSize: 18,
+      fontWeight: '500',
+      color: 'white',
+    },
+    // Add any additional styles you might need
+  });
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -60,43 +106,3 @@ export default function HomeScreen() {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    alignItems: 'center', // Center items horizontally in the container
-    justifyContent: 'center', // Center items vertically in the container
-    flex: 3, // You can adjust the height as needed
-  },
-  title: {
-    // Styles for the title
-    marginTop: 100,
-    color: colorScheme !== "dark" ? "black" : "white",
-    fontSize: 0.05 * screenWidth,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  menu: {
-    alignItems: 'center', // Center menu items horizontally
-    flex: 1,
-    paddingHorizontal: 40,
-    justifyContent: 'center', // Center menu items vertically
-  },
-  menuItem: {
-    // Styles for menu items
-    backgroundColor: '#572c5f',
-    width: "100%",
-    height: "70%",
-    justifyContent: "center",
-    borderRadius: 10,
-  },
-  menuText: {
-    // Styles for text inside menu items
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '500',
-    color: 'white',
-  },
-  // Add any additional styles you might need
-});

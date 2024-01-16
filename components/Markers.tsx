@@ -3,9 +3,6 @@ import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-import * as Location from 'expo-location';
-import { useContext } from 'react';
-import { LocationContext } from '../App';
 
 const colors: string[] = [
   "red",

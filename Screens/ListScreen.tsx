@@ -2,12 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { Animated, Dimensions, ScrollView, TouchableOpacity, View, Text, LayoutAnimation, Platform } from "react-native";
 import { API_URL } from "../constants";
 import { Place, PlaceList } from "../components/Place";
-import { LocationContext } from "../App";
+import { LocationContext } from "../util/globalvars";
 import Checkbox  from "../components/Checkbox";
 import { RadioButton } from 'react-native-paper';
 import { AddressInput } from "../components/AddressInput";
 import LogoTitle from "../components/LogoTitle";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useTheme } from "@react-navigation/native";
+
 
 const sortBys = [
   "Alphabetical",
@@ -15,7 +16,6 @@ const sortBys = [
   "Distance"
 ];
 
-const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -44,6 +44,8 @@ export default function ListScreen(sortBy: object | string= "") {
     const [nextCategory, setNextCategory] = useState(0);
     const [categories, setCategories] = useState([]);
     const [places, setPlaces] = useState([]);
+    const {colors} = useTheme();
+    const colorScheme = colors.background === "white" ? "light" : "dark";
 
     const onPressFilters = () => {
       // Configure the animation before the state changes.
@@ -147,7 +149,7 @@ export default function ListScreen(sortBy: object | string= "") {
                     right: 20,
                     width: screenWidth - 40, // 'auto' to fit content, or you could calculate the width based on the content size
                     height: '50%', // Same as width, 'auto' or a calculated value
-                    backgroundColor: '#e2cbe7',
+                    backgroundColor: "white" ,
                     borderRadius: 10,
                     shadowColor: '#171717',
                     shadowOffset: {width: -2, height: 4},
@@ -156,7 +158,7 @@ export default function ListScreen(sortBy: object | string= "") {
                     display: filtersExpanded ? "flex" : 'none',
                     borderColor: 'black',
                     borderWidth:  2,
-                    opacity: 0.9,
+                    opacity: 0.95,
                 }}
                 persistentScrollbar
             >
@@ -191,7 +193,7 @@ export default function ListScreen(sortBy: object | string= "") {
                 right: filtersExpanded ? (0.07 * screenWidth) : 40,
                 width: 'auto', // 'auto' to fit content, or you could calculate the width based on the content size
                 height: 'auto', // Same as width, 'auto' or a calculated value
-                backgroundColor: 'rgb(255, 255, 255)',
+                backgroundColor: colorScheme === "light" ? '#e2cbe7' : "white",
                 paddingHorizontal: (filtersExpanded ? 5 : 10),
                 borderRadius: (filtersExpanded ? 50 : 15),
                 borderColor: '#572C5F',
@@ -210,7 +212,7 @@ export default function ListScreen(sortBy: object | string= "") {
                     top: '14%',
                     right: 20,
                     width: screenWidth - 40, // 'auto' to fit content, or you could calculate the width based on the content size, // Same as width, 'auto' or a calculated value
-                    backgroundColor: '#e2cbe7',
+                    backgroundColor: 'white',
                     borderRadius: 10,
                     shadowColor: '#171717',
                     shadowOffset: {width: -2, height: 4},
@@ -219,7 +221,7 @@ export default function ListScreen(sortBy: object | string= "") {
                     display: sortByExpanded ? "flex" : 'none',
                     borderColor: 'black',
                     borderWidth:  2,
-                    opacity: 0.9,
+                    opacity: 0.95,
                 }}
             >
             <View style={{flex: 1}}>
@@ -253,7 +255,7 @@ export default function ListScreen(sortBy: object | string= "") {
                 left: sortByExpanded ? (0.86 * screenWidth) : 40,
                 // remove the right property
                 height: 'auto',
-                backgroundColor: 'rgb(255, 255, 255)',
+                backgroundColor: colorScheme === "light" ? '#e2cbe7' : "white",
                 paddingHorizontal: (sortByExpanded ? 5 : 10),
                 borderRadius: (sortByExpanded ? 50 : 15),
                 borderColor: '#572C5F',

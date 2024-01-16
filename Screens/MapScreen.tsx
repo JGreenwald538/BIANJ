@@ -1,17 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Animated, Dimensions, ScrollView, TouchableOpacity, View, Text, Image, LayoutAnimation, ActivityIndicator, Appearance } from "react-native";
+import { Animated, Dimensions, ScrollView, TouchableOpacity, View, Text, Image, LayoutAnimation, ActivityIndicator, Appearance, KeyboardAvoidingView } from "react-native";
 import { API_URL } from "../constants";
 import MapView, { Circle, Marker } from "react-native-maps";
 import Markers from "../components/Markers";
 import Slider from "../components/MileSlider";
 import Checkbox from "../components/Checkbox";
 import ClosestLocations  from "../components/ClosestLocations";
-import { LocationContext } from "../App";
+import { LocationContext } from "../util/globalvars";
 import { AddressInput } from "../components/AddressInput";
 import LogoTitle from "../components/LogoTitle";
 import { StatusBar, Platform } from 'react-native';
 import Ionicons from "react-native-vector-icons/Ionicons";
-const colorScheme = Appearance.getColorScheme();
 let hasNotch = false;
 
 if (Platform.OS === 'android') {
@@ -43,6 +42,8 @@ export default function MapScreen() {
     const [nextCategory, setNextCategory] = useState(0);
     const [bottomBarExpanded, setBottomBarExpanded] = useState(true);
     const rotAnim = React.useRef(new Animated.Value(1)).current;
+    const [bottomBarHeight, setBottomBarHeight] = useState(0);
+
 
     const handleClose = () => {
       setBottomBarExpanded(!bottomBarExpanded);
@@ -100,8 +101,10 @@ export default function MapScreen() {
   
 
     return (
-      <View
+      <KeyboardAvoidingView
       style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         <MapView
           style={{
@@ -146,7 +149,9 @@ export default function MapScreen() {
         />
           }
         </MapView>
-        {bottomBarExpanded && <View style={{paddingBottom: 10}}>
+        {bottomBarExpanded && <View style={{paddingBottom: 10}} onLayout={(event) => {
+          setBottomBarHeight(event.nativeEvent.layout.height);
+        } }>
           {/* @ts-ignore */}
           {currentLocation[0] && <Slider
             isEnabled={isEnabled}
@@ -169,7 +174,7 @@ export default function MapScreen() {
                     right: 20,
                     width: screenWidth - 40, // 'auto' to fit content, or you could calculate the width based on the content size
                     height: '50%', // Same as width, 'auto' or a calculated value
-                    backgroundColor: '#e2cbe7',
+                    backgroundColor: 'white',
                     borderRadius: 10,
                     shadowColor: '#171717',
                     shadowOffset: {width: -2, height: 4},
@@ -220,7 +225,7 @@ export default function MapScreen() {
                           right: filtersExpanded ? 20 + (0.01 * screenWidth) : (0.08 * screenWidth),
                           width: 'auto', // 'auto' to fit content, or you could calculate the width based on the content size
                           height: 'auto', // Same as width, 'auto' or a calculated value
-                          backgroundColor: !filtersExpanded ? 'rgba(255, 255, 255, 0.75)' : "#e2cbe7",
+                          backgroundColor: 'rgba(255, 255, 255, 0.75)',
                           paddingHorizontal: (filtersExpanded ? 5 : 10),
                           borderRadius: (filtersExpanded ? 50 : 15),
                           borderColor: '#572C5F',
@@ -240,7 +245,7 @@ export default function MapScreen() {
             style={{
               position: "absolute",
               right: 10,
-              bottom: bottomBarExpanded ? 300 : 5,
+              bottom: bottomBarExpanded ? bottomBarHeight + 5 : 5,
               transform: [
                 {
                   rotate: rotAnim.interpolate({
@@ -269,10 +274,10 @@ export default function MapScreen() {
               <Image
                 source={require('../assets/logos/ArrowIcon.png')}
                 alt={"logo"}
-                style={{ height: 25, resizeMode: "contain", width: 25 }}
+                style={{ height: 25, resizeMode: "contain", width: 25, borderRadius: 50, }}
               />
             </TouchableOpacity>
           </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     );
   }
