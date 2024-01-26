@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 
 // Define a type for the location objects
@@ -32,6 +32,22 @@ const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): nu
 };
 
 const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ locations, currentLocation, categories }) => {
+    const {colors} = useTheme();
+    const colorScheme = colors.background === "white" ? "light" : "dark";
+    const styles = StyleSheet.create({
+        container: {
+          backgroundColor: colorScheme === "light" ? '#e2cbe7' : "#70387a", // 
+          marginHorizontal: 20,
+          borderRadius: 10,
+          padding: 10,
+          marginTop: 15,
+          alignContent: 'center',
+          justifyContent: "space-between",
+          display: 'flex',
+          width: 'auto',
+          flexDirection: 'column',
+        },
+    });
     const navigation = useNavigation();
     if(!currentLocation[0] || !locations) {
         return null;
@@ -50,14 +66,14 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
         .slice(0, 3); // Get top 3 locations
     return (
         <View style={styles.container}>
-            <Text style={{textAlign: "center", fontWeight: "600"}}>Closest Locations</Text>
+            <Text style={{textAlign: "center", fontWeight: "600", color: colorScheme === "light" ? "black" : "white"}}>Closest Locations</Text>
             {sortedLocations.length > 0 ? (
                 sortedLocations.map((location, index) => (
                     // @ts-ignore
                     <Text key={index} style={{textAlign: "center"}}>{index+1}. {location.name}: ({Math.round(location.distance.toFixed(2))} mi)</Text>
                 ))
             ) : (
-                <Text style={{textAlign: "center"}}>No locations provided</Text>
+                <Text style={{textAlign: "center", color: colorScheme === "light" ? "black" : "white"}}>No locations provided</Text>
             )}
             <View style={{ paddingHorizontal: 10, paddingVertical: 5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <TouchableOpacity 
@@ -74,19 +90,5 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#e2cbe7',
-        marginHorizontal: 20,
-        borderRadius: 10,
-        padding: 10,
-        marginTop: 15,
-        alignContent: 'center',
-        justifyContent: 'flex-start',
-        display: 'flex',
-        flexDirection: 'column', // Changed to column for better display of multiple locations
-    },
-});
 
 export default ClosestLocationComponent;

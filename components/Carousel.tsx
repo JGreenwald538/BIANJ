@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 interface CarouselItem {
     title: string;
@@ -28,7 +28,7 @@ const carouselImages: Record<number, any> = {
     // Add more images as needed
 };
 
-const scale = 0.53;
+const scale = 0.3;
 
 export default class App extends React.Component<{}, AppState> {
     
@@ -67,8 +67,8 @@ export default class App extends React.Component<{}, AppState> {
     _renderItem = ({ index }: { index: number }) => {
         return (
             <View style={{
-                height: screenWidth * scale, 
-                width: screenWidth * scale,
+                height: screenHeight * scale, 
+                width: screenHeight * scale,
                 overflow: 'hidden',
             }}>
                 <Image
@@ -76,8 +76,8 @@ export default class App extends React.Component<{}, AppState> {
                     style={{ 
                         resizeMode: "stretch",
                         borderRadius: 20,
-                        width: screenWidth * scale,
-                        height: screenWidth * scale
+                        width: screenHeight * scale,
+                        height: screenHeight * scale
                     }}
                 />
             </View>
@@ -93,7 +93,7 @@ export default class App extends React.Component<{}, AppState> {
                         ref={this.carousel}
                         data={this.state.carouselItems}
                         sliderWidth={screenWidth}
-                        itemWidth={screenWidth * scale}
+                        itemWidth={screenHeight * scale}
                         renderItem={this._renderItem}
                         onSnapToItem={index => this.setState({ activeIndex: index })} 
                         vertical={false}

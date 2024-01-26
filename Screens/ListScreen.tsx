@@ -2,12 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { Animated, Dimensions, ScrollView, TouchableOpacity, View, Text, LayoutAnimation, Platform } from "react-native";
 import { API_URL } from "../constants";
 import { Place, PlaceList } from "../components/Place";
-import { LocationContext } from "../util/globalvars";
+import { LocationContext, PlacesContext } from "../util/globalvars";
 import Checkbox  from "../components/Checkbox";
 import { RadioButton } from 'react-native-paper';
 import { AddressInput } from "../components/AddressInput";
 import LogoTitle from "../components/LogoTitle";
 import { useFocusEffect, useTheme } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 const sortBys = [
@@ -18,9 +19,9 @@ const sortBys = [
 
 const screenHeight = Dimensions.get('window').height;
 
+
 const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-  // Haversine formula to calculate the distance
-  const R = 6371; // Radius of the Earth in km
+  const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
   const a = 
@@ -28,14 +29,13 @@ const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): nu
       Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c / 1.609; // Distance in mi
+  return R * c / 1.609;
 };
 
-export default function ListScreen(sortBy: object | string= "") {
+export default function ListScreen(sortBy: any = "") {
     const empty: any[] = []
     const [data, setData] = useState(empty);
-    const [values, setValues] = useState([]);
-    // @ts-ignore
+    const values = useContext(PlacesContext);
     const [sortByEnabled, setSortByEnabled] = useState(sortBy.route.params ? sortBy.route.params.sortBy : "");
     const currentLocation = useContext(LocationContext);
     const [filtersExpanded, setFiltersExpanded] = useState(false);
@@ -46,6 +46,8 @@ export default function ListScreen(sortBy: object | string= "") {
     const [places, setPlaces] = useState([]);
     const {colors} = useTheme();
     const colorScheme = colors.background === "white" ? "light" : "dark";
+    const insets = useSafeAreaInsets();
+
 
     const onPressFilters = () => {
       // Configure the animation before the state changes.
@@ -64,24 +66,6 @@ export default function ListScreen(sortBy: object | string= "") {
     };
 
     const screenWidth = Dimensions.get('window').width;  
-    
-    useEffect(() => {
-      async function fetchData() {
-        try {
-          const res = await fetch(API_URL, { method: "GET" });
-          const text = await res.text();
-          const parsedData = JSON.parse(text);
-          if (parsedData && parsedData.length > 0) {
-            setValues(parsedData);
-          } else {
-            console.error("Parsed data is empty or not an array:", parsedData);
-          }
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-        }
-      }
-      fetchData();
-    }, []);
     
     useEffect(() => {
       const sortData = async () => {
@@ -178,6 +162,7 @@ export default function ListScreen(sortBy: object | string= "") {
                       setCategoriesEnabled(newCategoriesEnabled);
                     }} // Pass the negated value of `isEnabled`
                     color={"#572C5F"}
+                    alt= {category + " Checkbox"}
                   />
                   <Text style={{fontSize: 18, paddingLeft: 2, paddingTop: 1}}>{category}</Text>
                 </View>
@@ -189,12 +174,12 @@ export default function ListScreen(sortBy: object | string= "") {
           style={[
               {
                 position: 'absolute',
-                top: filtersExpanded ? (0.15 * screenHeight) : (0.07 * screenHeight),
+                top: filtersExpanded ? (0.15 * screenHeight) : (insets.top + screenHeight * 0.01),
                 right: filtersExpanded ? (0.07 * screenWidth) : 40,
                 width: 'auto', // 'auto' to fit content, or you could calculate the width based on the content size
                 height: 'auto', // Same as width, 'auto' or a calculated value
                 backgroundColor: colorScheme === "light" ? '#e2cbe7' : "white",
-                paddingHorizontal: (filtersExpanded ? 5 : 10),
+                paddingHorizontal: (filtersExpanded ? 5 : 15),
                 borderRadius: (filtersExpanded ? 50 : 15),
                 borderColor: '#572C5F',
                 borderWidth: filtersExpanded ? 2: 0,
@@ -202,7 +187,8 @@ export default function ListScreen(sortBy: object | string= "") {
               },
           ]}
           >
-          <Text style={{ fontSize: filtersExpanded ? 25 : 19, color: '#572C5F', position: 'relative', lineHeight: filtersExpanded ? 25 : 30 , textAlign: 'center'
+          <Text accessibilityLabel={filtersExpanded ? "Close Button" : "Filters Button"}
+            style={{ fontSize: filtersExpanded ? 25 : 19, color: '#572C5F', position: 'relative', lineHeight: filtersExpanded ? 25 : 30 , textAlign: 'center'
               }}>{filtersExpanded ? "×" : "Filters"}
           </Text>
         </TouchableOpacity>}
@@ -251,12 +237,11 @@ export default function ListScreen(sortBy: object | string= "") {
           style={[
               {
                 position: 'absolute',
-                top: sortByExpanded ? 0.15 * screenHeight : 0.07 * screenHeight,
+                top: sortByExpanded ? 0.15 * screenHeight : (insets.top + screenHeight * 0.01),
                 left: sortByExpanded ? (0.86 * screenWidth) : 40,
-                // remove the right property
                 height: 'auto',
                 backgroundColor: colorScheme === "light" ? '#e2cbe7' : "white",
-                paddingHorizontal: (sortByExpanded ? 5 : 10),
+                paddingHorizontal: (sortByExpanded ? 5 : 15),
                 borderRadius: (sortByExpanded ? 50 : 15),
                 borderColor: '#572C5F',
                 borderWidth: sortByExpanded ? 2: 0,
@@ -264,7 +249,8 @@ export default function ListScreen(sortBy: object | string= "") {
               },
           ]}
           >
-          <Text style={{ fontSize: sortByExpanded ? 25 : 19, color: '#471f7d', lineHeight: sortByExpanded ? 25 : 30 , textAlign: 'center'
+          <Text accessibilityLabel={sortByExpanded ? "Close Button" : "Sort By Buttons"}
+          style={{ fontSize: sortByExpanded ? 25 : 19, color: '#471f7d', lineHeight: sortByExpanded ? 25 : 30 , textAlign: 'center'
               }}>{sortByExpanded ? "×" : "Sort By"}
           </Text>
         </TouchableOpacity>}

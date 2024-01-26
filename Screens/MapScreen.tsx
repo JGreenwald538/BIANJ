@@ -6,19 +6,13 @@ import Markers from "../components/Markers";
 import Slider from "../components/MileSlider";
 import Checkbox from "../components/Checkbox";
 import ClosestLocations  from "../components/ClosestLocations";
-import { LocationContext } from "../util/globalvars";
+import { LocationContext, PlacesContext } from "../util/globalvars";
 import { AddressInput } from "../components/AddressInput";
 import LogoTitle from "../components/LogoTitle";
-import { StatusBar, Platform } from 'react-native';
-import Ionicons from "react-native-vector-icons/Ionicons";
-let hasNotch = false;
+import { Platform } from 'react-native';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+const screenHeight = Dimensions.get('window').height;
 
-if (Platform.OS === 'android') {
-  // @ts-ignore
-  hasNotch = StatusBar.currentHeight > 24;
-} else {
-  hasNotch = Dimensions.get('window').height > 800;
-}
 
 const colors: string[] = [
   "red",
@@ -29,7 +23,7 @@ const colors: string[] = [
 ];
 
 export default function MapScreen() {
-    const [data, setData] = useState([]);
+    const data = useContext(PlacesContext);
     const [sliderValue, setSliderValue] = useState<number>(0);
     const currentLocation = useContext(LocationContext);
     // @ts-ignore
@@ -43,6 +37,7 @@ export default function MapScreen() {
     const [bottomBarExpanded, setBottomBarExpanded] = useState(true);
     const rotAnim = React.useRef(new Animated.Value(1)).current;
     const [bottomBarHeight, setBottomBarHeight] = useState(0);
+    const insets = useSafeAreaInsets();
 
 
     const handleClose = () => {
@@ -63,24 +58,7 @@ export default function MapScreen() {
         setIsEnabled(!isEnabled);
       }
     };
-  
-    useEffect(() => {
-      async function fetchData() {
-        try {
-          const res = await fetch(API_URL, { method: "GET" });
-          const text = await res.text();
-          const parsedData = JSON.parse(text);
-          if (parsedData && parsedData.length > 0) {
-            setData(parsedData);
-          } else {
-            console.error("Parsed data is empty or not an array:", parsedData);
-          }
-        } catch (error) {
-          console.error("Error parsing JSON:", error);
-        }
-      }
-      fetchData();
-    }, []);
+
     const onPress = () => {
         // Configure the animation before the state changes.
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -211,6 +189,7 @@ export default function MapScreen() {
                       setCategoriesEnabled(newCategoriesEnabled);
                   }} // Pass the negated value of `isEnabled`
                   color={colors[categoriesEnabled.indexOf(category)]}
+                  alt= {category + " Checkbox"}
                 />
                 <Text style={{fontSize: 18, paddingLeft: 2, paddingTop: 1}}>{category}</Text>
               </View>
@@ -221,7 +200,7 @@ export default function MapScreen() {
                     style={[
                         {
                           position: 'absolute',
-                          top: filtersExpanded ? "15%" : (hasNotch ? "8%" : "4%"),
+                          top: filtersExpanded ? "15%" : (insets.top + screenHeight * 0.01),
                           right: filtersExpanded ? 20 + (0.01 * screenWidth) : (0.08 * screenWidth),
                           width: 'auto', // 'auto' to fit content, or you could calculate the width based on the content size
                           height: 'auto', // Same as width, 'auto' or a calculated value
@@ -233,7 +212,8 @@ export default function MapScreen() {
                         },
                     ]}
                     >
-                    <Text style={{ fontSize: filtersExpanded ? 25 : 19, color: '#572C5F', position: 'relative', lineHeight: filtersExpanded ? 25 : 30 , textAlign: 'center'
+                    <Text accessibilityLabel={filtersExpanded ? "Close Button" : "Filters Button"}
+                    style={{ fontSize: filtersExpanded ? 25 : 19, color: '#572C5F', position: 'relative', lineHeight: filtersExpanded ? 25 : 30 , textAlign: 'center'
                         }}>{filtersExpanded ? "×" : "Filters"}
                     </Text>
         </TouchableOpacity>}
@@ -246,6 +226,7 @@ export default function MapScreen() {
               position: "absolute",
               right: 10,
               bottom: bottomBarExpanded ? bottomBarHeight + 5 : 5,
+              
               transform: [
                 {
                   rotate: rotAnim.interpolate({
@@ -258,16 +239,11 @@ export default function MapScreen() {
           >
             <TouchableOpacity
               onPress={() => {
-                setBottomBarExpanded(!bottomBarExpanded);
-                Animated.timing(rotAnim, {
-                  toValue: +!bottomBarExpanded,
-                  duration: 150,
-                  useNativeDriver: true,
-                }).start();
-                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                handleClose();
               }}
               style={{
-                opacity: 0.8
+                opacity: 0.8,
+                zIndex: -4
               }}
               activeOpacity={1}
             >

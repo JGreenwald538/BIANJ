@@ -1,22 +1,24 @@
 import { useTheme } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Image, Dimensions } from 'react-native';
-let hasNotch = false;
-
-hasNotch = Dimensions.get('window').height > 800;
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
-const screenWidth = Dimensions.get('window').width;
+let screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 export default function LogoTitle() {
+  const [insets, setInsets] = React.useState(useSafeAreaInsets());
   const {colors} = useTheme();
   const colorScheme = colors.background === "white" ? "light" : "dark";
+  useEffect(() => {
+    screenWidth = Dimensions.get('window').width;
+  });
   return (
-    <View style={{ flex: 1, alignItems: 'center', position: 'absolute', top: (hasNotch ? screenHeight * 0.07 : screenHeight * 0.04), left: 0.5 * screenWidth - 20 }}>
+    <View style={{ flex: 1, alignItems: 'center', position: 'absolute', top: insets.top, left: 0.5 * screenWidth - 20 }}>
       <Image
         source={colorScheme === "light" ? require('../assets/BIANJLogo.png') : require('../assets/BIANJLogoHeader.png')}
-        alt={"logo"}
+        alt={"Brain Injury Alliance of New Jersey Logo"}
         style={{ height: 50, resizeMode: "contain", width: 50 }}
       />
     </View>

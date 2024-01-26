@@ -1,4 +1,3 @@
-import { color } from 'native-base/lib/typescript/theme/styled-system';
 import React, { useState } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -8,9 +7,10 @@ interface CheckboxProps {
   isChecked: boolean;
   onCheck: () => void;
   color: string;
+  alt: string;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({ isChecked, onCheck, color }) => {
+const Checkbox: React.FC<CheckboxProps> = ({ isChecked, onCheck, color, alt }) => {
   const iconName = isChecked ? 'checkbox' : 'square-outline'; // Ionicons names for checked/unchecked
 
   return (
@@ -19,6 +19,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ isChecked, onCheck, color }) => {
         name={iconName}
         size={24}
         color={isChecked ? color : 'grey'}
+        accessibilityLabel={alt}
       />
     </TouchableOpacity>
   );

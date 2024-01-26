@@ -11,8 +11,10 @@ import SavedScreen from "./Screens/SavedScreen";
 import SettingsScreen from "./Screens/SettingsScreen";
 import { getCurrentLocation } from "./lib/location";
 import { Image, Platform, UIManager, Appearance, useColorScheme } from "react-native";
-import { LocationContext } from "./util/globalvars";
+import { LocationContext, PlacesContext } from "./util/globalvars";
 import { color } from "native-base/lib/typescript/theme/styled-system";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
+import { API_URL } from "./constants";
 
 
 SplashScreen.preventAutoHideAsync();
@@ -49,15 +51,33 @@ export default function App() {
   const [location, setLocation] = React.useState<{lat: number, long: number} | null>(null);
   const [isRealLocation, setIsRealLocation] = React.useState<boolean>(true);
   const colorScheme = useColorScheme();
+  const [places, setPlaces] = React.useState<any[]>([]);
   useEffect(() => {
-    // Function to update the location and color scheme
     const updateState = async () => {
       setLocation(await getCurrentLocation());
     };
     updateState();
   }, []);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch(API_URL, { method: "GET" });
+        const text = await res.text();
+        const parsedData = JSON.parse(text);
+        if (parsedData && parsedData.length > 0) {
+          setPlaces(parsedData);
+        } else {
+          console.error("Parsed data is empty or not an array:", parsedData);
+        }
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+      }
+    }
+    fetchData();
+  }, []);
   return (
-    
+    <SafeAreaProvider style={{backgroundColor: colorScheme === "dark" ? "black" : "white"}}>
+    <PlacesContext.Provider value={places}>
     <LocationContext.Provider value={[location, setLocation, isRealLocation, setIsRealLocation]}>
     <NavigationContainer theme={colorScheme === "light" ? lightTheme : darkTheme}>
       <Tab.Navigator
@@ -66,7 +86,7 @@ export default function App() {
             if (route.name === "Home") {
               return (
                 <Image
-                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon2.png") : require("./assets/logos/icon2black.png")) : require("./assets/logos/icon2dark.png")}
+                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon2.png") : require("./assets/logos/icon2purple.png")) : require("./assets/logos/icon2dark.png")}
                   alt={"logo"}
                   style={{ height: size, resizeMode: "contain", width: size }}
                 />
@@ -82,7 +102,7 @@ export default function App() {
             } else if (route.name === "Map") {
               return (
                 <Image
-                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon5.png") : require("./assets/logos/icon5black.png")) : require("./assets/logos/icon5dark.png")}
+                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon5.png") : require("./assets/logos/icon5purple.png")) : require("./assets/logos/icon5dark.png")}
                   alt={"logo"}
                   style={{ height: size, resizeMode: "contain", width: size }}
                 />
@@ -90,7 +110,7 @@ export default function App() {
             } else if (route.name === "List") {
               return (
                 <Image
-                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon4.png") : require("./assets/logos/icon4black.png")) : require("./assets/logos/icon4dark.png")}
+                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon4.png") : require("./assets/logos/icon4purple.png")) : require("./assets/logos/icon4dark.png")}
                   alt={"logo"}
                   style={{ height: size, resizeMode: "contain", width: size }}
                 />
@@ -98,7 +118,7 @@ export default function App() {
             } else if (route.name === "Saved") {
               return (
                 <Image
-                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon7.png") : require("./assets/logos/icon7black.png")) : require("./assets/logos/icon7dark.png")}
+                  source={focused ? (colorScheme === "dark" ? require("./assets/logos/icon7.png") : require("./assets/logos/icon7purple.png")) : require("./assets/logos/icon7dark.png")}
                   alt={"logo"}
                   style={{ height: size, resizeMode: "contain", width: size }}
                 />
@@ -106,7 +126,7 @@ export default function App() {
             }
           },
           tabBarInactiveTintColor: "#63666a",
-          tabBarActiveTintColor: colorScheme !== "dark" ? "black" : "white",
+          tabBarActiveTintColor: colorScheme !== "dark" ? "#572c5f" : "white",
           headerShown: false,
           // tabBarActiveBackgroundColor: "#572C5F",
           // tabBarInactiveBackgroundColor: "#572C5F",
@@ -115,13 +135,15 @@ export default function App() {
             elevation: 0,
             backgroundColor: colorScheme === "dark" ? "black" : "white",
             height: 60,
-            paddingBottom: 5,
+            paddingBottom: 10,
+            marginBottom: useSafeAreaInsets().bottom,
             paddingHorizontal: 20,
             opacity: 1,
           },
           lazy: true,
           headerTitle: () => <LogoTitle />,
-          headerTransparent: true
+          headerTransparent: true,
+          style: {backgroundColor: colorScheme === "dark" ? "black" : "white"}
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} /> 
@@ -132,5 +154,7 @@ export default function App() {
       </Tab.Navigator>
       </NavigationContainer>
       </LocationContext.Provider>
+      </PlacesContext.Provider>
+      </SafeAreaProvider>
   );
 }

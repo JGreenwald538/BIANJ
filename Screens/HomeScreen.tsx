@@ -8,6 +8,7 @@ import { useTheme } from '@react-navigation/native';
 
 
 const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
 
 
 
@@ -28,9 +29,10 @@ export default function HomeScreen() {
       // Styles for the title
       marginTop: 100,
       color: colorScheme !== "dark" ? "black" : "white",
-      fontSize: 0.05 * screenWidth,
+      fontSize: 0.025 * screenHeight,
       textAlign: 'center',
       fontWeight: 'bold',
+      width: "90%"
     },
     menu: {
       alignItems: 'center', // Center menu items horizontally
@@ -63,7 +65,27 @@ export default function HomeScreen() {
       </View>
 
       <Carousel />
-
+        <View style={styles.menu}>
+          <TouchableOpacity style={styles.menuItem} onPress={async () => {
+            Linking.openURL("https://bianj.org/about-us/");
+          }}>
+            <Text style={styles.menuText}>About Us</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.menu}>
+          <TouchableOpacity style={styles.menuItem} onPress={async () => {
+            Linking.openURL("https://bianj.org/upcoming-events/");
+          }}>
+            <Text style={styles.menuText}>Get Involved</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.menu}>
+          <TouchableOpacity style={styles.menuItem} onPress={async () => {
+            Linking.openURL("https://bianj.org/resources/");
+          }}>
+            <Text style={styles.menuText}>Resources</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.menu}>
           <TouchableOpacity style={styles.menuItem} onPress={async () => {
             Linking.openURL("https://bianj.org/donate/");
@@ -76,27 +98,6 @@ export default function HomeScreen() {
             Linking.openURL("https://bianj.org/contact-us/");
           }}>
             <Text style={styles.menuText}>Contact Us</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem} onPress={async () => {
-            Linking.openURL("https://bianj.org/upcoming-events/");
-          }}>
-            <Text style={styles.menuText}>Get Involved</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem} onPress={async () => {
-            Linking.openURL("https://bianj.org/about-us/");
-          }}>
-            <Text style={styles.menuText}>About Us</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem} onPress={async () => {
-            Linking.openURL("https://bianj.org/resources/");
-          }}>
-            <Text style={styles.menuText}>Resources</Text>
           </TouchableOpacity>
         </View>
         {/* Repeat the above TouchableOpacity for each menu item */}

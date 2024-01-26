@@ -8,6 +8,7 @@ import { AddressInput } from "../components/AddressInput";
 import { LocationContext } from "../util/globalvars";
 import LogoTitle from "../components/LogoTitle";
 import { useFocusEffect, useTheme } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -31,6 +32,8 @@ const sortBys = [
   "Distance"
 ];
 
+const hasNotch = Dimensions.get('window').height > 800;
+
 export default function SavedScreen() {
   const [data, setData] = useState([]);
   const currentLocation = useContext(LocationContext);
@@ -39,10 +42,11 @@ export default function SavedScreen() {
   const [categoriesEnabled, setCategoriesEnabled] = useState([]);
   const [nextCategory, setNextCategory] = useState(0);
   const [categories, setCategories] = useState([]);
-  const [sortByEnabled, setSortByEnabled] = useState("");
+  const [sortByEnabled, setSortByEnabled] = useState("Category");
   const [places, setPlaces] = useState([]);
   const {colors} = useTheme();
   const colorScheme = colors.background === "white" ? "light" : "dark";
+  const insets = useSafeAreaInsets();
 
   const onPressFilters = () => {
     // Configure the animation before the state changes.
@@ -119,7 +123,7 @@ export default function SavedScreen() {
       <ScrollView>
         <Place invisible />
         {places}
-        <View style={{paddingHorizontal: 40}}>
+        {categories.length !== 0 && <View style={{paddingHorizontal: 40}}>
           <TouchableOpacity style={{backgroundColor: '#572c5f',
                   width: "100%",
                   height: 45,
@@ -134,7 +138,7 @@ export default function SavedScreen() {
               fontWeight: '500',
               color: 'white',}}>Clear Saved</Text>
             </TouchableOpacity>
-        </View>
+        </View>}
       </ScrollView>
       <Animated.ScrollView
                 style={{
@@ -172,6 +176,7 @@ export default function SavedScreen() {
                       setCategoriesEnabled(newCategoriesEnabled);
                     }} // Pass the negated value of `isEnabled`
                     color={"#471f7d"}
+                    alt= {category + " Checkbox"}
                   />
                   <Text style={{fontSize: 18, paddingLeft: 2, paddingTop: 1}}>{category}</Text>
                 </View>
@@ -183,12 +188,12 @@ export default function SavedScreen() {
           style={
               {
                 position: 'absolute',
-                top: filtersExpanded ? (0.15 * screenHeight) : (0.07 * screenHeight),
+                top: filtersExpanded ? (0.15 * screenHeight) : (insets.top + screenHeight * 0.01),
                 right: filtersExpanded ? (0.07 * screenWidth) : 40,
                 width: 'auto', // 'auto' to fit content, or you could calculate the width based on the content size
                 height: 'auto', // Same as width, 'auto' or a calculated value
                 backgroundColor: colorScheme === "light" ? '#e2cbe7' : "white",
-                paddingHorizontal: (filtersExpanded ? 5 : 10),
+                paddingHorizontal: (filtersExpanded ? 5 : 15),
                 borderRadius: (filtersExpanded ? 50 : 15),
                 borderColor: '#572C5F',
                 borderWidth: filtersExpanded ? 2: 0,
@@ -196,7 +201,8 @@ export default function SavedScreen() {
               }
           }
           >
-          <Text style={{ fontSize: filtersExpanded ? 25 : 19, color: '#471f7d', position: 'relative', lineHeight: filtersExpanded ? 25 : 30 , textAlign: 'center'
+          <Text accessibilityLabel={filtersExpanded ? "Close Button" : "Filters Button"}
+          style={{ fontSize: filtersExpanded ? 25 : 19, color: '#471f7d', position: 'relative', lineHeight: filtersExpanded ? 25 : 30 , textAlign: 'center'
               }}>{filtersExpanded ? "×" : "Filters"}
           </Text>
         </TouchableOpacity>}
@@ -245,12 +251,12 @@ export default function SavedScreen() {
           style={[
             {
               position: 'absolute',
-              top: sortByExpanded ? 0.15 * screenHeight : 0.07 * screenHeight,
+              top: sortByExpanded ? 0.15 * screenHeight : (insets.top + screenHeight * 0.01),
               left: sortByExpanded ? (0.86 * screenWidth) : 40,
               // remove the right property
               height: 'auto',
               backgroundColor: colorScheme === "light" ? '#e2cbe7' : "white",
-              paddingHorizontal: (sortByExpanded ? 5 : 10),
+              paddingHorizontal: (sortByExpanded ? 5 : 15),
               borderRadius: (sortByExpanded ? 50 : 15),
               borderColor: '#572C5F',
               borderWidth: sortByExpanded ? 2: 0,
@@ -258,7 +264,8 @@ export default function SavedScreen() {
             },
           ]}
         >
-          <Text style={{ fontSize: sortByExpanded ? 25 : 19, color: '#471f7d', lineHeight: sortByExpanded ? 25 : 30, textAlign: 'center', width: "auto", position: 'relative', 
+          <Text accessibilityLabel={sortByExpanded ? "Close Button" : "Sort By Button"}
+          style={{ fontSize: sortByExpanded ? 25 : 19, color: '#471f7d', lineHeight: sortByExpanded ? 25 : 30, textAlign: 'center', width: "auto", position: 'relative', 
               }}>{sortByExpanded ? "×" : "Sort By"}
           </Text>
         </TouchableOpacity>}

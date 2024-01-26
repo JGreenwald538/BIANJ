@@ -1,12 +1,29 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { LocationContext } from "../util/globalvars";
+import { useTheme } from '@react-navigation/native';
 
 
 export const AddressInput: React.FC = () => {
     const [input, setInput] = useState('');
     // @ts-ignore
     const [currentLocation, setCurrentLocation, isRealLocation, setIsRealLocation] = useContext(LocationContext);
+    const {colors} = useTheme();
+    const colorScheme = colors.background === "white" ? "light" : "dark";
+    const styles = StyleSheet.create({
+        container: {
+          backgroundColor: colorScheme === "light" ? '#e2cbe7' : "#70387a", // 
+          marginHorizontal: 20,
+          borderRadius: 10,
+          padding: 10,
+          marginTop: 15,
+          alignContent: 'center',
+          justifyContent: "space-between",
+          display: 'flex',
+          width: 'auto',
+          flexDirection: 'column',
+        },
+    });
 
     const fetchCoordinates = async () => {
         try {
@@ -28,15 +45,15 @@ export const AddressInput: React.FC = () => {
     return (
         <View style={styles.container}>
             <View style={{paddingVertical: 3}}>
-                <Text style={{ fontWeight: '600', textAlign: "center" }}>{"Enter Address"}</Text>
+                <Text style={{ fontWeight: '600', textAlign: "center", color: colorScheme === "light" ? "black" : "white", }}>{"Enter Address"}</Text>
             </View>
             <View>
               <TextInput
                   value={input}
                   onChangeText={setInput}
                   placeholder="Enter an address"
-                  placeholderTextColor={"#6C6C75"}
-                  style={{paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5, borderColor: '#ffffff', borderWidth: 1 }}
+                  placeholderTextColor={colorScheme === "light" ? "black" : "white"}
+                  style={{paddingHorizontal: 10, paddingVertical: 5, borderRadius: 5, borderColor: colorScheme === "light" ? "black" : "white", borderWidth: 1 }}
               />
             </View>
             <View style={{ paddingHorizontal: 10, paddingTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -50,17 +67,4 @@ export const AddressInput: React.FC = () => {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-      backgroundColor: '#e2cbe7',
-      marginHorizontal: 20,
-      borderRadius: 10,
-      padding: 10,
-      marginTop: 15,
-      alignContent: 'center',
-      justifyContent: "space-between",
-      display: 'flex',
-      width: 'auto',
-      flexDirection: 'column',
-    },
-});
+

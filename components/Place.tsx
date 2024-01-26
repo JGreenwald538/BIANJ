@@ -91,6 +91,7 @@ const Place: React.FC<PlaceProps> = ({
       color: "black",
       overflow: "scroll",
       fontWeight: "bold",
+      width: "90%",
     },
     typeText: {
       fontSize: 15,
