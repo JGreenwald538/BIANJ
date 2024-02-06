@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "BIANJ",
+    "slug": "BIANJ",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/BIANJLogoSplash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#572C5F"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.BIANJ"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.anonymous.BIANJ"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "736b222f-dc35-4f78-b81e-2257f244344e"
+      }
+    }
+  }
+}
