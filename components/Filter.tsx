@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import Checkbox from "./Checkbox";
 
+const colors: string[] = ["red", "green", "blue", "yellow", "orange"];
+
 // Define props for the Filter component
 interface FilterProps {
   categories: string[];
@@ -21,6 +23,8 @@ interface FilterProps {
   insets: any;
   update?: boolean;
   setUpdate?: (update: boolean) => void;
+  nextCategory: number;
+  setNextCategory: any;
 }
 
 export const Filter: React.FC<FilterProps> = ({
@@ -35,6 +39,8 @@ export const Filter: React.FC<FilterProps> = ({
   insets,
   update,
   setUpdate,
+  nextCategory,
+  setNextCategory,
 }) => {
   return (
     <>
@@ -75,20 +81,32 @@ export const Filter: React.FC<FilterProps> = ({
                 // @ts-ignore
                 isChecked={categoriesEnabled.indexOf(category) !== -1}
                 onCheck={() => {
-                  // @ts-ignore
                   const newCategoriesEnabled = [...categoriesEnabled];
-                  if (categoriesEnabled.indexOf(category) === -1) {
-                    newCategoriesEnabled.push(category);
-                  } else {
-                    newCategoriesEnabled.splice(
-                      categoriesEnabled.indexOf(category),
-                      1
-                    );
-                  }
-
-                  setCategoriesEnabled(newCategoriesEnabled);
+									if (newCategoriesEnabled.indexOf(category) === -1) {
+										if (
+											nextCategory % 5 ===
+												5 -
+													newCategoriesEnabled.filter((x) => x === "").length ||
+											newCategoriesEnabled.filter((x) => x === "").length === 0
+										) {
+											setNextCategory(nextCategory + 1);
+										} else {
+											setNextCategory(
+												newCategoriesEnabled.filter((x) => x === "").length -
+													(1 % 5)
+											);
+										}
+										newCategoriesEnabled[nextCategory % 5] = category;
+									} else {
+										newCategoriesEnabled[
+											newCategoriesEnabled.indexOf(category)
+										] = "";
+										setNextCategory(categoriesEnabled.indexOf(category));
+									}
+									setCategoriesEnabled(newCategoriesEnabled);
+                  // console.log(categoriesEnabled);
                 }} // Pass the negated value of `isEnabled`
-                color={colorScheme === "light" ? "black" : "white"}
+                color={colors[categoriesEnabled.indexOf(category)]}
                 uncheckedColor={colorScheme === "light" ? "black" : "white"}
                 alt={category + " Checkbox"}
               />

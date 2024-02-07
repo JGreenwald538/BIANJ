@@ -65,30 +65,74 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
         .sort((a, b) => a.distance - b.distance)
         .slice(0, 3); // Get top 3 locations
     return (
-        <View style={styles.container}>
-            <Text style={{textAlign: "center", fontWeight: "600", color: colorScheme === "light" ? "black" : "white"}}>Closest Locations</Text>
-            {sortedLocations.length > 0 ? (
-                sortedLocations.map((location, index) => (
-                    // @ts-ignore
-                    <Text key={index} style={{textAlign: "center"}}>{index+1}. {location.name}: ({Math.round(location.distance.toFixed(2))} mi)</Text>
-                ))
-            ) : (
-                <Text style={{textAlign: "center", color: colorScheme === "light" ? "black" : "white"}}>Select Filters To See Closest Locations</Text>
-            )}
-            <View style={{ paddingHorizontal: 10, paddingVertical: 5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <TouchableOpacity 
-                    style={{ paddingVertical: 5, backgroundColor: "#572C5F", borderRadius: 5 }}
-                    onPress={
-                        () => {
-                            // @ts-ignore
-                           navigation.navigate("List", { sortBy: "Distance" });
-                        }
-                    }>
-                        <Text style={{ color: 'white', textAlign: "center", paddingHorizontal: 5  }} numberOfLines={1}>{"See All"}</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
+			<View style={styles.container}>
+				<Text
+					style={{
+						textAlign: "center",
+						fontWeight: "600",
+						color: colorScheme === "light" ? "black" : "white",
+					}}
+				>
+					Closest Locations
+				</Text>
+				{sortedLocations.length > 0 ? (
+					sortedLocations.map((location, index) => (
+						// @ts-ignore
+						<Text
+							key={index}
+							style={{
+								textAlign: "center",
+								color: colorScheme === "light" ? "black" : "white",
+							}}
+						>
+							{index + 1}. {location.name}: (
+							{Math.round(location.distance.toFixed(2))} mi)
+						</Text>
+					))
+				) : (
+					<Text
+						style={{
+							textAlign: "center",
+							color: colorScheme === "light" ? "black" : "white",
+						}}
+					>
+						Select Filters To See Closest Locations
+					</Text>
+				)}
+				<View
+					style={{
+						paddingHorizontal: 10,
+						paddingVertical: 5,
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+					}}
+				>
+					<TouchableOpacity
+						style={{
+							paddingVertical: 5,
+							backgroundColor: "#572C5F",
+							borderRadius: 5,
+						}}
+						onPress={() => {
+							// @ts-ignore
+							navigation.navigate("List", { sortBy: "Distance" });
+						}}
+					>
+						<Text
+							style={{
+								color: "white",
+								textAlign: "center",
+								paddingHorizontal: 5,
+							}}
+							numberOfLines={1}
+						>
+							{"See All"}
+						</Text>
+					</TouchableOpacity>
+				</View>
+			</View>
+		);
 };
 
 export default ClosestLocationComponent;

@@ -1,7 +1,6 @@
 import React, {createContext, useContext, useEffect} from "react";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import * as SplashScreen from 'expo-splash-screen';
 import MapScreen from "./Screens/MapScreen";
 import HomeScreen from "./Screens/HomeScreen";
@@ -15,6 +14,8 @@ import { LocationContext, PlacesContext, CategoriesContext } from "./util/global
 import { color } from "native-base/lib/typescript/theme/styled-system";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { API_URL } from "./constants";
+import { Ionicons } from "@expo/vector-icons";
+import { useFonts } from "expo-font";
 
 
 SplashScreen.preventAutoHideAsync();
@@ -86,8 +87,16 @@ export default function App() {
     setCategories(tempCategories);
   }, [places])
 
+  // const [loaded] = useFonts({
+	// 	checkbox: require("@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/checkbox.ttf"),
+	// });
+
+	// if (!loaded) {
+	// 	return null;
+	// }
+
   return (
-    <SafeAreaProvider style={{backgroundColor: colorScheme === "dark" ? "black" : "white"}}>
+    // <SafeAreaProvider style={{backgroundColor: colorScheme === "dark" ? "black" : "white"}}>
     <CategoriesContext.Provider value={categories}>
     <PlacesContext.Provider value={places}>
     <LocationContext.Provider value={[location, setLocation, isRealLocation, setIsRealLocation]}>
@@ -163,6 +172,6 @@ export default function App() {
       </LocationContext.Provider>
       </PlacesContext.Provider>
       </CategoriesContext.Provider>
-      </SafeAreaProvider>
+      // </SafeAreaProvider>
   );
 }

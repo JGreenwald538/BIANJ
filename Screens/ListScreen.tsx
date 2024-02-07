@@ -65,6 +65,7 @@ export default function ListScreen(sortBy: any = "") {
 	const colorScheme = colors.background === "white" ? "light" : "dark";
 	const insets = useSafeAreaInsets();
 	const [update, setUpdate] = useState(false);
+	const [nextCategory, setNextCategory] = useState(0);
 
 	const onPressFilters = () => {
 		// Configure the animation before the state changes.
@@ -165,6 +166,8 @@ export default function ListScreen(sortBy: any = "") {
         setUpdate={setUpdate}
         onPressFilters={onPressFilters}
         screenHeight={screenHeight}
+		nextCategory={nextCategory}
+		setNextCategory={setNextCategory}
       />
 			<SortBy
         categories={categories}

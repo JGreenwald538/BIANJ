@@ -4,7 +4,6 @@ import { API_URL } from "../constants";
 import MapView, { Circle, Marker } from "react-native-maps";
 import Markers from "../components/Markers";
 import Slider from "../components/MileSlider";
-import Checkbox from "../components/Checkbox";
 import ClosestLocations  from "../components/ClosestLocations";
 import { LocationContext, PlacesContext } from "../util/globalvars";
 import { AddressInput } from "../components/AddressInput";
@@ -172,7 +171,8 @@ export default function MapScreen() {
           insets={insets}
           screenWidth={screenWidth}
           screenHeight={screenHeight}
-
+          nextCategory={nextCategory}
+          setNextCategory={setNextCategory}
         />
         <LogoTitle />
         <View

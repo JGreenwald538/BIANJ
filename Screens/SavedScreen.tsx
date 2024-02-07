@@ -58,6 +58,7 @@ export default function SavedScreen() {
 	const colorScheme = colors.background === "white" ? "light" : "dark";
 	const insets = useSafeAreaInsets();
 	const [update, setUpdate] = useState(false);
+	const [nextCategory, setNextCategory] = useState(0);
 
 	const onPressFilters = () => {
 		// Configure the animation before the state changes.
@@ -74,73 +75,74 @@ export default function SavedScreen() {
 			setSortByExpanded(!sortByExpanded); // This would be your state to control the button size.
 		}
 	};
+	useFocusEffect(
+		React.useCallback(() => {
+			const sortData = async () => {
+				const keys = await AsyncStorage.getAllKeys();
+				const values = await AsyncStorage.multiGet(keys);
+				let sortedValues = [];
 
-	useEffect(() => {
-		const sortData = async () => {
-			const keys = await AsyncStorage.getAllKeys(); 
-			const values = await AsyncStorage.multiGet(keys); 
-			let sortedValues = [];
+				sortedValues = values
+					.map(([_, value]) => {
+						const tempCategories = categories;
+						if (
+							!tempCategories.includes(JSON.parse(value as string).typeOfPlace)
+						) {
+							tempCategories.push(JSON.parse(value as string).typeOfPlace);
+						}
+						return JSON.parse(value as string);
+					})
 
-			sortedValues = values
-				.map(([_, value]) => {
-					const tempCategories = categories;
-					if (
-						!tempCategories.includes(JSON.parse(value as string).typeOfPlace)
-					) {
-						tempCategories.push(JSON.parse(value as string).typeOfPlace);
-					}
-					return JSON.parse(value as string);
-				})
-
-				.sort((a, b) => {
-					switch (sortByEnabled) {
-						case "Alphabetical":
-							return a.name.localeCompare(b.name);
-						case "Category":
-							return a.typeOfPlace.localeCompare(b.typeOfPlace);
-						case "Distance":
-							// @ts-ignore
-							if (currentLocation[0]) {
+					.sort((a, b) => {
+						switch (sortByEnabled) {
+							case "Alphabetical":
+								return a.name.localeCompare(b.name);
+							case "Category":
+								return a.typeOfPlace.localeCompare(b.typeOfPlace);
+							case "Distance":
 								// @ts-ignore
-								return (
-									getDistance(
-										a.lat,
-										a.long,
-										currentLocation![0].lat,
-										currentLocation![0].long
-									) -
+								if (currentLocation[0]) {
 									// @ts-ignore
-									getDistance(
-										b.lat,
-										b.long,
-										currentLocation![0].lat,
-										currentLocation![0].long
-									)
-								);
-							}
-							return 0;
-						default:
-							return 0;
-					}
-				});
+									return (
+										getDistance(
+											a.lat,
+											a.long,
+											currentLocation![0].lat,
+											currentLocation![0].long
+										) -
+										// @ts-ignore
+										getDistance(
+											b.lat,
+											b.long,
+											currentLocation![0].lat,
+											currentLocation![0].long
+										)
+									);
+								}
+								return 0;
+							default:
+								return 0;
+						}
+					});
 
-			if (categoriesEnabled.length !== 0) {
-				sortedValues = sortedValues.filter((value) => {
-					// @ts-ignore
-					return categoriesEnabled.indexOf(value.typeOfPlace) !== -1;
-				});
-			}
-			// @ts-ignore
-			const places = PlaceList(sortedValues);
-			if (places) {
+				if (categoriesEnabled.length !== 0) {
+					sortedValues = sortedValues.filter((value) => {
+						// @ts-ignore
+						return categoriesEnabled.indexOf(value.typeOfPlace) !== -1;
+					});
+				}
 				// @ts-ignore
-				setPlaces(places.view);
-			}
-		};
+				const places = PlaceList(sortedValues);
+				if (places) {
+					// @ts-ignore
+					setPlaces(places.view);
+				}
+			};
 
-		sortData();
-		// @ts-ignore
-	}, [sortByEnabled, currentLocation[0], update, categoriesEnabled]);
+			sortData();
+			// @ts-ignore
+		}, [sortByEnabled, currentLocation[0], update, categoriesEnabled])
+	);
 
 	useFocusEffect(
 		React.useCallback(() => {
@@ -169,6 +171,9 @@ export default function SavedScreen() {
 							onPress={async () => {
 								await AsyncStorage.clear();
 								alert("Cleared");
+								setUpdate(!update);
+								setCategoriesEnabled([]);
+								setCategories([]);
 							}}
 						>
 							<Text
@@ -197,6 +202,8 @@ export default function SavedScreen() {
 				onPressFilters={onPressFilters}
 				update={update}
 				setUpdate={setUpdate}
+				nextCategory={nextCategory}
+				setNextCategory={setNextCategory}
 			/>
 			<SortBy
 				categories={categories}

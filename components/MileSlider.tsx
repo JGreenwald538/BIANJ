@@ -94,13 +94,13 @@ const MileSlider: React.FC<MileSliderProps> = ({
       fontSize: 12,
       color: colorScheme === "light" ? "black" : "white",
       textAlign: "center",
-      marginTop: 8, // Adjust this as needed to position the label
+      marginTop: 10, // Adjust this as needed to position the label
       marginLeft: 5,
     },
   });
   return (
     <View style={styles.container}>
-      <View style={{ paddingTop: 10 }}>
+      <View style={{flexDirection: "column", justifyContent: "center" }}>
         <Checkbox
           isChecked={isEnabled}
           onCheck={() => isEnabledChange(!isEnabled && !filters.every((str) => str === ""))} // Pass the negated value of `isEnabled`
