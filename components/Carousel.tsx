@@ -86,22 +86,19 @@ export default class App extends React.Component<{}, AppState> {
 
     render() {
         return (
-            <SafeAreaView style={{ flex: 4 }}>
-                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
-                    <Carousel
-                        layout={"default"}
-                        ref={this.carousel}
-                        data={this.state.carouselItems}
-                        sliderWidth={screenWidth}
-                        itemWidth={screenHeight * scale}
-                        renderItem={this._renderItem}
-                        onSnapToItem={index => this.setState({ activeIndex: index })} 
-                        vertical={false}
-                        autoplay={true}
-                        autoplayInterval={5000}
-                    />
-                </View>
-            </SafeAreaView>
+            
+            <Carousel
+                layout={"default"}
+                ref={this.carousel}
+                data={this.state.carouselItems}
+                sliderWidth={screenWidth}
+                itemWidth={screenHeight * scale}
+                renderItem={this._renderItem}
+                onSnapToItem={index => this.setState({ activeIndex: index })} 
+                vertical={false}
+                autoplay={true}
+                autoplayInterval={5000}
+            />
         );
     }
 }

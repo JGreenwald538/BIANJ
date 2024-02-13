@@ -19,6 +19,13 @@ import {
 } from "react-native";
 const { width, height } = Dimensions.get("window");
 import Ionicons from "react-native-vector-icons/Ionicons";
+import DropdownIcon from "../assets/SVGs/caret-down-circle-outline.svg";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { useTheme } from "@react-navigation/native";
+import { useColorScheme } from "react-native";
+import SaveIcon from "../assets/SVGs/download-outline.svg";
+import DeleteIcon from "../assets/SVGs/close-circle-outline.svg"
+
 
 interface PlaceProps extends React.ComponentPropsWithoutRef<typeof View> {
 	name?: string;
@@ -28,11 +35,20 @@ interface PlaceProps extends React.ComponentPropsWithoutRef<typeof View> {
 	address?: string;
 	phone?: string;
 	website?: string;
+	object?: any;
+	save?: boolean;
+	deleteIcon?: boolean;
+	setUpdate?: any;
+	update?: boolean;
 }
 
 let hasNotch = false;
 
 hasNotch = Dimensions.get("window").height > 800;
+
+const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
+
 
 const Place: React.FC<PlaceProps> = ({
 	name = "Name",
@@ -42,6 +58,11 @@ const Place: React.FC<PlaceProps> = ({
 	address = "Address",
 	phone = "Phone",
 	website = "Website",
+	object,
+	save = true,
+	deleteIcon = false,
+	setUpdate,
+	update,
 }) => {
 	const [expanded, setExpanded] = React.useState(false);
 	const [expandedText, setExpandedText] = React.useState(false);
@@ -89,7 +110,7 @@ const Place: React.FC<PlaceProps> = ({
 			color: colorScheme === "light" ? "black" : "white",
 			overflow: "scroll",
 			fontWeight: "bold",
-			width: "90%",
+			width: "80%",
 		},
 		typeText: {
 			fontSize: 15,
@@ -124,7 +145,7 @@ const Place: React.FC<PlaceProps> = ({
 
 	if (!invisible) {
 		return (
-			<Animated.View style={{ ...styles.container }}>
+			<View style={{ ...styles.container }}>
 				<View style={{ flexDirection: "row" }}>
 					<View style={styles.logoContainer}>
 						{logoUri ? (
@@ -244,8 +265,8 @@ const Place: React.FC<PlaceProps> = ({
 					</View>
 					<Animated.View
 						style={{
-							width: 36,
-							height: 36,
+							width: save ? 30 : 36,
+							height: save ? 30 : 36,
 							position: "absolute",
 							right: 1,
 							bottom: 1,
@@ -279,15 +300,104 @@ const Place: React.FC<PlaceProps> = ({
 								}
 							}}
 						>
-							<Ionicons
-								name={"caret-down-circle-outline"}
-								size={36}
-								color={"#471f7d"}
+							<DropdownIcon
+								width={save ? 30 : 36}
+								height={save ? 30 : 36}
+								color={colorScheme === "light" ? "#471f7d" : "white"}
 							/>
 						</TouchableOpacity>
 					</Animated.View>
+					{save && (
+						<TouchableOpacity
+							onPress={async () => {
+								try {
+									await AsyncStorage.setItem(name, JSON.stringify(object));
+									alert("Saved!");
+								} catch (e) {
+									console.log(e);
+								}
+							}}
+						>
+							<View
+								style={{
+									// width: 30,
+									// height: 30,
+									position: "absolute",
+									right: expanded ? screenWidth * 0.77 : 1,
+									top: expanded ? screenHeight * 0.095 : 1,
+									zIndex: 1,
+									alignContent: "center",
+								}}
+							>
+								<SaveIcon
+									width={30}
+									height={30}
+									color={colorScheme === "light" ? "#471f7d" : "white"}
+								/>
+								{expanded && (
+									<Text
+										style={{
+											fontSize: 12,
+											textAlign: "center",
+											color: colorScheme === "light" ? "#471f7d" : "white",
+											marginTop: 2,
+										}}
+									>
+										Save
+									</Text>
+								)}
+							</View>
+						</TouchableOpacity>
+					)}
+					{deleteIcon && (
+						<TouchableOpacity
+							onPress={async () => {
+								try {
+									await AsyncStorage.removeItem(name)
+									setUpdate(!update);
+									alert("Removed!")
+								} catch (e) {
+									console.log(e);
+								}
+							}}
+						>
+							<View
+								style={{
+									// width: 30,
+									// height: 30,
+									position: "absolute",
+									right: expanded ? screenWidth * 0.77 : 1,
+									top: expanded ? screenHeight * 0.095 : 1,
+									zIndex: 1,
+									alignContent: "center",
+									justifyContent: "center",
+								}}
+							>
+								<View style={{justifyContent: "center", alignContent: "center", flexDirection: "column"}}>
+									<DeleteIcon
+										width={30}
+										height={30}
+										color={colorScheme === "light" ? "#471f7d" : "white"}
+										style={{marginLeft: 5}}
+									/>
+									{expanded && (
+										<Text
+											style={{
+												fontSize: 12,
+												textAlign: "center",
+												color: colorScheme === "light" ? "#471f7d" : "white",
+												marginTop: 2,
+											}}
+										>
+											Remove
+										</Text>
+									)}
+								</View>
+							</View>
+						</TouchableOpacity>
+					)}
 				</View>
-			</Animated.View>
+			</View>
 		);
 	} else {
 		return <View style={[styles.invisible]}></View>;
@@ -295,7 +405,7 @@ const Place: React.FC<PlaceProps> = ({
 };
 
 // @ts-ignore
-function PlaceList(items) {
+function PlaceList(items, save?: boolean, deleteIcon?: boolean, update?: boolean, setUpdate?: any) {
 	// @ts-ignore
 	const categories = [];
 	for (let i = 0; i < items.length; i++) {
@@ -322,6 +432,11 @@ function PlaceList(items) {
 								}`}
 								phone={item.phone}
 								website={item.website}
+								object = {item}
+								save = {save}
+								deleteIcon = {deleteIcon}
+								update = {update}
+								setUpdate={setUpdate}
 							/>
 						))
 					}

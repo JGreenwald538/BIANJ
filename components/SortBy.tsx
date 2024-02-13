@@ -54,8 +54,6 @@ export const SortBy: React.FC<FilterProps> = ({
 					shadowOpacity: 0.2,
 					shadowRadius: 3,
 					display: sortByExpanded ? "flex" : "none",
-					borderColor: "black",
-					borderWidth: 2,
 					opacity: 0.95,
 				}}
 			>
@@ -131,7 +129,12 @@ export const SortBy: React.FC<FilterProps> = ({
 						}
 						style={{
 							fontSize: sortByExpanded ? 25 : 19,
-							color: "rgb(255, 255, 255)",
+							color:
+								colorScheme === "light"
+									? sortByExpanded
+										? "black"
+										: "white"
+									: "white",
 							lineHeight: sortByExpanded ? 25 : 30,
 							textAlign: "center",
 						}}

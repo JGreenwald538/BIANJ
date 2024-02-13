@@ -169,7 +169,7 @@ export default function Markers(data, categoriesEnabled, userLocation) {
                 key={i}
                 onPress={async () => {
                   try{
-                    await AsyncStorage.setItem(i.toString(), JSON.stringify(data[i]))
+                    await AsyncStorage.setItem(name, JSON.stringify(data[i]))
                   } catch (e) {
                     console.log(e)
                   }

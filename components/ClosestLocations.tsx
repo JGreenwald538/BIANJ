@@ -77,7 +77,6 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
 				</Text>
 				{sortedLocations.length > 0 ? (
 					sortedLocations.map((location, index) => (
-						// @ts-ignore
 						<Text
 							key={index}
 							style={{
@@ -86,7 +85,7 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
 							}}
 						>
 							{index + 1}. {location.name}: (
-							{Math.round(location.distance.toFixed(2))} mi)
+							{Math.round(parseFloat(location.distance.toFixed(2)))} mi)
 						</Text>
 					))
 				) : (

@@ -78,10 +78,13 @@ export default function SavedScreen() {
 	useFocusEffect(
 		React.useCallback(() => {
 			const sortData = async () => {
+				console.log("Sorting");
 				const keys = await AsyncStorage.getAllKeys();
 				const values = await AsyncStorage.multiGet(keys);
 				let sortedValues = [];
-
+				if(values.length === 0) {
+					setCategories([]);
+				}
 				sortedValues = values
 					.map(([_, value]) => {
 						const tempCategories = categories;
@@ -90,6 +93,7 @@ export default function SavedScreen() {
 						) {
 							tempCategories.push(JSON.parse(value as string).typeOfPlace);
 						}
+						setCategories(tempCategories);
 						return JSON.parse(value as string);
 					})
 
@@ -132,7 +136,7 @@ export default function SavedScreen() {
 					});
 				}
 				// @ts-ignore
-				const places = PlaceList(sortedValues);
+				const places = PlaceList(sortedValues, false, true, update, setUpdate);
 				if (places) {
 					// @ts-ignore
 					setPlaces(places.view);
@@ -143,6 +147,8 @@ export default function SavedScreen() {
 			// @ts-ignore
 		}, [sortByEnabled, currentLocation[0], update, categoriesEnabled])
 	);
+
+	console.log(categories)
 
 	useFocusEffect(
 		React.useCallback(() => {
@@ -157,6 +163,26 @@ export default function SavedScreen() {
 		<View>
 			<ScrollView>
 				<Place invisible />
+				{categories.length === 0 && (
+					<View
+						style={{
+							flex: 1,
+							justifyContent: "center",
+							alignItems: "center",
+							marginTop: screenHeight / 3,
+						}}
+					>
+						<Text
+							style={{
+								fontSize: 25,
+								color: colorScheme === "light" ? "black" : "white",
+							}}
+						>
+							No Saved Places
+						</Text>
+					</View>
+				)
+						}
 				{places}
 				{categories.length !== 0 && (
 					<View style={{ paddingHorizontal: 40 }}>
