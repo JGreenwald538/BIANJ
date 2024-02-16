@@ -6,15 +6,15 @@ import {
 	StyleSheet,
 	Dimensions,
 	Linking,
-	Button,
 } from "react-native";
 import LogoTitle from "../components/LogoTitle";
 import Carousel from "../components/Carousel";
-import { useNavigation, useTheme } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import ReloadIcon from "../assets/SVGs/reload-circle-outline.svg";
+import { WalkthroughContext } from "../util/globalvars";
+
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -81,8 +81,10 @@ export default function HomeScreen({navigation} : any) {
 	const donateRef = useRef<View>(null);
 	const contactUsRef = useRef<View>(null);
 
+	const [walkthrough, setWalkthrough] = React.useContext(WalkthroughContext);
+
 	// State to manage the current step, overlay visibility, and target element position
-	const [currentStep, setCurrentStep] = useState<number>(0);
+	const [currentStep, setCurrentStep] = useState<number>(walkthrough);
 	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
 	const [targetMeasure, setTargetMeasure] = useState<{
 		x: number;
@@ -168,6 +170,7 @@ export default function HomeScreen({navigation} : any) {
 		} else {
 			setOverlayVisible(false);
 			navigation.navigate("Map");
+			setWalkthrough(currentStep + 1);
 		}
 	};
 	return (

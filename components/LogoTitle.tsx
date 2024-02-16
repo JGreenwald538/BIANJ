@@ -8,7 +8,7 @@ let screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 export default function LogoTitle() {
-  const [insets, setInsets] = React.useState(useSafeAreaInsets());
+  const insets = useSafeAreaInsets();
   const {colors} = useTheme();
   const colorScheme = colors.background === "white" ? "light" : "dark";
   useEffect(() => {

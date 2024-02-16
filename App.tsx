@@ -9,7 +9,7 @@ import ListScreen from "./Screens/ListScreen";
 import SavedScreen from "./Screens/SavedScreen.tsx";
 import { getCurrentLocation } from "./lib/location";
 import { Image, Platform, UIManager, useColorScheme } from "react-native";
-import { LocationContext, PlacesContext, CategoriesContext } from "./util/globalvars";
+import { LocationContext, PlacesContext, CategoriesContext, WalkthroughContext } from "./util/globalvars";
 import { API_URL } from "./constants";
 
 
@@ -50,6 +50,7 @@ export default function App() {
   const colorScheme = useColorScheme();
   const [places, setPlaces] = React.useState<any[]>([]);
   const [categories, setCategories] = React.useState<any[]>([]);
+  const [walkthrough, setWalkthrough] = React.useState<number>(0);
   useEffect(() => {
     const updateState = async () => {
       setLocation(await getCurrentLocation());
@@ -84,6 +85,7 @@ export default function App() {
   }, [places])
 
   return (
+	<WalkthroughContext.Provider value={[walkthrough, setWalkthrough]}>
 		<CategoriesContext.Provider value={categories}>
 			<PlacesContext.Provider value={places}>
 				<LocationContext.Provider
@@ -198,7 +200,7 @@ export default function App() {
 										paddingHorizontal: 20,
 										opacity: 1,
 									},
-									lazy: true,
+									lazy: false,
 									headerTitle: () => <LogoTitle />,
 									headerTransparent: true,
 									style: {
@@ -216,5 +218,6 @@ export default function App() {
 				</LocationContext.Provider>
 			</PlacesContext.Provider>
 		</CategoriesContext.Provider>
+	</WalkthroughContext.Provider>
 	);
 }

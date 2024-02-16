@@ -1,7 +1,7 @@
 import { useTheme } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "native-base";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Animated,
 	View,
@@ -40,6 +40,11 @@ interface PlaceProps extends React.ComponentPropsWithoutRef<typeof View> {
 	deleteIcon?: boolean;
 	setUpdate?: any;
 	update?: boolean;
+	titleRef?: any
+	typeRef?: any
+	buttonRef?: any
+	containerRef?: any
+	placeEnabled?: any
 }
 
 let hasNotch = false;
@@ -63,12 +68,29 @@ const Place: React.FC<PlaceProps> = ({
 	deleteIcon = false,
 	setUpdate,
 	update,
+	titleRef,
+	typeRef,
+	buttonRef,
+	containerRef,
+	placeEnabled,
 }) => {
 	const [expanded, setExpanded] = React.useState(false);
 	const [expandedText, setExpandedText] = React.useState(false);
 	const rotAnim = React.useRef(new Animated.Value(0)).current;
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
+	// console.log(placeEnabled)
+	// if(placeEnabled){
+	// 	console.log("false")
+	// 	setExpanded(placeEnabled)
+	// }
+
+	useEffect(() => {
+		if (placeEnabled !== expanded) {
+			setExpanded(placeEnabled);
+		}
+	}, [placeEnabled, expanded]);
+
 	const styles = StyleSheet.create({
 		container: {
 			flexDirection: "column",
@@ -145,7 +167,7 @@ const Place: React.FC<PlaceProps> = ({
 
 	if (!invisible) {
 		return (
-			<View style={{ ...styles.container }}>
+			<View style={{ ...styles.container }} ref={containerRef}>
 				<View style={{ flexDirection: "row" }}>
 					<View style={styles.logoContainer}>
 						{logoUri ? (
@@ -164,8 +186,12 @@ const Place: React.FC<PlaceProps> = ({
 						)}
 					</View>
 					<View style={{ flexDirection: "column", flex: 1, marginTop: 10 }}>
-						<Text style={styles.nameText}>{name}</Text>
-						<Text style={styles.typeText}>{type}</Text>
+						<Text style={styles.nameText} ref={titleRef}>
+							{name}
+						</Text>
+						<Text style={styles.typeText} ref={typeRef}>
+							{type}
+						</Text>
 						<View
 							style={{
 								flexDirection: "row",
@@ -264,9 +290,10 @@ const Place: React.FC<PlaceProps> = ({
 						</View>
 					</View>
 					<Animated.View
+						ref={buttonRef}
 						style={{
-							width: save ? 30 : 36,
-							height: save ? 30 : 36,
+							width: 30,
+							height: 30,
 							position: "absolute",
 							right: 1,
 							bottom: 1,
@@ -301,8 +328,8 @@ const Place: React.FC<PlaceProps> = ({
 							}}
 						>
 							<DropdownIcon
-								width={save ? 30 : 36}
-								height={save ? 30 : 36}
+								width={30}
+								height={30}
 								color={colorScheme === "light" ? "#471f7d" : "white"}
 							/>
 						</TouchableOpacity>
@@ -353,9 +380,9 @@ const Place: React.FC<PlaceProps> = ({
 						<TouchableOpacity
 							onPress={async () => {
 								try {
-									await AsyncStorage.removeItem(name)
+									await AsyncStorage.removeItem(name);
 									setUpdate(!update);
-									alert("Removed!")
+									alert("Removed!");
 								} catch (e) {
 									console.log(e);
 								}
@@ -373,12 +400,18 @@ const Place: React.FC<PlaceProps> = ({
 									justifyContent: "center",
 								}}
 							>
-								<View style={{justifyContent: "center", alignContent: "center", flexDirection: "column"}}>
+								<View
+									style={{
+										justifyContent: "center",
+										alignContent: "center",
+										flexDirection: "column",
+									}}
+								>
 									<DeleteIcon
 										width={30}
 										height={30}
 										color={colorScheme === "light" ? "#471f7d" : "white"}
-										style={{marginLeft: 5}}
+										style={{ marginLeft: 5 }}
 									/>
 									{expanded && (
 										<Text
@@ -405,7 +438,7 @@ const Place: React.FC<PlaceProps> = ({
 };
 
 // @ts-ignore
-function PlaceList(items, save?: boolean, deleteIcon?: boolean, update?: boolean, setUpdate?: any) {
+function PlaceList(items, save?: boolean, deleteIcon?: boolean, update?: boolean, setUpdate?: any, titleRef?: any, typeRef?: any, buttonRef?: any, containerRef?: any, placeEnabled?: any) {
 	// @ts-ignore
 	const categories = [];
 	for (let i = 0; i < items.length; i++) {
@@ -437,6 +470,11 @@ function PlaceList(items, save?: boolean, deleteIcon?: boolean, update?: boolean
 								deleteIcon = {deleteIcon}
 								update = {update}
 								setUpdate={setUpdate}
+								titleRef={index === 0 ? titleRef : null}
+								typeRef={index === 0 ? typeRef : null}
+								buttonRef={index === 0 ? buttonRef : null}
+								containerRef={index === 0 ? containerRef : null}
+								placeEnabled={index === 0 ? placeEnabled : undefined}
 							/>
 						))
 					}

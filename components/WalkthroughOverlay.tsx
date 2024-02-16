@@ -19,6 +19,7 @@ interface OverlayProps {
 	targetMeasure: { x: number; y: number; width: number; height: number };
 	content: Content;
 	onClose: () => void;
+	center?: boolean;
 }
 
 const WalkthroughOverlay: React.FC<OverlayProps> = ({
@@ -26,10 +27,42 @@ const WalkthroughOverlay: React.FC<OverlayProps> = ({
 	targetMeasure,
 	content,
 	onClose,
+	center,
 }) => {
 	const windowDimensions = Dimensions.get("window");
+	const [height, setHeight] = React.useState(200);
+	const [width, setWidth] = React.useState(200);
 
-	// Calculate the styles for the dimmed areas
+	// Calculate styles for additional dimmed overlays (left and right)
+	const dimmedLeftStyle = {
+		top: targetMeasure.y,
+		left: 0,
+		width: targetMeasure.x,
+		height: targetMeasure.height,
+	};
+
+	const dimmedRightStyle = {
+		top: targetMeasure.y,
+		right: 0,
+		width: windowDimensions.width - targetMeasure.x - targetMeasure.width,
+		height: targetMeasure.height,
+	};
+
+	// Determine if the tooltip should be shown above or below based on available space
+	const showTooltipAbove =
+		targetMeasure.y + targetMeasure.height + height > windowDimensions.height;
+
+	// Adjust tooltip position dynamically
+	let tooltipStyle = {
+		top: center ? (windowDimensions.height - height) / 2 : showTooltipAbove
+			? targetMeasure.y - height
+			: targetMeasure.y + targetMeasure.height + 20, // Position above if too low, else below
+		left: center ? (windowDimensions.width - width) / 2  : Math.max(0, targetMeasure.x + targetMeasure.width / 2 - 100),
+		right: center ? undefined :  Math.max(
+			0,
+			windowDimensions.width - targetMeasure.x - targetMeasure.width / 2 - 100
+		),
+	};
 	const dimmedTopStyle = {
 		top: 0,
 		left: 0,
@@ -44,22 +77,6 @@ const WalkthroughOverlay: React.FC<OverlayProps> = ({
 		height: windowDimensions.height - (targetMeasure.y + targetMeasure.height), // Bottom overlay extends from the bottom of the highlighted area to the bottom of the screen
 	};
 
-	// Determine if the tooltip should be shown above the highlighted area based on its position.
-	const showTooltipAbove =
-		targetMeasure.y + targetMeasure.height + 100 > windowDimensions.height;
-
-	// Adjust tooltip position dynamically.
-	let tooltipStyle = {
-		top: showTooltipAbove
-			? targetMeasure.y - 200
-			: targetMeasure.y + targetMeasure.height + 20, // Position above if too low, else below
-		left: Math.max(0, targetMeasure.x + targetMeasure.width / 2 - 100),
-		right: Math.max(
-			0,
-			windowDimensions.width - targetMeasure.x - targetMeasure.width / 2 - 100
-		),
-	};
-
 	return (
 		<Modal
 			visible={visible}
@@ -67,27 +84,53 @@ const WalkthroughOverlay: React.FC<OverlayProps> = ({
 			animationType="fade"
 			onRequestClose={onClose}
 		>
-			<View style={styles.fullscreenOverlay}>
+			<TouchableOpacity
+				style={styles.fullscreenOverlay}
+				onPress={onClose}
+				activeOpacity={1}
+			>
 				{/* Dimmed area above the highlighted area */}
+				<View
+					style={[
+						styles.dimmedOverlay,
+						{ top: 0, height: targetMeasure.y, left: 0, right: 0 },
+					]}
+				/>
+				{/* Dimmed area below the highlighted area */}
+				<View
+					style={[
+						styles.dimmedOverlay,
+						{ top: targetMeasure.y + targetMeasure.height, left: 0, right: 0 },
+					]}
+				/>
 				<View style={[styles.dimmedOverlay, dimmedTopStyle]} />
 
 				{/* Dimmed area below the highlighted area */}
 				<View style={[styles.dimmedOverlay, dimmedBottomStyle]} />
+				{/* Dimmed area to the left of the highlighted area */}
+				<View style={[styles.dimmedOverlay, dimmedLeftStyle]} />
+				{/* Dimmed area to the right of the highlighted area */}
+				<View style={[styles.dimmedOverlay, dimmedRightStyle]} />
 
 				{/* Tooltip container */}
-				<TouchableOpacity
-					style={[
-						styles.tooltip, tooltipStyle,
-					]}
-					onPress={onClose}
-				>
+				<View style={[styles.tooltip, tooltipStyle]} onLayout={
+					({
+						nativeEvent: {
+							layout: { height, width },
+						},
+					}) => {
+						setHeight(height)
+						setWidth(width)
+					}
+				
+				}>
 					<Text style={styles.title}>{content.title}</Text>
 					<Text style={styles.description}>{content.description}</Text>
 					<TouchableOpacity onPress={onClose} style={styles.button}>
 						<Text>{content.buttonText}</Text>
 					</TouchableOpacity>
-				</TouchableOpacity>
-			</View>
+				</View>
+			</TouchableOpacity>
 		</Modal>
 	);
 };
@@ -110,6 +153,8 @@ const styles = StyleSheet.create({
 		padding: 16,
 		maxWidth: 300,
 		zIndex: 5,
+		borderWidth: 1,
+		borderColor: "#ddd",
 	},
 	title: {
 		fontSize: 18,

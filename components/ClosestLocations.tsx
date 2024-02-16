@@ -16,6 +16,7 @@ type ClosestLocationComponentProps = {
     locations: Location[];
     currentLocation: any;
     categories: any;
+	ref?: any;
 };
 
 const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -31,7 +32,7 @@ const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): nu
     return R * c / 1.609; // Distance in km
 };
 
-const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ locations, currentLocation, categories }) => {
+const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ locations, currentLocation, categories, ref }) => {
     const {colors} = useTheme();
     const colorScheme = colors.background === "white" ? "light" : "dark";
     const styles = StyleSheet.create({
@@ -65,7 +66,7 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
         .sort((a, b) => a.distance - b.distance)
         .slice(0, 3); // Get top 3 locations
     return (
-			<View style={styles.container}>
+			<View style={styles.container} ref={ref}>
 				<Text
 					style={{
 						textAlign: "center",

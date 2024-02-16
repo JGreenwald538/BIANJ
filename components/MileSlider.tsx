@@ -11,6 +11,7 @@ interface MileSliderProps {
   onValueChange: (value: number) => void;
   isEnabledChange: (isEnabled: boolean) => void;
   filters: string[];
+  ref?: any;
 }
 
 const MileSlider: React.FC<MileSliderProps> = ({
@@ -19,6 +20,7 @@ const MileSlider: React.FC<MileSliderProps> = ({
   onValueChange,
   isEnabledChange,
   filters,
+  ref
 }) => {
   const handleChange = (newValue: number[]) => {
     if (isEnabled) {
@@ -99,7 +101,7 @@ const MileSlider: React.FC<MileSliderProps> = ({
     },
   });
   return (
-    <View style={styles.container}>
+    <View style={styles.container} ref={ref}>
       <View style={{flexDirection: "column", justifyContent: "center" }}>
         <Checkbox
           isChecked={isEnabled}

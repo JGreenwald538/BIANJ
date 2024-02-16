@@ -78,7 +78,6 @@ export default function SavedScreen() {
 	useFocusEffect(
 		React.useCallback(() => {
 			const sortData = async () => {
-				console.log("Sorting");
 				const keys = await AsyncStorage.getAllKeys();
 				const values = await AsyncStorage.multiGet(keys);
 				let sortedValues = [];
@@ -147,9 +146,6 @@ export default function SavedScreen() {
 			// @ts-ignore
 		}, [sortByEnabled, currentLocation[0], update, categoriesEnabled])
 	);
-
-	console.log(categories)
-
 	useFocusEffect(
 		React.useCallback(() => {
 			return () => {

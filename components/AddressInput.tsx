@@ -10,7 +10,11 @@ import {
 import { LocationContext } from "../util/globalvars";
 import { useTheme } from "@react-navigation/native";
 
-export const AddressInput: React.FC = () => {
+interface AddressInputProps {
+  ref?: any;
+}
+
+export const AddressInput: React.FC<AddressInputProps> = ({ref}) => {
   const [input, setInput] = useState("");
   // @ts-ignore
   const [
@@ -54,61 +58,63 @@ export const AddressInput: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={{ paddingVertical: 3 }}>
-        <Text
-          style={{
-            fontWeight: "600",
-            textAlign: "center",
-            color: colorScheme === "light" ? "black" : "white",
-          }}
-        >
-          Enter Manual Address
-        </Text>
-      </View>
-      <View>
-        <TextInput
-          value={input}
-          onChangeText={setInput}
-          placeholder="Enter an address"
-          placeholderTextColor={colorScheme === "light" ? "black" : "white"}
-          style={{
-            paddingHorizontal: 10,
-            paddingVertical: 5,
-            borderRadius: 5,
-            borderColor: colorScheme === "light" ? "black" : "white",
-            borderWidth: 1,
-          }}
-        />
-      </View>
-      <View
-        style={{
-          paddingHorizontal: 10,
-          paddingTop: 10,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            paddingVertical: 5,
-            backgroundColor: "#572C5F",
-            borderRadius: 5,
-          }}
-          onPress={fetchCoordinates}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              paddingHorizontal: 5,
-            }}
-          >
-            Submit
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+		<>
+			<View style={styles.container} ref={ref}>
+				<View style={{ paddingVertical: 3 }}>
+					<Text
+						style={{
+							fontWeight: "600",
+							textAlign: "center",
+							color: colorScheme === "light" ? "black" : "white",
+						}}
+					>
+						Enter Manual Address
+					</Text>
+				</View>
+				<View>
+					<TextInput
+						value={input}
+						onChangeText={setInput}
+						placeholder="Enter an address"
+						placeholderTextColor={colorScheme === "light" ? "black" : "white"}
+						style={{
+							paddingHorizontal: 10,
+							paddingVertical: 5,
+							borderRadius: 5,
+							borderColor: colorScheme === "light" ? "black" : "white",
+							borderWidth: 1,
+						}}
+					/>
+				</View>
+				<View
+					style={{
+						paddingHorizontal: 10,
+						paddingTop: 10,
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+					}}
+				>
+					<TouchableOpacity
+						style={{
+							paddingVertical: 5,
+							backgroundColor: "#572C5F",
+							borderRadius: 5,
+						}}
+						onPress={fetchCoordinates}
+					>
+						<Text
+							style={{
+								color: "white",
+								textAlign: "center",
+								paddingHorizontal: 5,
+							}}
+						>
+							Submit
+						</Text>
+					</TouchableOpacity>
+				</View>
+			</View>
+		</>
+	);
 };

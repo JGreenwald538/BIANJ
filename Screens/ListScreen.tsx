@@ -1,33 +1,36 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
-	Animated,
 	Dimensions,
 	ScrollView,
-	TouchableOpacity,
 	View,
-	Text,
 	LayoutAnimation,
-	Platform,
 } from "react-native";
-import { API_URL } from "../constants";
 import { Place, PlaceList } from "../components/Place";
 import {
 	CategoriesContext,
 	LocationContext,
 	PlacesContext,
+	WalkthroughContext,
 } from "../util/globalvars";
-import Checkbox from "../components/Checkbox";
-import { RadioButton } from "react-native-paper";
-import { AddressInput } from "../components/AddressInput";
 import LogoTitle from "../components/LogoTitle";
 import { useFocusEffect, useTheme } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
+import WalkthroughOverlay from "../components/WalkthroughOverlay";
 
 const sortBys = ["Alphabetical", "Category", "Distance"];
 
 const screenHeight = Dimensions.get("window").height;
+
+interface StepInfo {
+	ref: React.RefObject<View>[];
+	content: {
+		title: string;
+		description: string;
+		buttonText: string;
+	};
+}
 
 const getDistance = (
 	lat1: number,
@@ -48,12 +51,14 @@ const getDistance = (
 	return (R * c) / 1.609;
 };
 
-export default function ListScreen(sortBy: any = "") {
+export default function ListScreen(
+	{ route, navigation }: any = { route: { params: {} }, navigation: null }
+) {
 	const empty: any[] = [];
 	const [data, setData] = useState(empty);
 	const values = useContext(PlacesContext);
 	const [sortByEnabled, setSortByEnabled] = useState(
-		sortBy.route.params ? sortBy.route.params.sortBy : ""
+		route.params ? route.params.sortBy : ""
 	);
 	const currentLocation = useContext(LocationContext);
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
@@ -84,6 +89,126 @@ export default function ListScreen(sortBy: any = "") {
 	};
 
 	const screenWidth = Dimensions.get("window").width;
+
+	const [walkthrough, setWalkthrough] = useContext(WalkthroughContext);
+
+	const [currentStep, setCurrentStep] = useState<number>(0);
+	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
+	const updateVisibility = () => {
+		setOverlayVisible(walkthrough !== 0);
+	};
+
+	const [centered, setCentered] = useState(true);
+
+	const [targetMeasure, setTargetMeasure] = useState<{
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	}>({ x: 0, y: 0, width: 0, height: 0 });
+
+	const screenRef = React.useRef<View>(null);
+	const containerRef = React.useRef<View>(null);
+	const titleRef = React.useRef<View>(null);
+	const buttonRef = React.useRef<View>(null);
+	const typeRef = React.useRef<View>(null);
+	const [placeEnabled, setPlaceEnabled] = useState(false)
+
+	// Define the steps of your walkthrough, including the ref to the target element and the content to display
+	const steps: StepInfo[] = [
+		{
+			ref: [screenRef],
+			content: {
+				title: "List",
+				description:
+					"This page has a list of all the resources from our database.",
+				buttonText: "Next",
+			},
+		},
+		{
+			ref: [containerRef],
+			content: {
+				title: "List",
+				description:
+					"Each resource is displayed with its name, type, and distance from your current location.",
+				buttonText: "Next",
+			},
+		},
+		{
+			ref: [titleRef, typeRef, buttonRef],
+			content: {
+				title: "Resource Information",
+				description:
+					"You can see the title, type of place, and you can click on the button to see more information.",
+				buttonText: "Next",
+			},
+		},
+		{
+			ref: [titleRef, typeRef, buttonRef],
+			content: {
+				title: "Resource Information",
+				description:
+					"You can see the title, type of place, and you can click on the button to see more information.",
+				buttonText: "Next",
+			},
+		},
+	];
+
+	// Effect to measure the current target element's position
+	useEffect(() => {
+		if (overlayVisible) {
+			const currentRef = steps[currentStep].ref;
+			let minX = Infinity;
+			let minY = Infinity;
+			let maxX = 0;
+			let maxY = 0;
+
+			let measurementsCount = 0;
+			currentRef.forEach((ref) => {
+				ref.current?.measure((x, y, width, height, pageX, pageY) => {
+					minX = Math.min(minX, pageX);
+					minY = Math.min(minY, pageY);
+					maxX = Math.max(maxX, pageX + width);
+					maxY = Math.max(maxY, pageY + height);
+
+					measurementsCount++;
+					if (measurementsCount === currentRef.length) {
+						// All measurements are done
+						setTargetMeasure({
+							x: minX,
+							y: minY,
+							width: maxX - minX,
+							height: maxY - minY,
+						});
+					}
+				});
+			});
+		}
+	}, [currentStep, overlayVisible]);
+
+	// Function to proceed to the next step or end the walkthrough
+	const nextStep = () => {
+		if (currentStep < steps.length - 1) {
+			setCurrentStep(currentStep + 1);
+			if (currentStep === 0) {
+				setCentered(false);
+			} else if (currentStep === 2) {
+				console.log("setting place enabled")
+				setPlaceEnabled(true);
+				setCentered(true);
+			}
+		} else {
+			setOverlayVisible(false);
+			navigation.navigate("Saved");
+			setWalkthrough(currentStep + 1);
+		}
+	};
+
+	useFocusEffect(() => {
+		{
+			updateVisibility();
+		}
+	});
 
 	useEffect(() => {
 		const sortData = async () => {
@@ -128,7 +253,7 @@ export default function ListScreen(sortBy: any = "") {
 					return categoriesEnabled.indexOf(value.typeOfPlace) !== -1;
 				});
 			}
-			const places = PlaceList(sortedValues);
+			const places = PlaceList(sortedValues, undefined, undefined, undefined, undefined, titleRef, typeRef, buttonRef, containerRef, placeEnabled);
 			if (places) {
 				// @ts-ignore
 				setPlaces(places.view);
@@ -150,39 +275,47 @@ export default function ListScreen(sortBy: any = "") {
 
 	return (
 		<View>
+			<View ref={screenRef}></View>
+			<WalkthroughOverlay
+				visible={overlayVisible}
+				targetMeasure={targetMeasure}
+				content={steps[currentStep].content}
+				onClose={nextStep}
+				center={centered}
+			/>
 			<ScrollView>
 				<Place invisible />
 				{places}
 			</ScrollView>
 			<Filter
-        filtersExpanded={filtersExpanded}
-        categoriesEnabled={categoriesEnabled}
-        setCategoriesEnabled={setCategoriesEnabled}
-        categories={categories}
-        colorScheme={colorScheme}
-        insets={insets}
-        screenWidth={screenWidth}
-        update={update}
-        setUpdate={setUpdate}
-        onPressFilters={onPressFilters}
-        screenHeight={screenHeight}
-		nextCategory={nextCategory}
-		setNextCategory={setNextCategory}
-      />
+				filtersExpanded={filtersExpanded}
+				categoriesEnabled={categoriesEnabled}
+				setCategoriesEnabled={setCategoriesEnabled}
+				categories={categories}
+				colorScheme={colorScheme}
+				insets={insets}
+				screenWidth={screenWidth}
+				update={update}
+				setUpdate={setUpdate}
+				onPressFilters={onPressFilters}
+				screenHeight={screenHeight}
+				nextCategory={nextCategory}
+				setNextCategory={setNextCategory}
+			/>
 			<SortBy
-        categories={categories}
-        colorScheme={colorScheme}
-        sortByExpanded={sortByExpanded}
-        onPressSortBy={onPressSortBy}
-        screenWidth={screenWidth}
-        screenHeight={screenHeight}
-        insets={insets}
-        sortByEnabled={sortByEnabled}
-        setSortByEnabled={setSortByEnabled}
-        currentLocation={currentLocation}
-        sortBys={sortBys}
-        setSortByExpanded={setSortByExpanded}
-      />
+				categories={categories}
+				colorScheme={colorScheme}
+				sortByExpanded={sortByExpanded}
+				onPressSortBy={onPressSortBy}
+				screenWidth={screenWidth}
+				screenHeight={screenHeight}
+				insets={insets}
+				sortByEnabled={sortByEnabled}
+				setSortByEnabled={setSortByEnabled}
+				currentLocation={currentLocation}
+				sortBys={sortBys}
+				setSortByExpanded={setSortByExpanded}
+			/>
 			<LogoTitle />
 		</View>
 	);

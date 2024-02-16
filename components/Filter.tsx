@@ -25,6 +25,9 @@ interface FilterProps {
   setUpdate?: (update: boolean) => void;
   nextCategory: number;
   setNextCategory: any;
+  map?: boolean;
+  buttonRef?: any;
+  menuRef?: any;
 }
 
 export const Filter: React.FC<FilterProps> = ({
@@ -41,6 +44,9 @@ export const Filter: React.FC<FilterProps> = ({
   setUpdate,
   nextCategory,
   setNextCategory,
+  map = false,
+  buttonRef,
+  menuRef,
 }) => {
   return (
 		<>
@@ -61,7 +67,21 @@ export const Filter: React.FC<FilterProps> = ({
 					opacity: 0.95,
 				}}
 				persistentScrollbar
+				ref={menuRef}
 			>
+				{map && (
+					<Text
+						style={{
+							fontSize: 20,
+							color: colorScheme === "light" ? "black" : "white",
+							textAlign: "center",
+							padding: 10,
+						}}
+					>
+						Select Five Categories
+					</Text>
+				)}
+
 				<View style={{ flex: 1 }}>
 					{categories.map((category, index) => (
 						<View
@@ -79,32 +99,50 @@ export const Filter: React.FC<FilterProps> = ({
 								// @ts-ignore
 								isChecked={categoriesEnabled.indexOf(category) !== -1}
 								onCheck={() => {
-									const newCategoriesEnabled = [...categoriesEnabled];
-									if (newCategoriesEnabled.indexOf(category) === -1) {
-										if (
-											nextCategory % 5 ===
-												5 -
-													newCategoriesEnabled.filter((x) => x === "").length ||
-											newCategoriesEnabled.filter((x) => x === "").length === 0
-										) {
-											setNextCategory(nextCategory + 1);
+									if (map) {
+										const newCategoriesEnabled = [...categoriesEnabled];
+										if (newCategoriesEnabled.indexOf(category) === -1) {
+											if (
+												nextCategory % 5 ===
+													5 -
+														newCategoriesEnabled.filter((x) => x === "")
+															.length ||
+												newCategoriesEnabled.filter((x) => x === "").length ===
+													0
+											) {
+												setNextCategory(nextCategory + 1);
+											} else {
+												setNextCategory(
+													newCategoriesEnabled.filter((x) => x === "").length -
+														(1 % 5)
+												);
+											}
+											newCategoriesEnabled[nextCategory % 5] = category;
 										} else {
-											setNextCategory(
-												newCategoriesEnabled.filter((x) => x === "").length -
-													(1 % 5)
+											newCategoriesEnabled[
+												newCategoriesEnabled.indexOf(category)
+											] = "";
+											setNextCategory(categoriesEnabled.indexOf(category));
+										}
+										setCategoriesEnabled(newCategoriesEnabled);
+									} else {
+										if (categoriesEnabled.indexOf(category) === -1) {
+											setCategoriesEnabled([...categoriesEnabled, category]);
+										} else {
+											setCategoriesEnabled(
+												categoriesEnabled.filter((x) => x !== category)
 											);
 										}
-										newCategoriesEnabled[nextCategory % 5] = category;
-									} else {
-										newCategoriesEnabled[
-											newCategoriesEnabled.indexOf(category)
-										] = "";
-										setNextCategory(categoriesEnabled.indexOf(category));
 									}
-									setCategoriesEnabled(newCategoriesEnabled);
 									// console.log(categoriesEnabled);
 								}} // Pass the negated value of `isEnabled`
-								color={colors[categoriesEnabled.indexOf(category)]}
+								color={
+									map
+										? colors[categoriesEnabled.indexOf(category)]
+										: colorScheme === "light"
+										? "black"
+										: "white"
+								}
 								uncheckedColor={colorScheme === "light" ? "black" : "white"}
 								alt={category + " Checkbox"}
 							/>
@@ -146,6 +184,7 @@ export const Filter: React.FC<FilterProps> = ({
 							setUpdate(!update);
 						}
 					}}
+					ref={buttonRef}
 				>
 					<Text
 						accessibilityLabel={
