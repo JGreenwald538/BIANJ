@@ -1,23 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
-
+import type {Place} from '../lib/place';
 // Define the schema for places
-interface IPlace extends Document {
-  name: string;
-  reviews: string[];
-  streetAddress: string;
-  city: string;
-  zip: string;
-  long: number; // Assuming this is for longitude
-  lat: number;  // Assuming this is for latitude
-  website: string;
-  phone: string;
-  image: string;
-  rating: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
-const placeSchema = new Schema<IPlace>({
+const placeSchema = new Schema<Place>({
   name: {
     type: String,
     required: true,
@@ -69,6 +54,6 @@ const placeSchema = new Schema<IPlace>({
 });
 
 // Create a model for places using the schema
-const Place = mongoose.model<IPlace>('Place', placeSchema);
+const Place = mongoose.model<Place>('Place', placeSchema);
 
 export default Place;

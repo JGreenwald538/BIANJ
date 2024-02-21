@@ -37,7 +37,8 @@ export default function HomeScreen({navigation} : any) {
 		header: {
 			alignItems: "center", // Center items horizontally in the container
 			justifyContent: "flex-end", // Center items vertically in the container
-			flex: 3, // You can adjust the height as needed
+			flex: 3.5, // You can adjust the height as needed
+			marginBottom: 15
 		},
 		title: {
 			// Styles for the title
@@ -188,7 +189,7 @@ export default function HomeScreen({navigation} : any) {
 					Welcome to the Brain Injury Alliance of New Jersey Resource Center
 				</Text>
 			</View>
-			<View ref={carouselRef}>
+			<View ref={carouselRef} style={{marginBottom: 15}}>
 				<Carousel />
 			</View>
 			<View style={styles.menu} ref={aboutUsRef}>
@@ -253,14 +254,6 @@ export default function HomeScreen({navigation} : any) {
 					height={30}
 				/>
 			</TouchableOpacity>
-			{/* <View
-				style={{
-					position: "absolute",
-					backgroundColor: "rgba(0,0,0,0.5)",
-					width: screenWidth,
-					height: screenHeight,
-				}}
-			></View> */}
 		</View>
 	);
 }

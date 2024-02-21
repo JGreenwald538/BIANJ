@@ -1,10 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import {
-	Dimensions,
-	ScrollView,
-	View,
-	LayoutAnimation,
-} from "react-native";
+import React, { Dispatch, SetStateAction, createContext, useContext, useEffect, useMemo, useState } from "react";
+import { Dimensions, ScrollView, View, LayoutAnimation } from "react-native";
 import { Place, PlaceList } from "../components/Place";
 import {
 	CategoriesContext,
@@ -18,6 +13,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const sortBys = ["Alphabetical", "Category", "Distance"];
 
@@ -51,6 +48,8 @@ const getDistance = (
 	return (R * c) / 1.609;
 };
 
+export const WalkthroughListScreenContext = createContext<[boolean, Dispatch<SetStateAction<boolean>>]>(undefined!);
+
 export default function ListScreen(
 	{ route, navigation }: any = { route: { params: {} }, navigation: null }
 ) {
@@ -65,7 +64,6 @@ export default function ListScreen(
 	const [sortByExpanded, setSortByExpanded] = useState(false);
 	const [categoriesEnabled, setCategoriesEnabled] = useState([]);
 	const categories = useContext(CategoriesContext);
-	const [places, setPlaces] = useState([]);
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
 	const insets = useSafeAreaInsets();
@@ -112,7 +110,7 @@ export default function ListScreen(
 	const titleRef = React.useRef<View>(null);
 	const buttonRef = React.useRef<View>(null);
 	const typeRef = React.useRef<View>(null);
-	const [placeEnabled, setPlaceEnabled] = useState(false)
+	const [placeEnabled, setPlaceEnabled] = useState(false);
 
 	// Define the steps of your walkthrough, including the ref to the target element and the content to display
 	const steps: StepInfo[] = [
@@ -139,16 +137,16 @@ export default function ListScreen(
 			content: {
 				title: "Resource Information",
 				description:
-					"You can see the title, type of place, and you can click on the button to see more information.",
+					"You can see the title, type of place, and you can click on the button to see more information. Let's do it!",
 				buttonText: "Next",
 			},
 		},
 		{
-			ref: [titleRef, typeRef, buttonRef],
+			ref: [containerRef],
 			content: {
-				title: "Resource Information",
+				title: "Expanded Resource Information",
 				description:
-					"You can see the title, type of place, and you can click on the button to see more information.",
+					"Now you can see all of the information for one place including the address, phone number, and website. You can also save the place. I'll save one for you.",
 				buttonText: "Next",
 			},
 		},
@@ -188,16 +186,23 @@ export default function ListScreen(
 
 	// Function to proceed to the next step or end the walkthrough
 	const nextStep = () => {
-		if (currentStep < steps.length - 1) {
+		if (currentStep === 2) {
+			setPlaceEnabled(true);
+			setTimeout(() => {
+				setCurrentStep(currentStep + 1);
+			}, 0);
+		} else if (currentStep < steps.length - 1) {
 			setCurrentStep(currentStep + 1);
 			if (currentStep === 0) {
 				setCentered(false);
-			} else if (currentStep === 2) {
-				console.log("setting place enabled")
-				setPlaceEnabled(true);
-				setCentered(true);
 			}
 		} else {
+			(async () => {
+				await AsyncStorage.setItem(
+					sortedValues[0].name,
+					JSON.stringify(sortedValues[0])
+				);
+			})();
 			setOverlayVisible(false);
 			navigation.navigate("Saved");
 			setWalkthrough(currentStep + 1);
@@ -210,8 +215,7 @@ export default function ListScreen(
 		}
 	});
 
-	useEffect(() => {
-		const sortData = async () => {
+	const sortedValues = useMemo(() => {
 			let sortedValues = [];
 			// Convert to JSON and apply the sorting logic
 			sortedValues = values.sort((a, b) => {
@@ -253,16 +257,10 @@ export default function ListScreen(
 					return categoriesEnabled.indexOf(value.typeOfPlace) !== -1;
 				});
 			}
-			const places = PlaceList(sortedValues, undefined, undefined, undefined, undefined, titleRef, typeRef, buttonRef, containerRef, placeEnabled);
-			if (places) {
-				// @ts-ignore
-				setPlaces(places.view);
-			}
-		};
+			return sortedValues;
+	}, [sortByEnabled, categoriesEnabled, values, currentLocation]);
 
-		sortData();
-		// @ts-ignore
-	}, [sortByEnabled, currentLocation[0], categoriesEnabled, update]);
+	
 
 	useFocusEffect(
 		React.useCallback(() => {
@@ -285,7 +283,25 @@ export default function ListScreen(
 			/>
 			<ScrollView>
 				<Place invisible />
-				{places}
+				<WalkthroughListScreenContext.Provider value={[placeEnabled, setPlaceEnabled]}>
+
+				<PlaceList 
+				items={sortedValues}
+				// save={undefined,
+				// deleteIcon: undefined,
+				// update: undefined,
+				// setUpdate: undefined,
+				titleRef={titleRef}
+				typeRef={typeRef}
+				buttonRef={buttonRef}
+				containerRef={containerRef}
+				useRef={true}
+				// placeEnabled={placeEnabled}
+				// setPlaceEnabled={setPlaceEnabled}
+
+			/>
+				</WalkthroughListScreenContext.Provider>
+
 			</ScrollView>
 			<Filter
 				filtersExpanded={filtersExpanded}

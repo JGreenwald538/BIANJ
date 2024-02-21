@@ -46,11 +46,11 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   const [location, setLocation] = React.useState<{lat: number, long: number} | null>(null);
-  const [isRealLocation, setIsRealLocation] = React.useState<boolean>(true);
+  const [isRealLocation, setIsRealLocation] = React.useState(true);
   const colorScheme = useColorScheme();
   const [places, setPlaces] = React.useState<any[]>([]);
-  const [categories, setCategories] = React.useState<any[]>([]);
-  const [walkthrough, setWalkthrough] = React.useState<number>(0);
+  // const [categories, setCategories] = React.useState<any[]>([]);
+  const [walkthrough, setWalkthrough] = React.useState(0);
   useEffect(() => {
     const updateState = async () => {
       setLocation(await getCurrentLocation());
@@ -74,15 +74,18 @@ export default function App() {
     }
     fetchData();
   }, []);
-  useEffect(() => {
-    const tempCategories: any[] = [];
-    places.forEach((place) => {
-      if (!tempCategories.includes(place.typeOfPlace)) {
-        tempCategories.push(place.typeOfPlace);
-      }
-    });
-    setCategories(tempCategories);
-  }, [places])
+
+	const categories = [...new Set(places.map((place) => place.typeOfPlace))];
+
+  // useEffect(() => {
+  //   const tempCategories: any[] = [];
+  //   places.forEach((place) => {
+  //     if (!tempCategories.includes(place.typeOfPlace)) {
+  //       tempCategories.push(place.typeOfPlace);
+  //     }
+  //   });
+  //   setCategories(tempCategories);
+  // }, [places])
 
   return (
 	<WalkthroughContext.Provider value={[walkthrough, setWalkthrough]}>

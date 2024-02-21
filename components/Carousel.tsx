@@ -28,7 +28,7 @@ const carouselImages: Record<number, any> = {
     // Add more images as needed
 };
 
-const scale = 0.3;
+const scale = 0.25;
 
 export default class App extends React.Component<{}, AppState> {
     

@@ -51,7 +51,7 @@ export default function SavedScreen() {
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
 	const [sortByExpanded, setSortByExpanded] = useState(false);
 	const [categoriesEnabled, setCategoriesEnabled] = useState([]);
-	const [categories, setCategories] = useState([]);
+	const [categories, setCategories] = useState<string[]>([]);
 	const [sortByEnabled, setSortByEnabled] = useState("Category");
 	const [places, setPlaces] = useState([]);
 	const { colors } = useTheme();
@@ -81,16 +81,16 @@ export default function SavedScreen() {
 				const keys = await AsyncStorage.getAllKeys();
 				const values = await AsyncStorage.multiGet(keys);
 				let sortedValues = [];
-				if(values.length === 0) {
+				if (values.length === 0) {
 					setCategories([]);
 				}
 				sortedValues = values
 					.map(([_, value]) => {
 						const tempCategories = categories;
 						if (
-							!tempCategories.includes(JSON.parse(value as string).typeOfPlace)
+							!tempCategories.includes(JSON.parse(value as string).typeOfPlace as string)
 						) {
-							tempCategories.push(JSON.parse(value as string).typeOfPlace);
+							tempCategories.push(JSON.parse(value as string).typeOfPlace as string);
 						}
 						setCategories(tempCategories);
 						return JSON.parse(value as string);
@@ -134,11 +134,19 @@ export default function SavedScreen() {
 						return categoriesEnabled.indexOf(value.typeOfPlace) !== -1;
 					});
 				}
-				// @ts-ignore
-				const places = PlaceList(sortedValues, false, true, update, setUpdate);
-				if (places) {
+				const places = PlaceList({
+					items: sortedValues,
+					save: false,
+					deleteIcon: true,
+					update,
+					setUpdate,
+				});
+				if (sortedValues.length !== 0) {
 					// @ts-ignore
-					setPlaces(places.view);
+					setPlaces(places);
+				} else {
+					// @ts-ignore
+					setPlaces(null);
 				}
 			};
 
@@ -159,7 +167,7 @@ export default function SavedScreen() {
 		<View>
 			<ScrollView>
 				<Place invisible />
-				{categories.length === 0 && (
+				{!places && (
 					<View
 						style={{
 							flex: 1,
@@ -177,10 +185,9 @@ export default function SavedScreen() {
 							No Saved Places
 						</Text>
 					</View>
-				)
-						}
+				)}
 				{places}
-				{categories.length !== 0 && (
+				{places && (
 					<View style={{ paddingHorizontal: 40 }}>
 						<TouchableOpacity
 							style={{
@@ -212,7 +219,7 @@ export default function SavedScreen() {
 					</View>
 				)}
 			</ScrollView>
-			<Filter
+			{places && <Filter
 				filtersExpanded={filtersExpanded}
 				categoriesEnabled={categoriesEnabled}
 				setCategoriesEnabled={setCategoriesEnabled}
@@ -226,8 +233,8 @@ export default function SavedScreen() {
 				setUpdate={setUpdate}
 				nextCategory={nextCategory}
 				setNextCategory={setNextCategory}
-			/>
-			<SortBy
+			/>}
+			{places && <SortBy
 				categories={categories}
 				colorScheme={colorScheme}
 				sortByExpanded={sortByExpanded}
@@ -240,7 +247,7 @@ export default function SavedScreen() {
 				currentLocation={currentLocation}
 				sortBys={sortBys}
 				setSortByExpanded={setSortByExpanded}
-			/>
+			/>}
 			<LogoTitle />
 		</View>
 	);
