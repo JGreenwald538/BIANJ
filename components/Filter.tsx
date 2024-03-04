@@ -68,6 +68,7 @@ export const Filter: React.FC<FilterProps> = ({
 				}}
 				persistentScrollbar
 				ref={menuRef}
+				collapsable={false}
 			>
 				{map && (
 					<Text

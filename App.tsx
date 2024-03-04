@@ -75,7 +75,8 @@ export default function App() {
     fetchData();
   }, []);
 
-	const categories = [...new Set(places.map((place) => place.typeOfPlace))];
+	let categories = [...new Set(places.map((place) => place.typeOfPlace))];
+  	categories = categories.sort((a, b) => a[0].localeCompare(b[0]));
 
   // useEffect(() => {
   //   const tempCategories: any[] = [];

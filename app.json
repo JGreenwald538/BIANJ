@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "BIANJ",
-    "slug": "BIANJ",
+    "name": "Brain Injury Resource Center",
+    "slug": "BIRC",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,8 +29,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "736b222f-dc35-4f78-b81e-2257f244344e"
+        "projectId": "4f2a80e3-6fab-455a-84d9-9b1abcc76248"
       }
-    }
+    },
+    "owner": "blood_bones124"
   }
 }

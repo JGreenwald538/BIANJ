@@ -14,6 +14,7 @@ import Markers from "../components/Markers";
 import Slider from "../components/MileSlider";
 import ClosestLocations from "../components/ClosestLocations";
 import {
+	CategoriesContext,
 	LocationContext,
 	PlacesContext,
 	WalkthroughContext,
@@ -47,7 +48,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
 	const screenWidth = Dimensions.get("window").width;
 	const [mapHeight, setMapHeight] = useState(0);
-	const [categories, setCategories] = useState([]);
+	const categories = useContext(CategoriesContext);
 	const [categoriesEnabled, setCategoriesEnabled] = useState([
 		"",
 		"",
@@ -75,7 +76,8 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 	const [currentStep, setCurrentStep] = useState<number>(0);
 	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
 	const updateVisibility = () => {
-		setOverlayVisible(walkthrough !== 0);
+		console.log();
+		setOverlayVisible(walkthrough !== 0 && navigation.isFocused());
 	};
 	const [targetMeasure, setTargetMeasure] = useState<{
 		x: number;
@@ -109,7 +111,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 			content: {
 				title: "Filter Menu",
 				description:
-					"In this menu, you can filter the resources by category. You can only select up to 5 categories at a time. We will filter by the first category for now. Let's try it out!",
+					"In this menu, you can filter the resources by up to 5 categories. We will filter by the first category for now.",
 				buttonText: "Filter",
 			},
 		},
@@ -163,38 +165,53 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 
 	// Effect to measure the current target element's position
 	useEffect(() => {
-		if (overlayVisible) {
-			const currentRef = steps[currentStep].ref;
-			let minX = Infinity;
-			let minY = Infinity;
-			let maxX = 0;
-			let maxY = 0;
-
+		if (overlayVisible && steps[currentStep]?.ref) {
 			let measurementsCount = 0;
-			currentRef.forEach((ref) => {
-				ref.current?.measure((x, y, width, height, pageX, pageY) => {
-					minX = Math.min(minX, pageX);
-					minY = Math.min(minY, pageY);
-					maxX = Math.max(maxX, pageX + width);
-					maxY = Math.max(maxY, pageY + height);
+			const totalRefs = steps[currentStep].ref.length;
+			let minX = Infinity,
+				minY = Infinity,
+				maxX = 0,
+				maxY = 0;
 
-					measurementsCount++;
-					if (measurementsCount === currentRef.length) {
-						// All measurements are done
-						setTargetMeasure({
-							x: minX,
-							y: minY,
-							width: maxX - minX,
-							height: maxY - minY,
-						});
-					}
-				});
+			steps[currentStep].ref.forEach((ref) => {
+				if (ref.current) {
+					ref.current.measureInWindow((x, y, width, height) => {
+						// console.log(
+						// 	`Measurements for step ${currentStep}:`,
+						// 	x,
+						// 	y,
+						// 	width,
+						// 	height
+						// ); // Debugging log
+						if (!isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)) {
+							minX = Math.min(minX, x);
+							minY = Math.min(minY, y);
+							maxX = Math.max(maxX, x + width);
+							maxY = Math.max(maxY, y + height);
+						}
+
+						measurementsCount++;
+						if (measurementsCount === totalRefs) {
+							if (minX < Infinity && minY < Infinity) {
+								setTargetMeasure({
+									x: minX,
+									y: minY,
+									width: maxX - minX,
+									height: maxY - minY,
+								});
+							} else {
+								console.error("Invalid measurements detected");
+							}
+						}
+					});
+				}
 			});
 		}
-	}, [currentStep, overlayVisible]);
+	}, [overlayVisible, currentStep, steps]);
 
 	// Function to proceed to the next step or end the walkthrough
 	const nextStep = () => {
+		console.log(overlayVisible)
 		if (currentStep === 1) {
 			onPress();
 			setTimeout(() => {
@@ -211,9 +228,11 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 		} else if (currentStep < steps.length - 1) {
 			setCurrentStep(currentStep + 1);
 		} else {
-			setOverlayVisible(false);
 			navigation.navigate("List");
+			setCurrentStep(0);
+			setOverlayVisible(false);
 			setWalkthrough(currentStep + 1);
+			
 		}
 	};
 
@@ -258,8 +277,6 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 		const newMarkers = Markers(data, categoriesEnabled, currentLocation[0]);
 		// @ts-ignore
 		setMarkers(newMarkers[0]);
-		// @ts-ignore
-		setCategories(newMarkers[1]);
 	} // Dependencies
 	useEffect(() => {
 		updateMarkers();
@@ -276,7 +293,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 				content={steps[currentStep].content}
 				onClose={nextStep}
 			/>
-			<View ref={mapRef} style={{ flex: 1 }}>
+			<View ref={mapRef} collapsable={false} style={{ flex: 1 }}>
 				<MapView
 					style={{
 						width: "100%",
@@ -300,6 +317,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 						((marker[1] <= sliderValue / 1.60934 || !isEnabled) &&
 							categoriesEnabled.indexOf(marker[2]) !== -1) ||
 						(!currentLocation && categoriesEnabled.indexOf(marker[2]) !== -1)
+							// || true
 							? marker[0]
 							: null
 					)}
@@ -347,7 +365,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 					}}
 				>
 					{currentLocation && currentLocation[0] && (
-						<View ref={radiusRef}>
+						<View ref={radiusRef} collapsable={false}>
 							<Slider
 								isEnabled={isEnabled}
 								value={sliderValue}
@@ -358,7 +376,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 						</View>
 					)}
 					{currentLocation && currentLocation[0] && (
-						<View ref={closestLocationsRef}>
+						<View ref={closestLocationsRef} collapsable={false}>
 							<ClosestLocations
 								locations={data}
 								currentLocation={currentLocation}
@@ -366,7 +384,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 							/>
 						</View>
 					)}
-					<View ref={addressInputRef}>
+					<View ref={addressInputRef} collapsable={false}>
 						<AddressInput />
 					</View>
 				</View>

@@ -152,37 +152,50 @@ export default function ListScreen(
 		},
 	];
 
-	// Effect to measure the current target element's position
 	useEffect(() => {
-		if (overlayVisible) {
-			const currentRef = steps[currentStep].ref;
-			let minX = Infinity;
-			let minY = Infinity;
-			let maxX = 0;
-			let maxY = 0;
-
+		if (overlayVisible && steps[currentStep]?.ref) {
 			let measurementsCount = 0;
-			currentRef.forEach((ref) => {
-				ref.current?.measure((x, y, width, height, pageX, pageY) => {
-					minX = Math.min(minX, pageX);
-					minY = Math.min(minY, pageY);
-					maxX = Math.max(maxX, pageX + width);
-					maxY = Math.max(maxY, pageY + height);
+			const totalRefs = steps[currentStep].ref.length;
+			let minX = Infinity,
+				minY = Infinity,
+				maxX = 0,
+				maxY = 0;
 
-					measurementsCount++;
-					if (measurementsCount === currentRef.length) {
-						// All measurements are done
-						setTargetMeasure({
-							x: minX,
-							y: minY,
-							width: maxX - minX,
-							height: maxY - minY,
-						});
-					}
-				});
+			steps[currentStep].ref.forEach((ref) => {
+				if (ref.current) {
+					ref.current.measureInWindow((x, y, width, height) => {
+						// console.log(
+						// 	`Measurements for step ${currentStep}:`,
+						// 	x,
+						// 	y,
+						// 	width,
+						// 	height
+						// ); // Debugging log
+						if (!isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)) {
+							minX = Math.min(minX, x);
+							minY = Math.min(minY, y);
+							maxX = Math.max(maxX, x + width);
+							maxY = Math.max(maxY, y + height);
+						}
+
+						measurementsCount++;
+						if (measurementsCount === totalRefs) {
+							if (minX < Infinity && minY < Infinity) {
+								setTargetMeasure({
+									x: minX,
+									y: minY,
+									width: maxX - minX,
+									height: maxY - minY,
+								});
+							} else {
+								console.error("Invalid measurements detected");
+							}
+						}
+					});
+				}
 			});
 		}
-	}, [currentStep, overlayVisible]);
+	}, [overlayVisible, currentStep, steps]);
 
 	// Function to proceed to the next step or end the walkthrough
 	const nextStep = () => {
@@ -206,6 +219,7 @@ export default function ListScreen(
 			setOverlayVisible(false);
 			navigation.navigate("Saved");
 			setWalkthrough(currentStep + 1);
+			setCurrentStep(0);
 		}
 	};
 
@@ -273,7 +287,7 @@ export default function ListScreen(
 
 	return (
 		<View>
-			<View ref={screenRef}></View>
+			<View ref={screenRef} collapsable={false}></View>
 			<WalkthroughOverlay
 				visible={overlayVisible}
 				targetMeasure={targetMeasure}

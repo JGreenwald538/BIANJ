@@ -16,6 +16,7 @@ import { useTheme } from "@react-navigation/native";
 import DropdownIcon from "../assets/SVGs/caret-down-circle-outline.svg"; // Ensure these SVG imports work in your setup
 import DeleteIcon from "../assets/SVGs/close-circle-outline.svg";
 import SaveIcon from "../assets/SVGs/download-outline.svg";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface PlaceProps {
 	name?: string;
@@ -115,11 +116,6 @@ const styles = StyleSheet.create({
 	actionTextHidden: {
 		display: "none",
 	},
-	invisible: {
-		backgroundColor: "white",
-		width: width - 40,
-		height: hasNotch ? 125 : 100,
-	},
 	invisibleDark: {
 		backgroundColor: "black",
 	},
@@ -148,6 +144,12 @@ const Place: React.FC<PlaceProps> = ({
 	const rotAnim = useRef(new Animated.Value(0)).current;
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
+	const insets = useSafeAreaInsets();
+	const invisibleStyle = {
+		backgroundColor: "white",
+		width: width - 40,
+		height: hasNotch ? 80 + insets.top * (3/4) : 80,
+	}
 
 	const togglePlaceEnabled = useCallback(() => {
 		setPlaceEnabled(!placeEnabled);
@@ -186,7 +188,7 @@ const Place: React.FC<PlaceProps> = ({
 		return (
 			<View
 				style={[
-					styles.invisible,
+					invisibleStyle,
 					colorScheme === "dark" && styles.invisibleDark,
 				]}
 			/>
@@ -200,6 +202,7 @@ const Place: React.FC<PlaceProps> = ({
 				colorScheme === "light" ? styles.containerLight : styles.containerDark,
 			]}
 			ref={containerRef}
+			collapsable={false}
 		>
 			<View style={{ flexDirection: "row" }}>
 				<View style={styles.logoContainer}>
@@ -354,6 +357,7 @@ const Place: React.FC<PlaceProps> = ({
 				</View>
 				<Animated.View
 					ref={buttonRef}
+					collapsable={false}
 					style={{
 						width: 30,
 						height: 30,
@@ -400,16 +404,25 @@ const Place: React.FC<PlaceProps> = ({
 								console.log(e);
 							}
 						}}
+						style={{
+							position: "absolute",
+							right: placeEnabled ? "auto" : 10,
+							top: placeEnabled ? "auto" : 8,
+							bottom: placeEnabled ? 8 : "auto",
+							zIndex: 1,
+							left: placeEnabled ? 25 : "auto",
+						}}
 					>
 						<View
 							style={{
-								// width: 30,
-								// height: 30,
-								position: "absolute",
-								right: placeEnabled ? width * 0.77 : 10,
-								top: placeEnabled ? "auto" : 8,
-								bottom: placeEnabled ? 8 : "auto",
-								zIndex: 1,
+							// 	// width: 30,
+							// 	// height: 30,
+							// 	position: "absolute",
+							// 	right: placeEnabled ? "auto" : 10,
+							// 	left: placeEnabled ? 10 : "auto",
+							// 	top: placeEnabled ? "auto" : 8,
+							// 	bottom: placeEnabled ? 8 : "auto",
+							// 	zIndex: 1,
 								alignContent: "center",
 							}}
 						>
@@ -426,6 +439,7 @@ const Place: React.FC<PlaceProps> = ({
 										textAlign: "center",
 										color: colorScheme === "light" ? "#471f7d" : "white",
 										marginTop: 2,
+										marginLeft: 3,
 									}}
 								>
 									Save

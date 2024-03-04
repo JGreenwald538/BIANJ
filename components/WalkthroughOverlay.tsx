@@ -30,51 +30,74 @@ const WalkthroughOverlay: React.FC<OverlayProps> = ({
 	center,
 }) => {
 	const windowDimensions = Dimensions.get("window");
-	const [height, setHeight] = React.useState(200);
-	const [width, setWidth] = React.useState(200);
+	const [tooltipHeight, setTooltipHeight] = React.useState(0);
+	const [tooltipWidth, setTooltipWidth] = React.useState(0);
 
-	// Calculate styles for additional dimmed overlays (left and right)
-	const dimmedLeftStyle = {
-		top: targetMeasure.y,
-		left: 0,
-		width: targetMeasure.x,
-		height: targetMeasure.height,
+	// Assuming targetMeasure and windowDimensions are defined and have numeric values
+
+	// Before using targetMeasure values, check if they are valid numbers
+	const safeTargetMeasure = {
+		x: !isNaN(targetMeasure.x) ? targetMeasure.x : 0,
+		y: !isNaN(targetMeasure.y) ? targetMeasure.y : 0,
+		width: !isNaN(targetMeasure.width) ? targetMeasure.width : 0,
+		height: !isNaN(targetMeasure.height) ? targetMeasure.height : 0,
 	};
 
-	const dimmedRightStyle = {
-		top: targetMeasure.y,
-		right: 0,
-		width: windowDimensions.width - targetMeasure.x - targetMeasure.width,
-		height: targetMeasure.height,
+	const dimmedStyles = {
+		top: {
+			top: 0,
+			left: 0,
+			right: 0,
+			height: safeTargetMeasure.y,
+		},
+		bottom: {
+			top: safeTargetMeasure.y + safeTargetMeasure.height,
+			left: 0,
+			right: 0,
+			bottom: 0,
+		},
+		left: {
+			top: safeTargetMeasure.y,
+			left: 0,
+			width: safeTargetMeasure.x,
+			height: safeTargetMeasure.height,
+		},
+		right: {
+			top: safeTargetMeasure.y,
+			right: 0,
+			width:
+				windowDimensions.width -
+				(safeTargetMeasure.x + safeTargetMeasure.width),
+			height: safeTargetMeasure.height,
+		},
 	};
+
+	// Ensure no calculation results in NaN
+	Object.keys(dimmedStyles).forEach((key) => {
+		const style = dimmedStyles[key];
+		Object.keys(style).forEach((prop) => {
+			if (isNaN(style[prop])) {
+				console.error(`Invalid calculation for ${key} ${prop}:`, style[prop]);
+				style[prop] = 0; // Default to 0 if NaN
+			}
+		});
+	});
 
 	// Determine if the tooltip should be shown above or below based on available space
 	const showTooltipAbove =
-		targetMeasure.y + targetMeasure.height + height > windowDimensions.height;
+		targetMeasure.y + targetMeasure.height + tooltipHeight >
+		windowDimensions.height;
 
 	// Adjust tooltip position dynamically
 	let tooltipStyle = {
-		top: center ? (windowDimensions.height - height) / 2 : showTooltipAbove
-			? targetMeasure.y - height
+		top: center
+			? (windowDimensions.height - tooltipHeight) / 2
+			: showTooltipAbove
+			? targetMeasure.y - tooltipHeight - 20
 			: targetMeasure.y + targetMeasure.height + 20, // Position above if too low, else below
-		left: center ? (windowDimensions.width - width) / 2  : Math.max(0, targetMeasure.x + targetMeasure.width / 2 - 100),
-		right: center ? undefined :  Math.max(
-			0,
-			windowDimensions.width - targetMeasure.x - targetMeasure.width / 2 - 100
-		),
-	};
-	const dimmedTopStyle = {
-		top: 0,
-		left: 0,
-		width: windowDimensions.width,
-		height: targetMeasure.y, // Top overlay extends from the top of the screen to the top of the highlighted area
-	};
-
-	const dimmedBottomStyle = {
-		top: targetMeasure.y + targetMeasure.height,
-		left: 0,
-		width: windowDimensions.width,
-		height: windowDimensions.height - (targetMeasure.y + targetMeasure.height), // Bottom overlay extends from the bottom of the highlighted area to the bottom of the screen
+		left: center
+			? (windowDimensions.width - tooltipWidth) / 2
+			: targetMeasure.x + targetMeasure.width / 2 - tooltipWidth / 2,
 	};
 
 	return (
@@ -89,41 +112,26 @@ const WalkthroughOverlay: React.FC<OverlayProps> = ({
 				onPress={onClose}
 				activeOpacity={1}
 			>
-				{/* Dimmed area above the highlighted area */}
+				{/* Dimmed areas */}
+				<View style={[styles.dimmedOverlay, dimmedStyles.top]} />
+				<View style={[styles.dimmedOverlay, dimmedStyles.bottom]} />
+				<View style={[styles.dimmedOverlay, dimmedStyles.left]} />
 				<View
-					style={[
-						styles.dimmedOverlay,
-						{ top: 0, height: targetMeasure.y, left: 0, right: 0 },
-					]}
+					style={[styles.dimmedOverlay, { ...dimmedStyles.right, right: 0 }]}
 				/>
-				{/* Dimmed area below the highlighted area */}
-				<View
-					style={[
-						styles.dimmedOverlay,
-						{ top: targetMeasure.y + targetMeasure.height, left: 0, right: 0 },
-					]}
-				/>
-				<View style={[styles.dimmedOverlay, dimmedTopStyle]} />
-
-				{/* Dimmed area below the highlighted area */}
-				<View style={[styles.dimmedOverlay, dimmedBottomStyle]} />
-				{/* Dimmed area to the left of the highlighted area */}
-				<View style={[styles.dimmedOverlay, dimmedLeftStyle]} />
-				{/* Dimmed area to the right of the highlighted area */}
-				<View style={[styles.dimmedOverlay, dimmedRightStyle]} />
 
 				{/* Tooltip container */}
-				<View style={[styles.tooltip, tooltipStyle]} onLayout={
-					({
+				<View
+					style={[styles.tooltip, tooltipStyle]}
+					onLayout={({
 						nativeEvent: {
 							layout: { height, width },
 						},
 					}) => {
-						setHeight(height)
-						setWidth(width)
-					}
-				
-				}>
+						setTooltipHeight(height);
+						setTooltipWidth(width);
+					}}
+				>
 					<Text style={styles.title}>{content.title}</Text>
 					<Text style={styles.description}>{content.description}</Text>
 					<TouchableOpacity onPress={onClose} style={styles.button}>
@@ -145,16 +153,18 @@ const styles = StyleSheet.create({
 	dimmedOverlay: {
 		position: "absolute",
 		backgroundColor: "rgba(0, 0, 0, 0.7)",
+		width: "100%",
 	},
 	tooltip: {
 		position: "absolute",
 		backgroundColor: "white",
 		borderRadius: 8,
 		padding: 16,
-		maxWidth: 300,
 		zIndex: 5,
 		borderWidth: 1,
 		borderColor: "#ddd",
+		// Ensure the tooltip is centered and does not go off-screen
+		maxWidth: "80%",
 	},
 	title: {
 		fontSize: 18,

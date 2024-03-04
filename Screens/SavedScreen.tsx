@@ -14,12 +14,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Checkbox from "../components/Checkbox";
 import { RadioButton } from "react-native-paper";
 import { AddressInput } from "../components/AddressInput";
-import { CategoriesContext, LocationContext } from "../util/globalvars";
+import { CategoriesContext, LocationContext, WalkthroughContext } from "../util/globalvars";
 import LogoTitle from "../components/LogoTitle";
 import { useFocusEffect, useTheme } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
+import WalkthroughOverlay from "../components/WalkthroughOverlay";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -46,7 +47,16 @@ const getDistance = (
 
 const sortBys = ["Alphabetical", "Category", "Distance"];
 
-export default function SavedScreen() {
+interface StepInfo {
+	ref: React.RefObject<View>[];
+	content: {
+		title: string;
+		description: string;
+		buttonText: string;
+	};
+}
+
+export default function SavedScreen({ navigation }: { navigation: any }) {
 	const currentLocation = useContext(LocationContext);
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
 	const [sortByExpanded, setSortByExpanded] = useState(false);
@@ -88,9 +98,13 @@ export default function SavedScreen() {
 					.map(([_, value]) => {
 						const tempCategories = categories;
 						if (
-							!tempCategories.includes(JSON.parse(value as string).typeOfPlace as string)
+							!tempCategories.includes(
+								JSON.parse(value as string).typeOfPlace as string
+							)
 						) {
-							tempCategories.push(JSON.parse(value as string).typeOfPlace as string);
+							tempCategories.push(
+								JSON.parse(value as string).typeOfPlace as string
+							);
 						}
 						setCategories(tempCategories);
 						return JSON.parse(value as string);
@@ -163,8 +177,107 @@ export default function SavedScreen() {
 		}, [])
 	);
 
+	const [walkthrough, setWalkthrough] = useContext(WalkthroughContext);
+
+	// State to manage the current step, overlay visibility, and target element position
+	const [currentStep, setCurrentStep] = useState<number>(0);
+	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
+	const [centered, setCentered] = useState(true);
+	const updateVisibility = () => {
+		setOverlayVisible(walkthrough !== 0);
+	};
+	const [targetMeasure, setTargetMeasure] = useState<{
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	}>({ x: 0, y: 0, width: 0, height: 0 });
+
+	// Define the steps of your walkthrough, including the ref to the target element and the content to display
+	const steps: StepInfo[] = [
+		{
+			ref: [],
+			content: {
+				title: "Saved Screen",
+				description:
+					"This is the saved screen where you can see all the places you have saved and information similar to the list screen.",
+				buttonText: "Go to the end",
+			},
+		},
+	];
+
+	useEffect(() => {
+		if (overlayVisible && steps[currentStep]?.ref) {
+			let measurementsCount = 0;
+			const totalRefs = steps[currentStep].ref.length;
+			let minX = Infinity,
+				minY = Infinity,
+				maxX = 0,
+				maxY = 0;
+
+			steps[currentStep].ref.forEach((ref) => {
+				if (ref.current) {
+					ref.current.measureInWindow((x, y, width, height) => {
+						// console.log(
+						// 	`Measurements for step ${currentStep}:`,
+						// 	x,
+						// 	y,
+						// 	width,
+						// 	height
+						// ); // Debugging log
+						if (!isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)) {
+							minX = Math.min(minX, x);
+							minY = Math.min(minY, y);
+							maxX = Math.max(maxX, x + width);
+							maxY = Math.max(maxY, y + height);
+						}
+
+						measurementsCount++;
+						if (measurementsCount === totalRefs) {
+							if (minX < Infinity && minY < Infinity) {
+								setTargetMeasure({
+									x: minX,
+									y: minY,
+									width: maxX - minX,
+									height: maxY - minY,
+								});
+							} else {
+								console.error("Invalid measurements detected");
+							}
+						}
+					});
+				}
+			});
+		}
+	}, [overlayVisible, currentStep, steps]);
+
+	// Function to proceed to the next step or end the walkthrough
+	const nextStep = () => {
+		if (currentStep < steps.length - 1) {
+			setCurrentStep(currentStep + 1);
+		} else {
+			setOverlayVisible(false);
+			navigation.navigate("Home");
+			setWalkthrough(currentStep + 1);
+			setCurrentStep(0);
+		}
+	};
+
+	useFocusEffect(() => {
+		{
+			updateVisibility();
+		}
+	});
+
 	return (
 		<View>
+			<WalkthroughOverlay
+				visible={overlayVisible}
+				targetMeasure={targetMeasure}
+				content={steps[currentStep].content}
+				onClose={nextStep}
+				center={centered}
+			/>
 			<ScrollView>
 				<Place invisible />
 				{!places && (
@@ -219,35 +332,39 @@ export default function SavedScreen() {
 					</View>
 				)}
 			</ScrollView>
-			{places && <Filter
-				filtersExpanded={filtersExpanded}
-				categoriesEnabled={categoriesEnabled}
-				setCategoriesEnabled={setCategoriesEnabled}
-				categories={categories}
-				colorScheme={colorScheme}
-				screenHeight={screenHeight}
-				insets={insets}
-				screenWidth={screenWidth}
-				onPressFilters={onPressFilters}
-				update={update}
-				setUpdate={setUpdate}
-				nextCategory={nextCategory}
-				setNextCategory={setNextCategory}
-			/>}
-			{places && <SortBy
-				categories={categories}
-				colorScheme={colorScheme}
-				sortByExpanded={sortByExpanded}
-				onPressSortBy={onPressSortBy}
-				screenWidth={screenWidth}
-				screenHeight={screenHeight}
-				insets={insets}
-				sortByEnabled={sortByEnabled}
-				setSortByEnabled={setSortByEnabled}
-				currentLocation={currentLocation}
-				sortBys={sortBys}
-				setSortByExpanded={setSortByExpanded}
-			/>}
+			{places && (
+				<Filter
+					filtersExpanded={filtersExpanded}
+					categoriesEnabled={categoriesEnabled}
+					setCategoriesEnabled={setCategoriesEnabled}
+					categories={categories}
+					colorScheme={colorScheme}
+					screenHeight={screenHeight}
+					insets={insets}
+					screenWidth={screenWidth}
+					onPressFilters={onPressFilters}
+					update={update}
+					setUpdate={setUpdate}
+					nextCategory={nextCategory}
+					setNextCategory={setNextCategory}
+				/>
+			)}
+			{places && (
+				<SortBy
+					categories={categories}
+					colorScheme={colorScheme}
+					sortByExpanded={sortByExpanded}
+					onPressSortBy={onPressSortBy}
+					screenWidth={screenWidth}
+					screenHeight={screenHeight}
+					insets={insets}
+					sortByEnabled={sortByEnabled}
+					setSortByEnabled={setSortByEnabled}
+					currentLocation={currentLocation}
+					sortBys={sortBys}
+					setSortByExpanded={setSortByExpanded}
+				/>
+			)}
 			<LogoTitle />
 		</View>
 	);

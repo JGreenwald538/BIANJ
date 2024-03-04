@@ -6,14 +6,17 @@ import {
 	StyleSheet,
 	Dimensions,
 	Linking,
+	LayoutChangeEvent,
 } from "react-native";
 import LogoTitle from "../components/LogoTitle";
 import Carousel from "../components/Carousel";
-import { useTheme } from "@react-navigation/native";
+import { useFocusEffect, useTheme } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import ReloadIcon from "../assets/SVGs/reload-circle-outline.svg";
 import { WalkthroughContext } from "../util/globalvars";
+import { useFocus } from "native-base/lib/typescript/components/primitives";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 const screenHeight = Dimensions.get("window").height;
@@ -30,6 +33,7 @@ interface StepInfo {
 export default function HomeScreen({navigation} : any) {
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
+	const insets = useSafeAreaInsets();
 	const styles = StyleSheet.create({
 		container: {
 			flex: 1,
@@ -37,7 +41,7 @@ export default function HomeScreen({navigation} : any) {
 		header: {
 			alignItems: "center", // Center items horizontally in the container
 			justifyContent: "flex-end", // Center items vertically in the container
-			flex: 3.5, // You can adjust the height as needed
+			flex: 3, // You can adjust the height as needed
 			marginBottom: 15
 		},
 		title: {
@@ -81,12 +85,14 @@ export default function HomeScreen({navigation} : any) {
 	const resourcesRef = useRef<View>(null);
 	const donateRef = useRef<View>(null);
 	const contactUsRef = useRef<View>(null);
+	const reloadButtonRef = useRef<View>(null);
 
 	const [walkthrough, setWalkthrough] = React.useContext(WalkthroughContext);
 
 	// State to manage the current step, overlay visibility, and target element position
 	const [currentStep, setCurrentStep] = useState<number>(walkthrough);
 	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
+	const [centered, setCentered] = useState(true);
 	const [targetMeasure, setTargetMeasure] = useState<{
 		x: number;
 		y: number;
@@ -123,57 +129,86 @@ export default function HomeScreen({navigation} : any) {
 				buttonText: "Next",
 			},
 		},
+		{
+			ref: [reloadButtonRef],
+			content: {
+				title: "Conclusion",
+				description:
+					"Thank you for taking the time to learn more about the Brain Injury Alliance of New Jersey Resource Center. In order to start the walkthrough again, click the reload button in the top left corner.",
+				buttonText: "Finish",
+			},
+		},
 	];
 
-	// Effect to measure the current target element's position
 	useEffect(() => {
-		if (overlayVisible) {
-			const currentRef = steps[currentStep].ref
-			let minX = Infinity;
-			let minY = Infinity;
-			let maxX = 0;
-			let maxY = 0;
-
+		if (overlayVisible && steps[currentStep]?.ref) {
 			let measurementsCount = 0;
+			const totalRefs = steps[currentStep].ref.length;
+			let minX = Infinity,
+				minY = Infinity,
+				maxX = 0,
+				maxY = 0;
 
-			currentRef.forEach((ref) => {
-				ref.current?.measure((x, y, width, height, pageX, pageY) => {
-					minX = Math.min(minX, pageX);
-					minY = Math.min(minY, pageY);
-					maxX = Math.max(maxX, pageX + width);
-					maxY = Math.max(maxY, pageY + height);
-
-					measurementsCount++;
-					if (measurementsCount === currentRef.length) {
-						// All measurements are done
-						setTargetMeasure({
-							x: minX,
-							y: minY,
-							width: maxX - minX,
-							height: maxY - minY,
-						});
-					}
-				});
+			steps[currentStep].ref.forEach((ref) => {
+				if (ref.current) {
+					ref.current.measureInWindow((x, y, width, height) => {
+						if (!isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)) {
+							minX = Math.min(minX, x);
+							minY = Math.min(minY, y);
+							maxX = Math.max(maxX, x + width);
+							maxY = Math.max(maxY, y + height);
+						}
+						measurementsCount++;
+						if (measurementsCount === totalRefs) {
+							if (minX < Infinity && minY < Infinity) {
+								setTargetMeasure({
+									x: minX,
+									y: minY,
+									width: maxX - minX,
+									height: maxY - minY,
+								});
+							} else {
+								console.error("Invalid measurements detected");
+							}
+						}
+					});
+				}
 			});
 		}
-	}, [currentStep, overlayVisible]);
+	}, [overlayVisible, currentStep]);
+
+	useFocusEffect(() => {
+		if (walkthrough !== 0) {
+			setCentered(true);
+			setOverlayVisible(true);
+		}
+	});
 
 	// Function to start the walkthrough
 	const startWalkthrough = () => {
 		setCurrentStep(0);
 		setOverlayVisible(true);
+		setCentered(false)
 	};
 
 	// Function to proceed to the next step or end the walkthrough
 	const nextStep = () => {
-		if (currentStep < steps.length - 1) {
+		if (currentStep === 2) {
+			navigation.navigate("Map");
+			setOverlayVisible(false);
+			setWalkthrough(1)
+			setCurrentStep(currentStep + 1);
+		} else if (currentStep < steps.length - 1) {
 			setCurrentStep(currentStep + 1);
 		} else {
+			setWalkthrough(0)
 			setOverlayVisible(false);
-			navigation.navigate("Map");
-			setWalkthrough(currentStep + 1);
+			setCurrentStep(0);
+			setCentered(false)
 		}
 	};
+
+
 	return (
 		<View style={styles.container}>
 			<WalkthroughOverlay
@@ -181,6 +216,7 @@ export default function HomeScreen({navigation} : any) {
 				targetMeasure={targetMeasure}
 				content={steps[currentStep].content}
 				onClose={nextStep}
+				center={centered}
 			/>
 			<View style={styles.header}>
 				{/* Logo and Title */}
@@ -189,10 +225,10 @@ export default function HomeScreen({navigation} : any) {
 					Welcome to the Brain Injury Alliance of New Jersey Resource Center
 				</Text>
 			</View>
-			<View ref={carouselRef} style={{marginBottom: 15}}>
+			<View ref={carouselRef} style={{ marginBottom: 15 }} collapsable={false}>
 				<Carousel />
 			</View>
-			<View style={styles.menu} ref={aboutUsRef}>
+			<View style={styles.menu} ref={aboutUsRef} collapsable={false}>
 				<TouchableOpacity
 					style={styles.menuItem}
 					onPress={async () => {
@@ -202,7 +238,7 @@ export default function HomeScreen({navigation} : any) {
 					<Text style={styles.menuText}>About Us</Text>
 				</TouchableOpacity>
 			</View>
-			<View style={styles.menu} ref={getInvolvedRef}>
+			<View style={styles.menu} ref={getInvolvedRef} collapsable={false}>
 				<TouchableOpacity
 					style={styles.menuItem}
 					onPress={async () => {
@@ -212,7 +248,7 @@ export default function HomeScreen({navigation} : any) {
 					<Text style={styles.menuText}>Get Involved</Text>
 				</TouchableOpacity>
 			</View>
-			<View style={styles.menu} ref={resourcesRef}>
+			<View style={styles.menu} ref={resourcesRef} collapsable={false}>
 				<TouchableOpacity
 					style={styles.menuItem}
 					onPress={async () => {
@@ -222,7 +258,7 @@ export default function HomeScreen({navigation} : any) {
 					<Text style={styles.menuText}>Resources</Text>
 				</TouchableOpacity>
 			</View>
-			<View style={styles.menu} ref={donateRef}>
+			<View style={styles.menu} ref={donateRef} collapsable={false}>
 				<TouchableOpacity
 					style={styles.menuItem}
 					onPress={async () => {
@@ -232,7 +268,7 @@ export default function HomeScreen({navigation} : any) {
 					<Text style={styles.menuText}>Donate</Text>
 				</TouchableOpacity>
 			</View>
-			<View style={styles.menu} ref={contactUsRef}>
+			<View style={styles.menu} ref={contactUsRef} collapsable={false}>
 				<TouchableOpacity
 					style={styles.menuItem}
 					onPress={async () => {
@@ -244,15 +280,23 @@ export default function HomeScreen({navigation} : any) {
 			</View>
 			{/* Repeat the above TouchableOpacity for each menu item */}
 			<LogoTitle />
+
 			<TouchableOpacity
 				onPress={startWalkthrough}
-				style={{ position: "absolute", zIndex: 10, top: 70, left: 70 }}
+				style={{
+					position: "absolute",
+					zIndex: 10,
+					top: 0.015 * screenHeight + insets.top,
+					left: 70,
+				}}
 			>
-				<ReloadIcon
-					color={colorScheme === "light" ? "#e2cbe7" : "#70387a"}
-					width={30}
-					height={30}
-				/>
+				<View ref={reloadButtonRef} collapsable={false}>
+					<ReloadIcon
+						color={colorScheme === "light" ? "#e2cbe7" : "#70387a"}
+						width={30}
+						height={30}
+					/>
+				</View>
 			</TouchableOpacity>
 		</View>
 	);
