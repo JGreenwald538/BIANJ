@@ -41,7 +41,7 @@ const screenHeight = Dimensions.get("window").height;
 
 export default function MapScreen({ navigation }: { navigation: any }) {
 	const data = useContext(PlacesContext);
-	const [sliderValue, setSliderValue] = useState<number>(0);
+	const [sliderValue, setSliderValue] = useState<number>(10);
 	const currentLocation = useContext(LocationContext);
 	// @ts-ignore
 	const [isEnabled, setIsEnabled] = useState(false);
@@ -69,6 +69,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 	const radiusRef = React.useRef(null);
 	const closestLocationsRef = React.useRef(null);
 	const addressInputRef = React.useRef(null);
+	const closeButtonRef = React.useRef(null);
 
 	const [walkthrough, setWalkthrough] = useContext(WalkthroughContext);
 
@@ -76,7 +77,6 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 	const [currentStep, setCurrentStep] = useState<number>(0);
 	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
 	const updateVisibility = () => {
-		console.log();
 		setOverlayVisible(walkthrough !== 0 && navigation.isFocused());
 	};
 	const [targetMeasure, setTargetMeasure] = useState<{
@@ -94,6 +94,15 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 				title: "Map",
 				description:
 					"This is the map of New Jersey. You can see the locations of the resources on the map.",
+				buttonText: "Next",
+			},
+		},
+		{
+			ref: [closeButtonRef],
+			content: {
+				title: "Close Button",
+				description:
+					"This button closes the bottom bar. You can open it again by tapping on the arrow.",
 				buttonText: "Next",
 			},
 		},
@@ -211,7 +220,6 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 
 	// Function to proceed to the next step or end the walkthrough
 	const nextStep = () => {
-		console.log(overlayVisible)
 		if (currentStep === 1) {
 			onPress();
 			setTimeout(() => {
@@ -260,9 +268,11 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 	const handleSliderChange = (newValue: number) => {
 		setSliderValue(newValue);
 	};
-	const handleEnabledChange = () => {
-		if (currentLocation !== null) {
+	const handleEnabledChange = (isRadiusEnabled: boolean) => {
+		if (isRadiusEnabled || isEnabled) {
 			setIsEnabled(!isEnabled);
+		} else {
+			alert("Please enable filters to use the radius selector");
 		}
 	};
 
@@ -281,6 +291,14 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 	useEffect(() => {
 		updateMarkers();
 	}, [data, categoriesEnabled, currentLocation]);
+
+	function changeCategoriesEnbaled(categories: string[]) {
+		setCategoriesEnabled(categories);
+		if (categories.every((category) => category === "")) {
+			setIsEnabled(false);
+		}
+	}
+
 	return (
 		<KeyboardAvoidingView
 			style={{ flex: 1 }}
@@ -343,11 +361,11 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 						<Marker
 							coordinate={{
 								latitude:
-									currentLocation && currentLocation[0]
+									currentLocation[0] && currentLocation[0]
 										? currentLocation[0].lat
 										: 0,
 								longitude:
-									currentLocation && currentLocation[0]
+									currentLocation[0] && currentLocation[0]
 										? currentLocation[0].long
 										: 0,
 							}}
@@ -372,6 +390,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 								onValueChange={handleSliderChange}
 								isEnabledChange={handleEnabledChange}
 								filters={categoriesEnabled}
+								setFiltersExpanded={setFiltersExpanded}
 							/>
 						</View>
 					)}
@@ -381,6 +400,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 								locations={data}
 								currentLocation={currentLocation}
 								categories={[categories, categoriesEnabled]}
+								setFiltersExpanded={setFiltersExpanded}
 							/>
 						</View>
 					)}
@@ -392,7 +412,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 			<Filter
 				filtersExpanded={filtersExpanded}
 				categoriesEnabled={categoriesEnabled}
-				setCategoriesEnabled={setCategoriesEnabled}
+				setCategoriesEnabled={changeCategoriesEnbaled}
 				categories={categories}
 				onPressFilters={onPress}
 				colorScheme={colorScheme}
@@ -405,7 +425,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 				buttonRef={filterRef}
 				menuRef={filterMenuRef}
 			/>
-			<LogoTitle />
+			<LogoTitle left={!bottomBarExpanded} />
 			<View
 				style={{
 					position: "absolute",
@@ -430,6 +450,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 						},
 					],
 				}}
+				ref={closeButtonRef}
 			>
 				<TouchableOpacity
 					onPress={() => {
@@ -443,11 +464,11 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 				>
 					<Image
 						source={require("../assets/logos/ArrowIcon.png")}
-						alt={"logo"}
+						alt={"Close Bottom Bar"}
 						style={{
-							height: 25,
+							height: 30,
 							resizeMode: "contain",
-							width: 25,
+							width: 30,
 							borderRadius: 50,
 						}}
 					/>

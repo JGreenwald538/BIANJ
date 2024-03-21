@@ -14,6 +14,7 @@ import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Alert from "../components/Alert";
 
 
 const sortBys = ["Alphabetical", "Category", "Distance"];
@@ -53,11 +54,9 @@ export const WalkthroughListScreenContext = createContext<[boolean, Dispatch<Set
 export default function ListScreen(
 	{ route, navigation }: any = { route: { params: {} }, navigation: null }
 ) {
-	const empty: any[] = [];
-	const [data, setData] = useState(empty);
 	const values = useContext(PlacesContext);
 	const [sortByEnabled, setSortByEnabled] = useState(
-		route.params ? route.params.sortBy : ""
+		"Category"
 	);
 	const currentLocation = useContext(LocationContext);
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
@@ -97,6 +96,8 @@ export default function ListScreen(
 	};
 
 	const [centered, setCentered] = useState(true);
+	const [alertVisible, setAlertVisible] = useState(false);
+	const [message, setMessage] = useState("");
 
 	const [targetMeasure, setTargetMeasure] = useState<{
 		x: number;
@@ -128,7 +129,7 @@ export default function ListScreen(
 			content: {
 				title: "List",
 				description:
-					"Each resource is displayed with its name, type, and distance from your current location.",
+					"Each resource is displayed with its name and type of location.",
 				buttonText: "Next",
 			},
 		},
@@ -164,13 +165,6 @@ export default function ListScreen(
 			steps[currentStep].ref.forEach((ref) => {
 				if (ref.current) {
 					ref.current.measureInWindow((x, y, width, height) => {
-						// console.log(
-						// 	`Measurements for step ${currentStep}:`,
-						// 	x,
-						// 	y,
-						// 	width,
-						// 	height
-						// ); // Debugging log
 						if (!isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)) {
 							minX = Math.min(minX, x);
 							minY = Math.min(minY, y);
@@ -223,11 +217,17 @@ export default function ListScreen(
 		}
 	};
 
-	useFocusEffect(() => {
+	useEffect(() => 
 		{
 			updateVisibility();
+			setSortByEnabled(route.params ? route.params.sortBy : sortByEnabled);
+			setCategoriesEnabled(
+				route.params ? route.params.categoriesEnabled : categoriesEnabled
+			);
 		}
-	});
+	, [route.params]);
+
+
 
 	const sortedValues = useMemo(() => {
 			let sortedValues = [];
@@ -285,6 +285,7 @@ export default function ListScreen(
 		}, [])
 	);
 
+
 	return (
 		<View>
 			<View ref={screenRef} collapsable={false}></View>
@@ -295,27 +296,31 @@ export default function ListScreen(
 				onClose={nextStep}
 				center={centered}
 			/>
-			<ScrollView>
-				<Place invisible />
-				<WalkthroughListScreenContext.Provider value={[placeEnabled, setPlaceEnabled]}>
-
-				<PlaceList 
-				items={sortedValues}
-				// save={undefined,
-				// deleteIcon: undefined,
-				// update: undefined,
-				// setUpdate: undefined,
-				titleRef={titleRef}
-				typeRef={typeRef}
-				buttonRef={buttonRef}
-				containerRef={containerRef}
-				useRef={true}
-				// placeEnabled={placeEnabled}
-				// setPlaceEnabled={setPlaceEnabled}
-
+			<Alert
+				visible={alertVisible}
+				onClose={() => setAlertVisible(false)}
+				message={message}
 			/>
+			<ScrollView style={{ height: "100%" }}>
+				<Place invisible />
+				<WalkthroughListScreenContext.Provider
+					value={[placeEnabled, setPlaceEnabled]}
+				>
+					<PlaceList
+						items={sortedValues}
+						// save={undefined,
+						// deleteIcon: undefined,
+						// update: undefined,
+						// setUpdate: undefined,
+						titleRef={titleRef}
+						typeRef={typeRef}
+						buttonRef={buttonRef}
+						containerRef={containerRef}
+						useRef={true}
+						// placeEnabled={placeEnabled}
+						// setPlaceEnabled={setPlaceEnabled}
+					/>
 				</WalkthroughListScreenContext.Provider>
-
 			</ScrollView>
 			<Filter
 				filtersExpanded={filtersExpanded}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
 
@@ -16,6 +16,7 @@ type ClosestLocationComponentProps = {
     locations: Location[];
     currentLocation: any;
     categories: any;
+	setFiltersExpanded: (filtersExpanded: boolean) => void;
 	ref?: any;
 };
 
@@ -32,7 +33,7 @@ const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): nu
     return R * c / 1.609; // Distance in km
 };
 
-const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ locations, currentLocation, categories, ref }) => {
+const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ locations, currentLocation, categories, ref, setFiltersExpanded }) => {
     const {colors} = useTheme();
     const colorScheme = colors.background === "white" ? "light" : "dark";
     const styles = StyleSheet.create({
@@ -55,8 +56,7 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
     }
     const sortedLocations = locations
         .filter(location => {
-            // console.log(location.typeOfPlace);
-            return categories[1][categories[0].indexOf(location.typeOfPlace)];
+            return categories[1].indexOf(location.typeOfPlace) !== -1;
         }
             )
         .map(location => ({
@@ -65,6 +65,8 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
         }))
         .sort((a, b) => a.distance - b.distance)
         .slice(0, 3); // Get top 3 locations
+
+	const categoriesEmpty = categories[1].every((category: string) => category === "");
     return (
 			<View style={styles.container} ref={ref}>
 				<Text
@@ -90,14 +92,19 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
 						</Text>
 					))
 				) : (
-					<Text
-						style={{
-							textAlign: "center",
-							color: colorScheme === "light" ? "black" : "white",
-						}}
-					>
-						Select Filters To See Closest Locations
-					</Text>
+					<TouchableOpacity onPress={() => {
+						setFiltersExpanded(true)
+						LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+					}}>
+						<Text
+							style={{
+								textAlign: "center",
+								color: colorScheme === "light" ? "black" : "white",
+							}}
+						>
+							Select Filters To See Closest Locations
+						</Text>
+					</TouchableOpacity>
 				)}
 				<View
 					style={{
@@ -111,12 +118,20 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
 					<TouchableOpacity
 						style={{
 							paddingVertical: 5,
-							backgroundColor: "#572C5F",
+							backgroundColor: !categoriesEmpty ? "#572C5F" : "grey",
 							borderRadius: 5,
+							opacity: !categoriesEmpty ? 1 : 0.75,
 						}}
 						onPress={() => {
-							// @ts-ignore
-							navigation.navigate("List", { sortBy: "Distance" });
+							if (!categoriesEmpty) {
+								// @ts-ignore
+								navigation.navigate("List", {
+									sortBy: "Distance",
+									categoriesEnabled: categories[1],
+								});
+							} else {
+								alert("Please select filters to see closest locations");
+							}
 						}}
 					>
 						<Text
@@ -125,9 +140,8 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
 								textAlign: "center",
 								paddingHorizontal: 5,
 							}}
-							numberOfLines={1}
 						>
-							{"See All"}
+							See All
 						</Text>
 					</TouchableOpacity>
 				</View>

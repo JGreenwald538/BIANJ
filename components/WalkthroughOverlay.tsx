@@ -33,7 +33,6 @@ const WalkthroughOverlay: React.FC<OverlayProps> = ({
 	const [tooltipHeight, setTooltipHeight] = React.useState(0);
 	const [tooltipWidth, setTooltipWidth] = React.useState(0);
 
-	// Assuming targetMeasure and windowDimensions are defined and have numeric values
 
 	// Before using targetMeasure values, check if they are valid numbers
 	const safeTargetMeasure = {
@@ -96,8 +95,14 @@ const WalkthroughOverlay: React.FC<OverlayProps> = ({
 			? targetMeasure.y - tooltipHeight - 20
 			: targetMeasure.y + targetMeasure.height + 20, // Position above if too low, else below
 		left: center
-			? (windowDimensions.width - tooltipWidth) / 2
-			: targetMeasure.x + targetMeasure.width / 2 - tooltipWidth / 2,
+			? (windowDimensions.width - tooltipWidth) / 2 // Centered horizontally in the window
+			: Math.max(
+				0, // Minimum left padding to keep tooltip inside screen bounds
+			Math.min(
+			targetMeasure.x + targetMeasure.width / 2 - tooltipWidth / 2,
+			windowDimensions.width - tooltipWidth - 20 // Maximum right position to keep tooltip inside screen bounds
+			)
+		)
 	};
 
 	return (
@@ -128,15 +133,15 @@ const WalkthroughOverlay: React.FC<OverlayProps> = ({
 							layout: { height, width },
 						},
 					}) => {
-						setTooltipHeight(height);
+						setTooltipHeight(height + 30);
 						setTooltipWidth(width);
 					}}
 				>
 					<Text style={styles.title}>{content.title}</Text>
 					<Text style={styles.description}>{content.description}</Text>
-					<TouchableOpacity onPress={onClose} style={styles.button}>
+					{/* <TouchableOpacity onPress={onClose} style={styles.button}>
 						<Text>{content.buttonText}</Text>
-					</TouchableOpacity>
+					</TouchableOpacity> */}
 				</View>
 			</TouchableOpacity>
 		</Modal>
@@ -164,7 +169,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: "#ddd",
 		// Ensure the tooltip is centered and does not go off-screen
-		maxWidth: "80%",
+		// maxWidth: "80%",
 	},
 	title: {
 		fontSize: 18,
@@ -177,10 +182,11 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		alignSelf: "flex-end",
-		backgroundColor: "#2196F3",
+		backgroundColor: "#70387a",
 		paddingHorizontal: 20,
 		paddingVertical: 10,
 		borderRadius: 20,
+		color: "white",
 	},
 });
 

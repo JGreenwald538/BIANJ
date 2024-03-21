@@ -20,10 +20,9 @@ const carouselImages: Record<number, any> = {
 	2: require("../assets/CarouselImages/Carousel5.jpg"),
 	3: require("../assets/CarouselImages/Carousel6.jpg"),
 	4: require("../assets/CarouselImages/Carousel7.jpg"),
-	5: require("../assets/CarouselImages/Carousel8.jpg"),
-	6: require("../assets/CarouselImages/Carousel9.jpg"),
-	7: require("../assets/CarouselImages/Carousel10.jpg"),
-	8: require("../assets/CarouselImages/Carousel11.jpg"),
+	5: require("../assets/CarouselImages/Carousel9.jpg"),
+	6: require("../assets/CarouselImages/Carousel10.jpg"),
+	7: require("../assets/CarouselImages/Carousel11.jpg"),
 	// Add more images as needed
 };
 
@@ -69,10 +68,6 @@ export default class App extends React.Component<{}, AppState> {
                 {
                     title: "Item 8",
                     text: "Text 8",
-                },
-                {
-                    title: "Item 9",
-                    text: "Text 9",
                 },
 			],
 		};

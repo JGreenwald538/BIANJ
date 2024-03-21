@@ -5,6 +5,7 @@ import {
 	StyleSheet,
 	Animated,
 	Text,
+	TouchableWithoutFeedback,
 } from "react-native";
 import Checkbox from "./Checkbox";
 import { AddressInput } from "./AddressInput";
@@ -41,6 +42,20 @@ export const SortBy: React.FC<FilterProps> = ({
 }) => {
 	return (
 		<>
+			{sortByExpanded && (
+				<TouchableWithoutFeedback onPress={onPressSortBy}>
+					<View
+						style={{
+							position: "absolute",
+							top: 0,
+							bottom: 0,
+							left: 0,
+							right: 0,
+							backgroundColor: "transparent",
+						}}
+					></View>
+				</TouchableWithoutFeedback>
+			)}
 			<Animated.View
 				style={{
 					position: "absolute",

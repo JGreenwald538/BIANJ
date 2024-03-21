@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Touchable, TouchableOpacity, LayoutAnimation } from "react-native";
 import Slider from "react-native-a11y-slider";
 import "../assets/check-mark-icon.jpg";
 import Checkbox from "./Checkbox.tsx";
 import { useTheme } from "@react-navigation/native";
 
 interface MileSliderProps {
-  isEnabled: boolean;
-  value: number | string;
-  onValueChange: (value: number) => void;
-  isEnabledChange: (isEnabled: boolean) => void;
-  filters: string[];
-  ref?: any;
+	isEnabled: boolean;
+	value: number | string;
+	onValueChange: (value: number) => void;
+	isEnabledChange: (isEnabled: boolean) => void;
+	filters: string[];
+	setFiltersExpanded: (expanded: boolean) => void;
+	ref?: any;
 }
 
 const MileSlider: React.FC<MileSliderProps> = ({
@@ -20,6 +21,7 @@ const MileSlider: React.FC<MileSliderProps> = ({
   onValueChange,
   isEnabledChange,
   filters,
+  setFiltersExpanded,
   ref
 }) => {
   const handleChange = (newValue: number[]) => {
@@ -105,10 +107,11 @@ const MileSlider: React.FC<MileSliderProps> = ({
       <View style={{flexDirection: "column", justifyContent: "center" }}>
         <Checkbox
           isChecked={isEnabled}
-          onCheck={() => isEnabledChange(!isEnabled && !filters.every((str) => str === ""))} // Pass the negated value of `isEnabled`
+          onCheck={
+            () => isEnabledChange(!isEnabled && !filters.every((str) => str === ""))
+          } // Pass the negated value of `isEnabled`
           color={"#572C5F"}
           alt="Radius Checkbox"
-          enabled={!filters.every((str) => str === "")}
         />
       </View>
       <View style={styles.checkMarkerLabelContainer}>
@@ -126,11 +129,19 @@ const MileSlider: React.FC<MileSliderProps> = ({
           showLabel={false} // Disable the built-in label
           trackStyle={{width: "100%"}}
         />
-        <Text style={styles.sliderLabel}>
-          {isEnabled
-            ? `Distance: ${value} miles`
-            : filters.every((str) => str === "") ? "Select Filters" : "Enable Radius"}
+        {isEnabled ? <Text style={styles.sliderLabel}>
+            {`Distance: ${value} miles`}
         </Text>
+        : filters.every((str) => str === "") ?
+        <TouchableOpacity onPress={() => {
+          setFiltersExpanded(true)
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        }}>
+          <Text style={styles.sliderLabel}>Select Filters</Text>
+        </TouchableOpacity> :
+        <TouchableOpacity onPress={() => isEnabledChange(!isEnabled && !filters.every((str) => str === ""))}>
+          <Text style={styles.sliderLabel}>Enable Radius</Text>
+        </TouchableOpacity>}
       </View>
     </View>
   );

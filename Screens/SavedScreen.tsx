@@ -90,11 +90,15 @@ export default function SavedScreen({ navigation }: { navigation: any }) {
 			const sortData = async () => {
 				const keys = await AsyncStorage.getAllKeys();
 				const values = await AsyncStorage.multiGet(keys);
+				const filteredValues = values.filter(
+					(value) => value[0] !== "walkthroughed"
+				);
+
 				let sortedValues = [];
-				if (values.length === 0) {
+				if (filteredValues.length === 0) {
 					setCategories([]);
 				}
-				sortedValues = values
+				sortedValues = filteredValues
 					.map(([_, value]) => {
 						const tempCategories = categories;
 						if (
@@ -278,7 +282,7 @@ export default function SavedScreen({ navigation }: { navigation: any }) {
 				onClose={nextStep}
 				center={centered}
 			/>
-			<ScrollView>
+			<ScrollView style={{ height: "100%" }}>
 				<Place invisible />
 				{!places && (
 					<View
@@ -311,7 +315,15 @@ export default function SavedScreen({ navigation }: { navigation: any }) {
 								borderRadius: 10,
 							}}
 							onPress={async () => {
-								await AsyncStorage.clear();
+								// Make it so everything except for "walkthroughed" is cleared
+								const keys = await AsyncStorage.getAllKeys();
+								const values = await AsyncStorage.multiGet(keys);
+								const filteredValues = values.filter(
+									(value) => value[0] !== "walkthroughed"
+								);
+								filteredValues.forEach((value) => {
+									AsyncStorage.removeItem(value[0]);
+								});
 								alert("Cleared");
 								setUpdate(!update);
 								setCategoriesEnabled([]);

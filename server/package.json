@@ -4,6 +4,7 @@
   "type": "module",
   "devDependencies": {
     "@types/common-tags": "^1.8.2",
+    "@types/pg": "^8.11.2",
     "bun-types": "latest"
   },
   "peerDependencies": {
@@ -12,6 +13,8 @@
   "dependencies": {
     "common-tags": "^1.8.2",
     "elysia": "^0.7.14",
-    "mongoose": "^7.5.3"
+    "mongoose": "^7.5.3",
+    "pg": "^8.11.3",
+    "sql-template-strings": "^2.2.2"
   }
 }

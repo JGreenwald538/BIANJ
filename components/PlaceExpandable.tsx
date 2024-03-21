@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
 	},
 });
 
-const Place: React.FC<PlaceProps> = ({
+const Place: React.FC<PlaceProps> = React.memo(({
 	name = "Name",
 	type = "Type",
 	logoUri,
@@ -151,38 +151,15 @@ const Place: React.FC<PlaceProps> = ({
 		height: hasNotch ? 80 + insets.top * (3/4) : 80,
 	}
 
-	const togglePlaceEnabled = useCallback(() => {
-		setPlaceEnabled(!placeEnabled);
-		Animated.timing(rotAnim, {
-			toValue: +!placeEnabled,
-			duration: 150,
-			useNativeDriver: true,
-		}).start();
-		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-	}, [placeEnabled, setPlaceEnabled, rotAnim]);
+	const urlScheme = Platform.select({
+		ios: "maps://0,0?q=",
+		android: "geo:0,0?q=",
+	});
+	const url = `${urlScheme}${address}`;
+	const justNumber = phone.replaceAll(/[\(\)-\s]/g, "");
+	const tele = `${"tel:"}${justNumber}`;
+	// console.log(activateAlert, setPlaceEnabled);
 
-	const handleSave = useCallback(async () => {
-		try {
-			await AsyncStorage.setItem(name, JSON.stringify(object));
-			alert("Saved!");
-		} catch (e) {
-			console.log(e);
-		}
-	}, [name, object]);
-
-	const handleDelete = useCallback(async () => {
-		try {
-			await AsyncStorage.removeItem(name);
-			setUpdate(!update);
-			alert("Removed!");
-		} catch (e) {
-			console.log(e);
-		}
-	}, [name, update, setUpdate]);
-
-	const openURL = useCallback(async (url: string) => {
-		await Linking.openURL(url);
-	}, []);
 
 	if (invisible) {
 		return (
@@ -252,7 +229,7 @@ const Place: React.FC<PlaceProps> = ({
 					>
 						<TouchableOpacity
 							onPress={async () => {
-								Linking.openURL(website);
+								Linking.openURL(url);
 							}}
 						>
 							<View
@@ -398,31 +375,38 @@ const Place: React.FC<PlaceProps> = ({
 					<TouchableOpacity
 						onPress={async () => {
 							try {
-								await AsyncStorage.setItem(name, JSON.stringify(object));
-								alert("Saved!");
+								const value = await AsyncStorage.getItem(name);
+								if (value === null) {
+									await AsyncStorage.setItem(name, JSON.stringify(object));
+									alert("Saved!");
+									// activateAlert("Saved!");
+								} else {
+									// activateAlert("Already Saved!");
+									alert("Already saved!");
+								}
 							} catch (e) {
 								console.log(e);
 							}
 						}}
 						style={{
 							position: "absolute",
-							right: placeEnabled ? "auto" : 10,
-							top: placeEnabled ? "auto" : 8,
-							bottom: placeEnabled ? 8 : "auto",
+							right: placeEnabled ? undefined : 10,
+							top: placeEnabled ? undefined : 8,
+							bottom: placeEnabled ? 8 : undefined,
 							zIndex: 1,
-							left: placeEnabled ? 25 : "auto",
+							left: placeEnabled ? 25 : undefined,
 						}}
 					>
 						<View
 							style={{
-							// 	// width: 30,
-							// 	// height: 30,
-							// 	position: "absolute",
-							// 	right: placeEnabled ? "auto" : 10,
-							// 	left: placeEnabled ? 10 : "auto",
-							// 	top: placeEnabled ? "auto" : 8,
-							// 	bottom: placeEnabled ? 8 : "auto",
-							// 	zIndex: 1,
+								// 	// width: 30,
+								// 	// height: 30,
+								// 	position: "absolute",
+								// 	right: placeEnabled ? "auto" : 10,
+								// 	left: placeEnabled ? 10 : "auto",
+								// 	top: placeEnabled ? "auto" : 8,
+								// 	bottom: placeEnabled ? 8 : "auto",
+								// 	zIndex: 1,
 								alignContent: "center",
 							}}
 						>
@@ -455,16 +439,18 @@ const Place: React.FC<PlaceProps> = ({
 								await AsyncStorage.removeItem(name);
 								setUpdate(!update);
 								alert("Removed!");
+								// activateAlert("Removed!");
 							} catch (e) {
 								console.log(e);
 							}
 						}}
 						style={{
 							position: "absolute",
-							right: placeEnabled ? width * 0.75 : 10,
-							top: placeEnabled ? "auto" : 8,
-							bottom: placeEnabled ? 8 : "auto",
+							right: placeEnabled ? undefined : 10,
+							top: placeEnabled ? undefined : 8,
+							bottom: placeEnabled ? 8 : undefined,
 							zIndex: 1,
+							left: placeEnabled ? 20 : undefined,
 						}}
 					>
 						<View style={{ flexDirection: "column", alignItems: "center" }}>
@@ -491,6 +477,6 @@ const Place: React.FC<PlaceProps> = ({
 			</View>
 		</View>
 	);
-};
+});
 
 export default Place;

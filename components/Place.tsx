@@ -29,6 +29,7 @@ interface PlaceProps extends React.ComponentPropsWithoutRef<typeof View> {
 	placeEnabled?: any;
 	setPlaceEnabled?: any;
 	first?: boolean;
+	activateAlert?: any;
 }
 
 let hasNotch = false;
@@ -67,6 +68,7 @@ const Place: React.FC<Omit<PlaceProps, 'placeEnabled' |'setPlaceEnabled'>> = ({
 	if (first) {
 		[expanded, setExpanded] = useContext(WalkthroughListScreenContext);
 	}
+
 	
 	return <PlaceExpandable
 		name={name}
@@ -101,7 +103,8 @@ function PlaceList({
 	typeRef,
 	buttonRef,
 	containerRef,
-	useRef
+	useRef,
+	activateAlert
 }: {
 	items: Place[];
 	save?: boolean;
@@ -113,6 +116,7 @@ function PlaceList({
 	buttonRef?: any;
 	containerRef?: any;
 	useRef?: boolean;
+	activateAlert?: any;
 }) {
 		return 	<View key={0} style={{ alignItems: "center" }}>
 					{
@@ -140,6 +144,7 @@ function PlaceList({
 										buttonRef={index === 0 ? buttonRef : null}
 										containerRef={index === 0 ? containerRef : null}
 										first={index === 0 && useRef}
+										activateAlert={activateAlert}
 									/>
 								)
 						})

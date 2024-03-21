@@ -1,10 +1,12 @@
 {
   "expo": {
-    "name": "Brain Injury Resource Center",
+    "name": "BIANJ",
     "slug": "BIRC",
-    "version": "1.0.0",
+    "version": "1.0.5",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logos/APPICON.png",
+    "companyName": "Brain Injury Alliance of New Jersey",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/BIANJLogoSplash.png",
       "resizeMode": "contain",
@@ -15,14 +17,31 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.BIANJ"
+      "bundleIdentifier": "com.anonymous.BIANJ",
+      "buildNumber": "22",
+      "companyName": "Brain Injury Alliance of New Jersey",
+      "entitlements": {
+        "com.apple.developer.maps": true
+      },
+      "icon": "./assets/logos/APPICON.png"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "/Users/jackgreenwald/Desktop/Coding/BIANJ/assets/logos/iTunesArtwork@2x.png",
+        "backgroundColor": "#572C5F"
       },
-      "package": "com.anonymous.BIANJ"
+      "package": "com.anonymous.BIANJ",
+      "versionCode": 21,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBtLRyjM6a2KBTt_MkVBueX01qJNfSg3Io"
+        }
+      },
+      "icon": "./assets/logos/APPICON.png",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,6 +51,21 @@
         "projectId": "4f2a80e3-6fab-455a-84d9-9b1abcc76248"
       }
     },
-    "owner": "blood_bones124"
+    "owner": "blood_bones124",
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) access to your location to allow you to find nearby resources. Example: The map will use your location to create a radius of resources a certain distance from you.",
+          "NSPrivacyAccessedAPICategoryDiskSpace": "$(PRODUCT_NAME) stores the data of different resources for brain injuries from a database."
+        }
+      ]
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/4f2a80e3-6fab-455a-84d9-9b1abcc76248"
+    }
   }
 }

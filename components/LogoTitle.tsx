@@ -3,11 +3,14 @@ import React, { useEffect } from 'react';
 import { View, Image, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+interface LogoTitleProps {
+  left?: boolean;
+}
+
 
 let screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
 
-export default function LogoTitle() {
+const LogoTitle: React.FC<LogoTitleProps> = ({left}) => {
   const insets = useSafeAreaInsets();
   const {colors} = useTheme();
   const colorScheme = colors.background === "white" ? "light" : "dark";
@@ -15,7 +18,7 @@ export default function LogoTitle() {
     screenWidth = Dimensions.get('window').width;
   });
   return (
-    <View style={{ flex: 1, alignItems: 'center', position: 'absolute', top: insets.top, left: 0.5 * screenWidth - 20 }}>
+    <View style={{ flex: 1, alignItems: 'center', position: 'absolute', top: insets.top, left: left ? 40 : 0.5 * screenWidth - 20 }}>
       <Image
         source={colorScheme === "light" ? require('../assets/BIANJLogo.png') : require('../assets/BIANJLogoHeader.png')}
         alt={"Brain Injury Alliance of New Jersey Logo"}
@@ -24,3 +27,5 @@ export default function LogoTitle() {
     </View>
   );
 }
+
+export default LogoTitle;

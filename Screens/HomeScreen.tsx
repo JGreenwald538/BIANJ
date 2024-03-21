@@ -11,12 +11,12 @@ import {
 import LogoTitle from "../components/LogoTitle";
 import Carousel from "../components/Carousel";
 import { useFocusEffect, useTheme } from "@react-navigation/native";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import ReloadIcon from "../assets/SVGs/reload-circle-outline.svg";
-import { WalkthroughContext } from "../util/globalvars";
-import { useFocus } from "native-base/lib/typescript/components/primitives";
+import { LocationContext, WalkthroughContext } from "../util/globalvars";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const screenHeight = Dimensions.get("window").height;
@@ -33,6 +33,7 @@ interface StepInfo {
 export default function HomeScreen({navigation} : any) {
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
+	const currentLocation = useContext(LocationContext);
 	const insets = useSafeAreaInsets();
 	const styles = StyleSheet.create({
 		container: {
@@ -42,7 +43,7 @@ export default function HomeScreen({navigation} : any) {
 			alignItems: "center", // Center items horizontally in the container
 			justifyContent: "flex-end", // Center items vertically in the container
 			flex: 3, // You can adjust the height as needed
-			marginBottom: 15
+			marginBottom: 15,
 		},
 		title: {
 			// Styles for the title
@@ -90,8 +91,23 @@ export default function HomeScreen({navigation} : any) {
 	const [walkthrough, setWalkthrough] = React.useContext(WalkthroughContext);
 
 	// State to manage the current step, overlay visibility, and target element position
+
+	const [overlayVisible, setOverlayVisible] = useState(false);
+
+	useEffect(() => {
+		const checkWalkthroughStatus = async () => {
+			const value = await AsyncStorage.getItem("walkthroughed");
+			// Only set the overlay to be visible if the value indicates the walkthrough hasn't been completed.
+			if (value !== "true" && currentLocation && currentLocation[0]) {
+				setOverlayVisible(true);
+			}
+			// No need for an additional loading state since we're defaulting to the desired end state.
+		};
+
+		checkWalkthroughStatus();
+	}, []);
+
 	const [currentStep, setCurrentStep] = useState<number>(walkthrough);
-	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
 	const [centered, setCentered] = useState(true);
 	const [targetMeasure, setTargetMeasure] = useState<{
 		x: number;
@@ -107,7 +123,7 @@ export default function HomeScreen({navigation} : any) {
 			content: {
 				title: "Title",
 				description:
-					"Welcome to the Brain Injury Alliance of New Jersey Resource Center Walkthrough.",
+					"Welcome to the Brain Injury Alliance of New Jersey Resource Center Walkthrough. Press anywhere to advance.",
 				buttonText: "Let's Start!",
 			},
 		},
@@ -186,9 +202,13 @@ export default function HomeScreen({navigation} : any) {
 
 	// Function to start the walkthrough
 	const startWalkthrough = () => {
-		setCurrentStep(0);
-		setOverlayVisible(true);
-		setCentered(false)
+		if (currentLocation && currentLocation[0]) {
+			setCurrentStep(0);
+			setOverlayVisible(true);
+			setCentered(false);
+		} else {
+			alert("Please enable location services to start the walkthrough.")
+		}
 	};
 
 	// Function to proceed to the next step or end the walkthrough
@@ -196,18 +216,19 @@ export default function HomeScreen({navigation} : any) {
 		if (currentStep === 2) {
 			navigation.navigate("Map");
 			setOverlayVisible(false);
-			setWalkthrough(1)
+			setWalkthrough(1);
 			setCurrentStep(currentStep + 1);
 		} else if (currentStep < steps.length - 1) {
 			setCurrentStep(currentStep + 1);
 		} else {
-			setWalkthrough(0)
+			setWalkthrough(0);
 			setOverlayVisible(false);
 			setCurrentStep(0);
-			setCentered(false)
+			setCentered(false);
+			// Save that the user has completed the walkthrough
+			AsyncStorage.setItem("walkthroughed", "true");
 		}
 	};
-
 
 	return (
 		<View style={styles.container}>
@@ -281,8 +302,9 @@ export default function HomeScreen({navigation} : any) {
 			{/* Repeat the above TouchableOpacity for each menu item */}
 			<LogoTitle />
 
-			<TouchableOpacity
-				onPress={startWalkthrough}
+			<View
+				ref={reloadButtonRef}
+				collapsable={false}
 				style={{
 					position: "absolute",
 					zIndex: 10,
@@ -290,14 +312,16 @@ export default function HomeScreen({navigation} : any) {
 					left: 70,
 				}}
 			>
-				<View ref={reloadButtonRef} collapsable={false}>
+				<TouchableOpacity
+					onPress={startWalkthrough}
+				>
 					<ReloadIcon
 						color={colorScheme === "light" ? "#e2cbe7" : "#70387a"}
 						width={30}
 						height={30}
 					/>
-				</View>
-			</TouchableOpacity>
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 }

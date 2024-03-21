@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  Text,
+	View,
+	TouchableOpacity,
+	StyleSheet,
+	Animated,
+	Text,
+	Modal,
+	TouchableWithoutFeedback,
+	Platform,
 } from "react-native";
 import Checkbox from "./Checkbox";
 
@@ -12,44 +15,58 @@ const colors: string[] = ["red", "green", "blue", "yellow", "orange"];
 
 // Define props for the Filter component
 interface FilterProps {
-  categories: string[];
-  categoriesEnabled: string[];
-  setCategoriesEnabled: any;
-  colorScheme: string;
-  filtersExpanded: boolean;
-  onPressFilters: () => void;
-  screenWidth: number;
-  screenHeight: number;
-  insets: any;
-  update?: boolean;
-  setUpdate?: (update: boolean) => void;
-  nextCategory: number;
-  setNextCategory: any;
-  map?: boolean;
-  buttonRef?: any;
-  menuRef?: any;
+	categories: string[];
+	categoriesEnabled: string[];
+	setCategoriesEnabled: any;
+	colorScheme: string;
+	filtersExpanded: boolean;
+	onPressFilters: () => void;
+	screenWidth: number;
+	screenHeight: number;
+	insets: any;
+	update?: boolean;
+	setUpdate?: (update: boolean) => void;
+	nextCategory: number;
+	setNextCategory: any;
+	map?: boolean;
+	buttonRef?: any;
+	menuRef?: any;
 }
 
 export const Filter: React.FC<FilterProps> = ({
-  categories,
-  categoriesEnabled,
-  setCategoriesEnabled,
-  colorScheme,
-  filtersExpanded,
-  onPressFilters,
-  screenWidth,
-  screenHeight,
-  insets,
-  update,
-  setUpdate,
-  nextCategory,
-  setNextCategory,
-  map = false,
-  buttonRef,
-  menuRef,
+	categories,
+	categoriesEnabled,
+	setCategoriesEnabled,
+	colorScheme,
+	filtersExpanded,
+	onPressFilters,
+	screenWidth,
+	screenHeight,
+	insets,
+	update,
+	setUpdate,
+	nextCategory,
+	setNextCategory,
+	map = false,
+	buttonRef,
+	menuRef,
 }) => {
-  return (
+	return (
 		<>
+			{filtersExpanded && (
+				<TouchableWithoutFeedback onPress={onPressFilters}>
+					<View
+						style={{
+							position: "absolute",
+							top: 0,
+							bottom: 0,
+							left: 0,
+							right: 0,
+							backgroundColor: "transparent",
+						}}
+					></View>
+				</TouchableWithoutFeedback>
+			)}
 			<Animated.ScrollView
 				style={{
 					position: "absolute",
@@ -64,6 +81,7 @@ export const Filter: React.FC<FilterProps> = ({
 					shadowOpacity: 0.2,
 					shadowRadius: 3,
 					display: filtersExpanded ? "flex" : "none",
+					zIndex: filtersExpanded ? 1 : 0, // Ensure the menu is above the transparent view when expanded
 					opacity: 0.95,
 				}}
 				persistentScrollbar
@@ -85,7 +103,7 @@ export const Filter: React.FC<FilterProps> = ({
 
 				<View style={{ flex: 1 }}>
 					{categories.map((category, index) => (
-						<View
+						<TouchableOpacity
 							style={{
 								padding: 10,
 								alignContent: "center",
@@ -95,6 +113,33 @@ export const Filter: React.FC<FilterProps> = ({
 								flex: 1,
 							}}
 							key={index}
+							onPress={() => {
+								if (map) {
+									const newCategoriesEnabled = [...categoriesEnabled];
+									if (newCategoriesEnabled.indexOf(category) === -1) {
+										newCategoriesEnabled[nextCategory % 5] = category;
+									} else {
+										newCategoriesEnabled[
+											newCategoriesEnabled.indexOf(category)
+										] = "";
+									}
+									setNextCategory(
+										newCategoriesEnabled.indexOf("") !== -1
+											? newCategoriesEnabled.indexOf("")
+											: nextCategory + (1 % 5)
+									);
+									setCategoriesEnabled(newCategoriesEnabled);
+								} else {
+									if (categoriesEnabled.indexOf(category) === -1) {
+										setCategoriesEnabled([...categoriesEnabled, category]);
+									} else {
+										setCategoriesEnabled(
+											categoriesEnabled.filter((x) => x !== category)
+										);
+									}
+								}
+								// console.log(categoriesEnabled);
+							}} // Pass the negated value of `isEnabled`
 						>
 							<Checkbox
 								// @ts-ignore
@@ -103,28 +148,17 @@ export const Filter: React.FC<FilterProps> = ({
 									if (map) {
 										const newCategoriesEnabled = [...categoriesEnabled];
 										if (newCategoriesEnabled.indexOf(category) === -1) {
-											if (
-												nextCategory % 5 ===
-													5 -
-														newCategoriesEnabled.filter((x) => x === "")
-															.length ||
-												newCategoriesEnabled.filter((x) => x === "").length ===
-													0
-											) {
-												setNextCategory(nextCategory + 1);
-											} else {
-												setNextCategory(
-													newCategoriesEnabled.filter((x) => x === "").length -
-														(1 % 5)
-												);
-											}
 											newCategoriesEnabled[nextCategory % 5] = category;
 										} else {
 											newCategoriesEnabled[
 												newCategoriesEnabled.indexOf(category)
 											] = "";
-											setNextCategory(categoriesEnabled.indexOf(category));
 										}
+										setNextCategory(
+											newCategoriesEnabled.indexOf("") !== -1
+												? newCategoriesEnabled.indexOf("")
+												: nextCategory + (1 % 5)
+										);
 										setCategoriesEnabled(newCategoriesEnabled);
 									} else {
 										if (categoriesEnabled.indexOf(category) === -1) {
@@ -135,10 +169,9 @@ export const Filter: React.FC<FilterProps> = ({
 											);
 										}
 									}
-									// console.log(categoriesEnabled);
-								}} // Pass the negated value of `isEnabled`
+								}}
 								color={
-									map
+									map && Platform.OS === "ios"
 										? colors[categoriesEnabled.indexOf(category)]
 										: colorScheme === "light"
 										? "black"
@@ -156,7 +189,7 @@ export const Filter: React.FC<FilterProps> = ({
 							>
 								{category}
 							</Text>
-						</View>
+						</TouchableOpacity>
 					))}
 				</View>
 			</Animated.ScrollView>
@@ -178,6 +211,7 @@ export const Filter: React.FC<FilterProps> = ({
 							paddingHorizontal: filtersExpanded ? 5 : 15,
 							borderRadius: filtersExpanded ? 50 : 15,
 							opacity: 0.9,
+							zIndex: 2, // Ensure the button is always on top
 						},
 					]}
 					onLayout={() => {

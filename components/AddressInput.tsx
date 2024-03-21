@@ -41,20 +41,24 @@ export const AddressInput: React.FC<AddressInputProps> = ({ref}) => {
   });
 
   const fetchCoordinates = async () => {
-    try {
-      const response = await fetch(`https://geocode.maps.co/search?q=${input}`);
-      const data = await response.json();
+	if(input) {
+		try {
+		const response = await fetch(`https://geocode.maps.co/search?q=${input}`);
+		const data = await response.json();
 
-      if (data && data.length > 0) {
-        const { lat, lon } = data[0];
-        setCurrentLocation({ lat: parseFloat(lat), long: parseFloat(lon) });
-        setIsRealLocation(false);
-      } else {
-        throw new Error("No location found");
-      }
-    } catch (error) {
-      Alert.alert("Error", "Unable to fetch coordinates");
-    }
+		if (data && data.length > 0) {
+			const { lat, lon } = data[0];
+			setCurrentLocation({ lat: parseFloat(lat), long: parseFloat(lon) });
+			setIsRealLocation(false);
+		} else {
+			throw new Error("No location found");
+		}
+		} catch (error) {
+		Alert.alert("Error", "Unable to fetch coordinates. Retry address input.");
+		}
+	} else {
+		alert("Please enter an address.");
+	}
   };
 
   return (
@@ -98,7 +102,8 @@ export const AddressInput: React.FC<AddressInputProps> = ({ref}) => {
 					<TouchableOpacity
 						style={{
 							paddingVertical: 5,
-							backgroundColor: "#572C5F",
+							backgroundColor: input ? "#572C5F" : "grey",
+							opacity: input ? 1 : 0.75,
 							borderRadius: 5,
 						}}
 						onPress={fetchCoordinates}

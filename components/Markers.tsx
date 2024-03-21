@@ -4,6 +4,10 @@ import { Linking } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import React from "react";
+import SaveIcon from "../assets/SVGs/download-outline.svg";
+import { useTheme } from "@react-navigation/native";
+import { MarkerReact } from "./Marker";
+
 
 const colors: string[] = ["red", "green", "blue", "yellow", "orange"];
 
@@ -24,7 +28,7 @@ const styles = StyleSheet.create({
 		color: "#63666a",
 	},
 	actionText: {
-		fontSize: 8,
+		fontSize: 16,
 		borderRadius: 10,
 		color: "white",
 	},
@@ -104,208 +108,23 @@ export default function Markers(data, categoriesEnabled, userLocation) {
 	let markers = [];
 	const categories: any[] = [];
 	for (let i = 0; i < data.length; i++) {
-		if (device === "ios") {
-			const {
-				name,
-				typeOfPlace,
-				streetAddress,
-				state,
-				phone,
-				website,
-				city,
-				lat,
-				long,
-			} = data[i];
-			const urlScheme = Platform.select({
-				ios: "maps://0,0?q=",
-				android: "geo:0,0?q=",
-			});
-			const address = `${urlScheme}${
-				streetAddress + " " + city + " "
-			} ${state}`;
-			const justNumber = phone.replaceAll(/[\(\)-\s]/g, "");
-			const tele = `${"tel:"}${justNumber}`;
-			if (!categories.includes(typeOfPlace)) {
-				categories.push(typeOfPlace);
-			}
-			const color = colors[categoriesEnabled.indexOf(typeOfPlace)];
-			markers.push([
-				<Marker
-					coordinate={{ latitude: lat, longitude: long }}
-					title={name}
-					description="This is a custom info window."
-					key={i}
-					pinColor={color}
-				>
-					<Callout>
-						<View
-							style={{
-								flexDirection: "column",
-								justifyContent: "center",
-								alignItems: "center",
-                width: "90%"
-							}}
-						>
-							<Text style={styles.nameText}>{name}</Text>
-							<Text style={styles.typeText}>{typeOfPlace}</Text>
-							<View
-								style={{
-									flexDirection: "row",
-									justifyContent: "space-between",
-									width: "100%",
-									marginTop: 10,
-								}}
-							>
-								<TouchableOpacity
-									onPress={async () => {
-										Linking.openURL(website);
-									}}
-								>
-									<View
-										style={{
-											flexDirection: "column",
-											alignItems: "center",
-											borderRadius: 10,
-											backgroundColor: "#572C5F",
-											paddingHorizontal: 5,
-											display: "flex",
-										}}
-									>
-										<Image
-											source={require("../assets/logos/icon6.png")}
-											alt={"logo"}
-											style={{
-												resizeMode: "contain",
-												height: 15,
-												width: 15,
-												margin: 5,
-											}}
-										/>
-										<Text style={styles.actionText}>Address</Text>
-									</View>
-								</TouchableOpacity>
-								<TouchableOpacity
-									onPress={async () => {
-										Linking.openURL(`tel:${phone}`);
-									}}
-								>
-									<View
-										style={{
-											flexDirection: "column",
-											alignItems: "center",
-											borderRadius: 10,
-											backgroundColor: "#572C5F",
-											paddingHorizontal: 8,
-											display: "flex",
-										}}
-									>
-										<Image
-											source={require("../assets/logos/phoneicon.png")}
-											alt={"logo"}
-											style={{
-												resizeMode: "contain",
-												height: 15,
-												width: 15,
-												margin: 5,
-											}}
-										/>
-										<Text style={[styles.actionText, { flex: 1 }]}>
-											{"    Call    "}
-										</Text>
-									</View>
-								</TouchableOpacity>
-								<TouchableOpacity
-									onPress={async () => {
-										Linking.openURL(website.replaceAll(/[\s]/g, ""));
-									}}
-								>
-									<View
-										style={{
-											flexDirection: "column",
-											alignItems: "center",
-											borderRadius: 10,
-											backgroundColor: "#572C5F",
-											paddingHorizontal: 8,
-											display: "flex",
-										}}
-									>
-										<Image
-											source={require("../assets/logos/webicon.png")}
-											alt={"logo"}
-											style={{
-												resizeMode: "contain",
-												height: 15,
-												width: 15,
-												margin: 5,
-											}}
-										/>
-										<Text style={styles.actionText}>Website</Text>
-									</View>
-								</TouchableOpacity>
-							</View>
-							<TouchableOpacity
-								onPress={async () => {
-									try {
-										await AsyncStorage.setItem(
-											i.toString(),
-											JSON.stringify(data[i])
-										);
-										alert("Saved!");
-									} catch (e) {
-										console.log(e);
-									}
-								}}
-							>
-								<View>
-									<Text style={[styles.typeText, {marginBottom: 10}]}>Save</Text>
-								</View>
-							</TouchableOpacity>
-						</View>
-					</Callout>
-				</Marker>,
+		const {
+			typeOfPlace,
+		} = data[i];
+		markers.push([
+			<MarkerReact
+				data={data[i]}
+				categories={categories}
+				colors={colors}
+				categoriesEnabled={categoriesEnabled}
+				key={i}
+				i={i}
+			/>,
 
-				distances[i],
-				typeOfPlace,
-			]);
-		} else {
-			const {
-				name,
-				typeOfPlace,
-				streetAddress,
-				state,
-				phone,
-				website,
-				city,
-				lat,
-				long,
-			} = data[i];
-			if (!categories.includes(typeOfPlace)) {
-				categories.push(typeOfPlace);
-			}
-			markers.push([
-				<Marker
-					coordinate={{ latitude: data[i].lat, longitude: data[i].long }}
-					title={data[i].name}
-					description="This is a custom info window."
-					key={i}
-					onPress={async () => {
-						try {
-							await AsyncStorage.setItem(name, JSON.stringify(data[i]));
-						} catch (e) {
-							console.log(e);
-						}
-					}}
-				>
-					<Callout>
-						<View>
-							<Text>{data[i].name}</Text>
-						</View>
-					</Callout>
-				</Marker>,
-				distances[i],
-				typeOfPlace,
-			]);
-		}
+			distances[i],
+			typeOfPlace,
+		]); 
+			
 	}
 	return [markers, categories];
 }
