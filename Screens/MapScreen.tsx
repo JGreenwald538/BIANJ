@@ -463,8 +463,8 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 					activeOpacity={1}
 				>
 					<Image
-						source={require("../assets/logos/ArrowIcon.png")}
-						alt={"Close Bottom Bar"}
+						source={require("../assets/logos/arrowIcon.png")}
+						alt={"Close Bottom Bar Button"}
 						style={{
 							height: 30,
 							resizeMode: "contain",

@@ -71,6 +71,7 @@ export const SortBy: React.FC<FilterProps> = ({
 					display: sortByExpanded ? "flex" : "none",
 					opacity: 0.95,
 				}}
+				accessibilityLabel={"Sort By Menu"}
 			>
 				<View style={{ flex: 1 }}>
 					{sortBys.map((sortBy, index) => (
@@ -101,16 +102,18 @@ export const SortBy: React.FC<FilterProps> = ({
 										: false
 								}
 							/>
-							<Text
-								style={{
-									fontSize: 18,
-									paddingLeft: 2,
-									paddingTop: 6,
-									color: colorScheme === "light" ? "black" : "white",
-								}}
-							>
-								{sortBy}
-							</Text>
+							<TouchableOpacity onPress={() => setSortByEnabled(sortBy)}>
+								<Text
+									style={{
+										fontSize: 18,
+										paddingLeft: 2,
+										paddingTop: 6,
+										color: colorScheme === "light" ? "black" : "white",
+									}}
+								>
+									{sortBy}
+								</Text>
+							</TouchableOpacity>
 						</View>
 					))}
 					<View style={{ marginTop: -20 }}>
@@ -140,7 +143,7 @@ export const SortBy: React.FC<FilterProps> = ({
 				>
 					<Text
 						accessibilityLabel={
-							sortByExpanded ? "Close Button" : "Sort By Buttons"
+							sortByExpanded ? "Close Button" : "Sort By Button"
 						}
 						style={{
 							fontSize: sortByExpanded ? 25 : 19,

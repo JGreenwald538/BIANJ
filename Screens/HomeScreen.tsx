@@ -6,7 +6,6 @@ import {
 	StyleSheet,
 	Dimensions,
 	Linking,
-	LayoutChangeEvent,
 } from "react-native";
 import LogoTitle from "../components/LogoTitle";
 import Carousel from "../components/Carousel";
@@ -240,13 +239,16 @@ export default function HomeScreen({navigation} : any) {
 				center={centered}
 			/>
 			<View style={styles.header}>
-				{/* Logo and Title */}
-
 				<Text style={[styles.title]} ref={welcomeRef}>
 					Welcome to the Brain Injury Alliance of New Jersey Resource Center
 				</Text>
 			</View>
-			<View ref={carouselRef} style={{ marginBottom: 15 }} collapsable={false}>
+			<View
+				ref={carouselRef}
+				style={{ marginBottom: 15 }}
+				collapsable={false}
+				accessibilityLabel="Carousel of BIANJ Images"
+			>
 				<Carousel />
 			</View>
 			<View style={styles.menu} ref={aboutUsRef} collapsable={false}>
@@ -299,7 +301,6 @@ export default function HomeScreen({navigation} : any) {
 					<Text style={styles.menuText}>Contact Us</Text>
 				</TouchableOpacity>
 			</View>
-			{/* Repeat the above TouchableOpacity for each menu item */}
 			<LogoTitle />
 
 			<View
@@ -309,18 +310,31 @@ export default function HomeScreen({navigation} : any) {
 					position: "absolute",
 					zIndex: 10,
 					top: 0.015 * screenHeight + insets.top,
-					left: 70,
+					left: 20,
 				}}
+				accessibilityLabel="Reload Walkthrough Button"
 			>
-				<TouchableOpacity
-					onPress={startWalkthrough}
-				>
-					<ReloadIcon
-						color={colorScheme === "light" ? "#e2cbe7" : "#70387a"}
-						width={30}
-						height={30}
-					/>
-				</TouchableOpacity>
+				<View style={{ alignItems: "center" }}>
+					<TouchableOpacity onPress={startWalkthrough}>
+						<ReloadIcon
+							color={colorScheme === "light" ? "#e2cbe7" : "#70387a"}
+							width={30}
+							height={30}
+						/>
+					</TouchableOpacity>
+					<Text
+						style={{ color: colorScheme === "light" ? "#e2cbe7" : "#70387a" }}
+						numberOfLines={2}
+					>
+						Reload
+					</Text>
+					<Text
+						style={{ color: colorScheme === "light" ? "#e2cbe7" : "#70387a" }}
+						numberOfLines={2}
+					>
+						Walkthrough
+					</Text>
+				</View>
 			</View>
 		</View>
 	);

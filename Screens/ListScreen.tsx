@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Dimensions, ScrollView, View, LayoutAnimation } from "react-native";
 import { Place, PlaceList } from "../components/Place";
 import {
@@ -6,6 +6,7 @@ import {
 	LocationContext,
 	PlacesContext,
 	WalkthroughContext,
+	WalkthroughListScreenContext,
 } from "../util/globalvars";
 import LogoTitle from "../components/LogoTitle";
 import { useFocusEffect, useTheme } from "@react-navigation/native";
@@ -48,7 +49,6 @@ const getDistance = (
 	return (R * c) / 1.609;
 };
 
-export const WalkthroughListScreenContext = createContext<[boolean, Dispatch<SetStateAction<boolean>>]>(undefined!);
 
 export default function ListScreen(
 	{ route, navigation }: any = { route: { params: {} }, navigation: null }
@@ -300,17 +300,11 @@ export default function ListScreen(
 				>
 					<PlaceList
 						items={sortedValues}
-						// save={undefined,
-						// deleteIcon: undefined,
-						// update: undefined,
-						// setUpdate: undefined,
 						titleRef={titleRef}
 						typeRef={typeRef}
 						buttonRef={buttonRef}
 						containerRef={containerRef}
 						useRef={true}
-						// placeEnabled={placeEnabled}
-						// setPlaceEnabled={setPlaceEnabled}
 					/>
 				</WalkthroughListScreenContext.Provider>
 			</ScrollView>

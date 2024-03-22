@@ -140,6 +140,7 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
 								textAlign: "center",
 								paddingHorizontal: 5,
 							}}
+							accessibilityLabel='See All Closest Locations'
 						>
 							See All
 						</Text>

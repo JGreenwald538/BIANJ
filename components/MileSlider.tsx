@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Touchable, TouchableOpacity, LayoutAnimation } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation } from "react-native";
 import Slider from "react-native-a11y-slider";
-import "../assets/check-mark-icon.jpg";
 import Checkbox from "./Checkbox.tsx";
 import { useTheme } from "@react-navigation/native";
 
@@ -128,6 +127,7 @@ const MileSlider: React.FC<MileSliderProps> = ({
           markerColor={isEnabled ? "#572C5F" : "#d3d3d3"}
           showLabel={false} // Disable the built-in label
           trackStyle={{width: "100%"}}
+          alt = "Radius Slider"
         />
         {isEnabled ? <Text style={styles.sliderLabel}>
             {`Distance: ${value} miles`}

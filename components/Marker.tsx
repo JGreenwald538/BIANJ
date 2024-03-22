@@ -129,7 +129,7 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 										}}
 									>
 										<Image
-											source={require("../assets/logos/icon6.png")}
+											source={require("../assets/logos/nav.png")}
 											alt={"logo"}
 											style={{
 												resizeMode: "contain",
@@ -157,8 +157,8 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 										}}
 									>
 										<Image
-											source={require("../assets/logos/phoneicon.png")}
-											alt={"logo"}
+											source={require("../assets/logos/phoneIcon.png")}
+											alt={"Phone Button"}
 											style={{
 												resizeMode: "contain",
 												height: iconSize,
@@ -196,7 +196,7 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 										}}
 									>
 										<Image
-											source={require("../assets/logos/webicon.png")}
+											source={require("../assets/logos/webIcon.png")}
 											alt={"logo"}
 											style={{
 												resizeMode: "contain",

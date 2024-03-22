@@ -20,7 +20,7 @@ const LogoTitle: React.FC<LogoTitleProps> = ({left}) => {
   return (
     <View style={{ flex: 1, alignItems: 'center', position: 'absolute', top: insets.top, left: left ? 40 : 0.5 * screenWidth - 20 }}>
       <Image
-        source={colorScheme === "light" ? require('../assets/BIANJLogo.png') : require('../assets/BIANJLogoHeader.png')}
+        source={colorScheme === "light" ? require('../assets/logos/BIANJLogo.png') : require('../assets/logos/BIANJLogoHeader.png')}
         alt={"Brain Injury Alliance of New Jersey Logo"}
         style={{ height: 50, resizeMode: "contain", width: 50 }}
       />

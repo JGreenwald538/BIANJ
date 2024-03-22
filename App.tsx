@@ -101,29 +101,11 @@ export default function App() {
 														source={
 															focused
 																? colorScheme === "dark"
-																	? require("./assets/logos/homewhite.png")
-																	: require("./assets/logos/homepurple.png")
-																: require("./assets/logos/homedark.png")
+																	? require("./assets/logos/homeWhite.png")
+																	: require("./assets/logos/homePurple.png")
+																: require("./assets/logos/homeDark.png")
 														}
 														alt={"Home Screen Button"}
-														style={{
-															height: size,
-															resizeMode: "contain",
-															width: size,
-														}}
-													/>
-												);
-											} else if (route.name === "Settings") {
-												return (
-													<Image
-														source={
-															focused
-																? colorScheme === "dark"
-																	? require("./assets/logos/icon10.png")
-																	: require("./assets/logos/icon10black.png")
-																: require("./assets/logos/icon10dark.png")
-														}
-														alt={"logo"}
 														style={{
 															height: size,
 															resizeMode: "contain",
@@ -137,9 +119,9 @@ export default function App() {
 														source={
 															focused
 																? colorScheme === "dark"
-																	? require("./assets/logos/icon5.png")
-																	: require("./assets/logos/icon5purple.png")
-																: require("./assets/logos/icon5dark.png")
+																	? require("./assets/logos/mapWhite.png")
+																	: require("./assets/logos/mapPurple.png")
+																: require("./assets/logos/mapDark.png")
 														}
 														alt={"logo"}
 														style={{
@@ -155,11 +137,11 @@ export default function App() {
 														source={
 															focused
 																? colorScheme === "dark"
-																	? require("./assets/logos/icon4.png")
-																	: require("./assets/logos/icon4purple.png")
-																: require("./assets/logos/icon4dark.png")
+																	? require("./assets/logos/listWhite.png")
+																	: require("./assets/logos/listPurple.png")
+																: require("./assets/logos/listDark.png")
 														}
-														alt={"logo"}
+														alt={"List Screen Button"}
 														style={{
 															height: size,
 															resizeMode: "contain",
@@ -173,11 +155,11 @@ export default function App() {
 														source={
 															focused
 																? colorScheme === "dark"
-																	? require("./assets/logos/icon7.png")
-																	: require("./assets/logos/icon7purple.png")
-																: require("./assets/logos/icon7dark.png")
+																	? require("./assets/logos/savedWhite.png")
+																	: require("./assets/logos/savedPurple.png")
+																: require("./assets/logos/savedDark.png")
 														}
-														alt={"logo"}
+														alt={"Saved Screen Button"}
 														style={{
 															height: size,
 															resizeMode: "contain",

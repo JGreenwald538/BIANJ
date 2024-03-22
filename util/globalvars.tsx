@@ -5,3 +5,6 @@ export const LocationContext = createContext<[{lat: number, long: number} | null
 export const PlacesContext = createContext<Place[]>([]);
 export const CategoriesContext = createContext<any[]>([]);
 export const WalkthroughContext = createContext<any[]>([]);
+export const WalkthroughListScreenContext = createContext<
+	[boolean, Dispatch<SetStateAction<boolean>>]
+>(undefined!);

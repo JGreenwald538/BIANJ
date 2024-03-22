@@ -4,10 +4,9 @@ import {
 	View
 } from "react-native";
 const { width, height } = Dimensions.get("window");
-// import { useTheme } from "@react-navigation/native";
 import type { Place } from '../lib/place';
 import PlaceExpandable from "./PlaceExpandable";
-import { WalkthroughListScreenContext } from "../Screens/ListScreen";
+import { WalkthroughListScreenContext } from "../util/globalvars";
 
 interface PlaceProps extends React.ComponentPropsWithoutRef<typeof View> {
 	name?: string;

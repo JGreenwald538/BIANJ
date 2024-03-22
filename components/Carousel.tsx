@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, SafeAreaView, Dimensions, Image } from "react-native";
+import { View, Dimensions, Image } from "react-native";
 import Carousel from "react-native-snap-carousel";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");

@@ -1,69 +1,64 @@
 {
-  "expo": {
-    "name": "BIANJ",
-    "slug": "BIRC",
-    "version": "1.0.5",
-    "orientation": "portrait",
-    "icon": "./assets/logos/APPICON.png",
-    "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/BIANJLogoSplash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#572C5F"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.BIANJ",
-      "buildNumber": "23",
-      "entitlements": {
-        "com.apple.developer.maps": true
-      },
-      "icon": "./assets/logos/APPICON.png"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "/Users/jackgreenwald/Desktop/Coding/BIANJ/assets/logos/iTunesArtwork@2x.png",
-        "backgroundColor": "#572C5F"
-      },
-      "package": "com.anonymous.BIANJ",
-      "versionCode": 23,
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyA-pBCQTZGhP1VZGd6Yd9p1zB3AWkd21fA"
-        }
-      },
-      "icon": "./assets/logos/APPICON.png",
-      "permissions": [
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION"
-      ]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "4f2a80e3-6fab-455a-84d9-9b1abcc76248"
-      }
-    },
-    "owner": "blood_bones124",
-    "plugins": [
-      [
-        "expo-location",
-        {
-          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) access to your location to allow you to find nearby resources. Example: The map will use your location to create a radius of resources a certain distance from you.",
-          "NSPrivacyAccessedAPICategoryDiskSpace": "$(PRODUCT_NAME) stores the data of different resources for brain injuries from a database."
-        }
-      ]
-    ],
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/4f2a80e3-6fab-455a-84d9-9b1abcc76248"
-    }
-  }
+	"expo": {
+		"name": "BIANJ",
+		"slug": "BIRC",
+		"version": "1.0.5",
+		"orientation": "portrait",
+		"icon": "./assets/logos/appIcon.png",
+		"userInterfaceStyle": "automatic",
+		"splash": {
+			"image": "./assets/logos/BIANJLogoSplash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#572C5F"
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true,
+			"bundleIdentifier": "com.anonymous.BIANJ",
+			"buildNumber": "23",
+			"entitlements": {
+				"com.apple.developer.maps": true
+			},
+			"icon": "./assets/logos/appIcon.png"
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "/Users/jackgreenwald/Desktop/Coding/BIANJ/assets/logos/iTunesArtwork@2x.png",
+				"backgroundColor": "#572C5F"
+			},
+			"package": "com.anonymous.BIANJ",
+			"versionCode": 23,
+			"config": {
+				"googleMaps": {
+					"apiKey": "AIzaSyA-pBCQTZGhP1VZGd6Yd9p1zB3AWkd21fA"
+				}
+			},
+			"icon": "./assets/logos/APPICON.png",
+			"permissions": [
+				"android.permission.ACCESS_COARSE_LOCATION",
+				"android.permission.ACCESS_FINE_LOCATION"
+			]
+		},
+		"extra": {
+			"eas": {
+				"projectId": "4f2a80e3-6fab-455a-84d9-9b1abcc76248"
+			}
+		},
+		"owner": "blood_bones124",
+		"plugins": [
+			[
+				"expo-location",
+				{
+					"locationWhenInUsePermission": "Allow $(PRODUCT_NAME) access to your location to allow you to find nearby resources. Example: The map will use your location to create a radius of resources a certain distance from you.",
+					"NSPrivacyAccessedAPICategoryDiskSpace": "$(PRODUCT_NAME) stores the data of different resources for brain injuries from a database."
+				}
+			]
+		],
+		"runtimeVersion": {
+			"policy": "appVersion"
+		},
+		"updates": {
+			"url": "https://u.expo.dev/4f2a80e3-6fab-455a-84d9-9b1abcc76248"
+		}
+	}
 }

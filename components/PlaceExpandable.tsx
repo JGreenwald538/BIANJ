@@ -156,10 +156,6 @@ const Place: React.FC<PlaceProps> = React.memo(({
 		android: "geo:0,0?q=",
 	});
 	const url = `${urlScheme}${address}`;
-	const justNumber = phone.replaceAll(/[\(\)-\s]/g, "");
-	const tele = `${"tel:"}${justNumber}`;
-	// console.log(activateAlert, setPlaceEnabled);
-
 
 	if (invisible) {
 		return (
@@ -185,8 +181,8 @@ const Place: React.FC<PlaceProps> = React.memo(({
 				<View style={styles.logoContainer}>
 					{logoUri ? (
 						<Image
-							source={require("../assets/logos/icon12.png")}
-							alt={"logo"}
+							source={require("../assets/logos/helpingHandIcon.png")}
+							alt={"Helping Hand Icon"}
 							style={{
 								height: "80%",
 								resizeMode: "contain",
@@ -243,8 +239,8 @@ const Place: React.FC<PlaceProps> = React.memo(({
 								}}
 							>
 								<Image
-									source={require("../assets/logos/icon6.png")}
-									alt={"logo"}
+									source={require("../assets/logos/nav.png")}
+									alt={"Navigation Button"}
 									style={{
 										resizeMode: "contain",
 										height: 30,
@@ -277,8 +273,8 @@ const Place: React.FC<PlaceProps> = React.memo(({
 								}}
 							>
 								<Image
-									source={require("../assets/logos/phoneicon.png")}
-									alt={"logo"}
+									source={require("../assets/logos/phoneIcon.png")}
+									alt={"Call Button"}
 									style={{
 										resizeMode: "contain",
 										height: 30,
@@ -312,8 +308,8 @@ const Place: React.FC<PlaceProps> = React.memo(({
 								}}
 							>
 								<Image
-									source={require("../assets/logos/webicon.png")}
-									alt={"logo"}
+									source={require("../assets/logos/webIcon.png")}
+									alt={"Website Button"}
 									style={{
 										resizeMode: "contain",
 										height: 30,
@@ -368,6 +364,7 @@ const Place: React.FC<PlaceProps> = React.memo(({
 							width={30}
 							height={30}
 							color={colorScheme === "light" ? "#471f7d" : "white"}
+							accessibilityLabel={"Dropdown Button"}
 						/>
 					</TouchableOpacity>
 				</Animated.View>
@@ -396,17 +393,10 @@ const Place: React.FC<PlaceProps> = React.memo(({
 							zIndex: 1,
 							left: placeEnabled ? 25 : undefined,
 						}}
+						accessibilityLabel="Save Button"
 					>
 						<View
 							style={{
-								// 	// width: 30,
-								// 	// height: 30,
-								// 	position: "absolute",
-								// 	right: placeEnabled ? "auto" : 10,
-								// 	left: placeEnabled ? 10 : "auto",
-								// 	top: placeEnabled ? "auto" : 8,
-								// 	bottom: placeEnabled ? 8 : "auto",
-								// 	zIndex: 1,
 								alignContent: "center",
 							}}
 						>
@@ -452,6 +442,7 @@ const Place: React.FC<PlaceProps> = React.memo(({
 							zIndex: 1,
 							left: placeEnabled ? 20 : undefined,
 						}}
+						accessibilityLabel="Remove Button"
 					>
 						<View style={{ flexDirection: "column", alignItems: "center" }}>
 							<DeleteIcon
