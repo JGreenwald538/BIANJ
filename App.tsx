@@ -14,7 +14,6 @@ import {
 	CategoriesContext,
 	WalkthroughContext,
 } from "./util/globalvars";
-import { API_URL } from "./constants";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
@@ -61,7 +60,9 @@ export default function App() {
 	useEffect(() => {
 		async function fetchData() {
 			try {
-				const res = await fetch(API_URL, { method: "GET" });
+				const res = await fetch("https://api.bianj.org/index.php/places", {
+					method: "GET",
+				});
 				const text = await res.text();
 				const parsedData = JSON.parse(text);
 				if (parsedData && parsedData.length > 0) {
@@ -100,11 +101,11 @@ export default function App() {
 														source={
 															focused
 																? colorScheme === "dark"
-																	? require("./assets/logos/icon2.png")
-																	: require("./assets/logos/icon2purple.png")
-																: require("./assets/logos/icon2dark.png")
+																	? require("./assets/logos/homewhite.png")
+																	: require("./assets/logos/homepurple.png")
+																: require("./assets/logos/homedark.png")
 														}
-														alt={"logo"}
+														alt={"Home Screen Button"}
 														style={{
 															height: size,
 															resizeMode: "contain",

@@ -73,11 +73,12 @@ const WalkthroughOverlay: React.FC<OverlayProps> = ({
 
 	// Ensure no calculation results in NaN
 	Object.keys(dimmedStyles).forEach((key) => {
-		const style = dimmedStyles[key];
+		const style = dimmedStyles[key as keyof typeof dimmedStyles];
 		Object.keys(style).forEach((prop) => {
-			if (isNaN(style[prop])) {
-				console.error(`Invalid calculation for ${key} ${prop}:`, style[prop]);
-				style[prop] = 0; // Default to 0 if NaN
+			const value = prop as keyof typeof style;
+			if (isNaN(style[value])) {
+				console.error(`Invalid calculation for ${key} ${value}:`, style[value]);
+				style[value] = 0; // Default to 0 if NaN
 			}
 		});
 	});

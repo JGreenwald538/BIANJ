@@ -14,7 +14,6 @@ import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Alert from "../components/Alert";
 
 
 const sortBys = ["Alphabetical", "Category", "Distance"];
@@ -96,8 +95,6 @@ export default function ListScreen(
 	};
 
 	const [centered, setCentered] = useState(true);
-	const [alertVisible, setAlertVisible] = useState(false);
-	const [message, setMessage] = useState("");
 
 	const [targetMeasure, setTargetMeasure] = useState<{
 		x: number;
@@ -295,11 +292,6 @@ export default function ListScreen(
 				content={steps[currentStep].content}
 				onClose={nextStep}
 				center={centered}
-			/>
-			<Alert
-				visible={alertVisible}
-				onClose={() => setAlertVisible(false)}
-				message={message}
 			/>
 			<ScrollView style={{ height: "100%" }}>
 				<Place invisible />

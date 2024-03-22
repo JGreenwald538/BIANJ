@@ -5,7 +5,6 @@
     "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/logos/APPICON.png",
-    "companyName": "Brain Injury Alliance of New Jersey",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/BIANJLogoSplash.png",
@@ -18,8 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.BIANJ",
-      "buildNumber": "22",
-      "companyName": "Brain Injury Alliance of New Jersey",
+      "buildNumber": "23",
       "entitlements": {
         "com.apple.developer.maps": true
       },
@@ -31,10 +29,10 @@
         "backgroundColor": "#572C5F"
       },
       "package": "com.anonymous.BIANJ",
-      "versionCode": 21,
+      "versionCode": 23,
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBtLRyjM6a2KBTt_MkVBueX01qJNfSg3Io"
+          "apiKey": "AIzaSyA-pBCQTZGhP1VZGd6Yd9p1zB3AWkd21fA"
         }
       },
       "icon": "./assets/logos/APPICON.png",

@@ -16,6 +16,7 @@ web-build/
 *.key
 *.mobileprovision
 
+
 # Metro
 .metro-health-check*
 
@@ -40,3 +41,7 @@ bianj-app-1edd4f31a9ba.json
 release.keystore
 .vscode/settings.json
 /phpServer
+
+android/
+.env.development
+credentials.json
