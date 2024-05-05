@@ -1,41 +1,13 @@
-import { Marker, Callout } from "react-native-maps";
-import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { Linking } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
 import React from "react";
-import SaveIcon from "../assets/SVGs/download-outline.svg";
-import { useTheme } from "@react-navigation/native";
-import { MarkerReact } from "./Marker";
+import { MarkerProps, MarkerReact } from "./Marker";
 
+interface MarkersProps {
+	data: any;
+	categoriesEnabled: any;
+	userLocation: any;
+}
 
 const colors: string[] = ["red", "green", "blue", "yellow", "orange"];
-
-const device = Platform.OS;
-
-const styles = StyleSheet.create({
-	nameText: {
-		fontSize: 18,
-		color: "#333",
-		overflow: "scroll",
-		justifyContent: "center",
-		display: "flex",
-		flexWrap: "wrap",
-    textAlign: "center",
-	},
-	typeText: {
-		fontSize: 15,
-		color: "#63666a",
-	},
-	actionText: {
-		fontSize: 16,
-		borderRadius: 10,
-		color: "white",
-	},
-	actionTextHidden: {
-		display: "none",
-	},
-});
 
 function toRadians(degrees: number): number {
 	return (degrees * Math.PI) / 180;
@@ -63,23 +35,21 @@ function haversineDistance(
 
 // Function to calculate the distance between two coordinates using Bing Maps API
 function getDistanceTwoPoints(
-	userLocation: { lat: any; long: any },
-	targetLocation: any
+	userLocation: { lat: number; long: number },
+	targetLocations: { lat: number; long: number }[]
 ) {
 	let distances: any = [];
-	for (let i = 0; i < targetLocation.length; i++) {
+	for (let i = 0; i < targetLocations.length; i++) {
 		const data = haversineDistance(
 			userLocation.lat,
 			userLocation.long,
-			targetLocation[i].lat,
-			targetLocation[i].long
+			targetLocations[i].lat,
+			targetLocations[i].long
 		);
 		distances.push(data);
 	}
 	return distances;
 }
-
-// Function to request permission and get user's current location
 
 // Function to check if a coordinate is within a certain radius from the user
 function isCoordinateWithinRadius(
@@ -97,34 +67,35 @@ function isCoordinateWithinRadius(
 	return distances;
 }
 
-// @ts-ignore
-export default function Markers(data, categoriesEnabled, userLocation) {
-	// const userLocation = useContext(LocationContext);
-	// @ts-ignore
+export default function Markers({data, categoriesEnabled, userLocation}: MarkersProps ) {
 	let distances = [];
 	if (userLocation !== null) {
 		distances = isCoordinateWithinRadius(data, userLocation);
 	}
-	let markers = [];
-	const categories: any[] = [];
+	let markers: {
+		marker: React.ReactElement | null;
+		distance: number;
+		typeOfPlace: string;
+	}[] = [];
+	const categories: string[] = [];
 	for (let i = 0; i < data.length; i++) {
 		const {
 			typeOfPlace,
 		} = data[i];
-		markers.push([
-			<MarkerReact
-				data={data[i]}
-				categories={categories}
-				colors={colors}
-				categoriesEnabled={categoriesEnabled}
-				key={i}
-				i={i}
-			/>,
+				markers.push({
+					marker: <MarkerReact
+						categories={categories}
+						colors={colors}
+						categoriesEnabled={categoriesEnabled}
+						key={i}
+						i={i}
+						data={data[i]}
+					/>,
 
-			distances[i],
-			typeOfPlace,
-		]); 
+					distance: distances[i],
+					typeOfPlace: typeOfPlace,
+			}); 
 			
 	}
-	return [markers, categories];
+	return {markers: markers, categories: categories};
 }

@@ -8,8 +8,12 @@ import {
 	Modal,
 	TouchableWithoutFeedback,
 	Platform,
+	Dimensions,
+	ScrollView,
 } from "react-native";
 import Checkbox from "./Checkbox";
+import { useTheme } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const colors: string[] = ["red", "green", "blue", "yellow", "orange"];
 
@@ -17,32 +21,24 @@ const colors: string[] = ["red", "green", "blue", "yellow", "orange"];
 interface FilterProps {
 	categories: string[];
 	categoriesEnabled: string[];
-	setCategoriesEnabled: any;
-	colorScheme: string;
+	setCategoriesEnabled: (categories: string[]) => void;
 	filtersExpanded: boolean;
 	onPressFilters: () => void;
-	screenWidth: number;
-	screenHeight: number;
-	insets: any;
 	update?: boolean;
 	setUpdate?: (update: boolean) => void;
 	nextCategory: number;
 	setNextCategory: any;
 	map?: boolean;
-	buttonRef?: any;
-	menuRef?: any;
+	buttonRef?: React.RefObject<TouchableOpacity>;
+	menuRef?: React.RefObject<ScrollView>;
 }
 
 export const Filter: React.FC<FilterProps> = ({
 	categories,
 	categoriesEnabled,
 	setCategoriesEnabled,
-	colorScheme,
 	filtersExpanded,
 	onPressFilters,
-	screenWidth,
-	screenHeight,
-	insets,
 	update,
 	setUpdate,
 	nextCategory,
@@ -51,6 +47,11 @@ export const Filter: React.FC<FilterProps> = ({
 	buttonRef,
 	menuRef,
 }) => {
+	const { colors: colorsList } = useTheme();
+	const colorScheme = colorsList.background === "white" ? "light" : "dark";
+	const insets = useSafeAreaInsets();
+	const {width: screenWidth, height: screenHeight} = Dimensions.get("window");
+	console.log(categoriesEnabled);
 	return (
 		<>
 			{filtersExpanded && (
@@ -139,7 +140,6 @@ export const Filter: React.FC<FilterProps> = ({
 										);
 									}
 								}
-								// console.log(categoriesEnabled);
 							}} // Pass the negated value of `isEnabled`
 						>
 							<Checkbox
@@ -172,8 +172,9 @@ export const Filter: React.FC<FilterProps> = ({
 									}
 								}}
 								color={
+									
 									map && Platform.OS === "ios"
-										? colors[categoriesEnabled.indexOf(category)]
+										? colors[categoriesEnabled.indexOf(category)] ?? "black"
 										: colorScheme === "light"
 										? "black"
 										: "white"

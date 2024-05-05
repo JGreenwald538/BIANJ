@@ -3,20 +3,18 @@ import {
 	View,
 	TouchableOpacity,
 	ScrollView,
-	Animated,
 	Text,
 	Dimensions,
 	LayoutAnimation,
-	Platform,
 } from "react-native";
 import { Place, PlaceList } from "../components/Place";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Checkbox from "../components/Checkbox";
-import { RadioButton } from "react-native-paper";
-import { AddressInput } from "../components/AddressInput";
-import { CategoriesContext, LocationContext, WalkthroughContext } from "../util/globalvars";
+import {
+	LocationContext,
+	WalkthroughContext,
+} from "../util/globalvars";
 import LogoTitle from "../components/LogoTitle";
-import { useFocusEffect, useTheme } from "@react-navigation/native";
+import { NavigationProp, useFocusEffect, useTheme } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
@@ -26,23 +24,27 @@ const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
 const getDistance = (
-	lat1: number,
-	lon1: number,
-	lat2: number,
-	lon2: number
+	lat1: number | null,
+	lon1: number | null,
+	lat2: number | null,
+	lon2: number | null
 ): number => {
-	// Haversine formula to calculate the distance
-	const R = 6371; // Radius of the Earth in km
-	const dLat = (lat2 - lat1) * (Math.PI / 180);
-	const dLon = (lon2 - lon1) * (Math.PI / 180);
-	const a =
-		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.cos(lat1 * (Math.PI / 180)) *
-			Math.cos(lat2 * (Math.PI / 180)) *
-			Math.sin(dLon / 2) *
-			Math.sin(dLon / 2);
-	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	return (R * c) / 1.609; // Distance in mi
+	if (lat1 && lon1 && lat2 && lon2) {
+		// Haversine formula to calculate the distance
+		const R = 6371; // Radius of the Earth in km
+		const dLat = (lat2 - lat1) * (Math.PI / 180);
+		const dLon = (lon2 - lon1) * (Math.PI / 180);
+		const a =
+			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+			Math.cos(lat1 * (Math.PI / 180)) *
+				Math.cos(lat2 * (Math.PI / 180)) *
+				Math.sin(dLon / 2) *
+				Math.sin(dLon / 2);
+		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		return (R * c) / 1.609; // Distance in mi
+	} else {
+		return 0;
+	}
 };
 
 const sortBys = ["Alphabetical", "Category", "Distance"];
@@ -56,11 +58,11 @@ interface StepInfo {
 	};
 }
 
-export default function SavedScreen({ navigation }: { navigation: any }) {
-	const currentLocation = useContext(LocationContext);
+export default function SavedScreen({ navigation }: { navigation: NavigationProp<any> }) {
+	const currentLocation = useContext(LocationContext) ?? [{lat: null, long: null}];
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
 	const [sortByExpanded, setSortByExpanded] = useState(false);
-	const [categoriesEnabled, setCategoriesEnabled] = useState([]);
+	const [categoriesEnabled, setCategoriesEnabled] = useState<string[]>([]);
 	const [categories, setCategories] = useState<string[]>([]);
 	const [sortByEnabled, setSortByEnabled] = useState("Category");
 	const [places, setPlaces] = useState([]);
@@ -121,9 +123,7 @@ export default function SavedScreen({ navigation }: { navigation: any }) {
 							case "Category":
 								return a.typeOfPlace.localeCompare(b.typeOfPlace);
 							case "Distance":
-								// @ts-ignore
 								if (currentLocation[0]) {
-									// @ts-ignore
 									return (
 										getDistance(
 											a.lat,
@@ -131,7 +131,6 @@ export default function SavedScreen({ navigation }: { navigation: any }) {
 											currentLocation![0].lat,
 											currentLocation![0].long
 										) -
-										// @ts-ignore
 										getDistance(
 											b.lat,
 											b.long,
@@ -147,9 +146,8 @@ export default function SavedScreen({ navigation }: { navigation: any }) {
 					});
 
 				if (categoriesEnabled.length !== 0) {
-					sortedValues = sortedValues.filter((value) => {
-						// @ts-ignore
-						return categoriesEnabled.indexOf(value.typeOfPlace) !== -1;
+					sortedValues = sortedValues.filter((value: Place) => {
+						return categoriesEnabled.includes(value.typeOfPlace);
 					});
 				}
 				const places = PlaceList({
@@ -186,7 +184,6 @@ export default function SavedScreen({ navigation }: { navigation: any }) {
 	// State to manage the current step, overlay visibility, and target element position
 	const [currentStep, setCurrentStep] = useState<number>(0);
 	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
-	const [centered, setCentered] = useState(true);
 	const updateVisibility = () => {
 		setOverlayVisible(walkthrough !== 0);
 	};
@@ -280,7 +277,7 @@ export default function SavedScreen({ navigation }: { navigation: any }) {
 				targetMeasure={targetMeasure}
 				content={steps[currentStep].content}
 				onClose={nextStep}
-				center={centered}
+				center={true}
 			/>
 			<ScrollView style={{ height: "100%" }}>
 				<Place invisible />
@@ -350,10 +347,6 @@ export default function SavedScreen({ navigation }: { navigation: any }) {
 					categoriesEnabled={categoriesEnabled}
 					setCategoriesEnabled={setCategoriesEnabled}
 					categories={categories}
-					colorScheme={colorScheme}
-					screenHeight={screenHeight}
-					insets={insets}
-					screenWidth={screenWidth}
 					onPressFilters={onPressFilters}
 					update={update}
 					setUpdate={setUpdate}

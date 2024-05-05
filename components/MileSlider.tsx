@@ -101,13 +101,14 @@ const MileSlider: React.FC<MileSliderProps> = ({
       marginLeft: 5,
     },
   });
+  console.log(isEnabled);
   return (
     <View style={styles.container} ref={ref}>
       <View style={{flexDirection: "column", justifyContent: "center" }}>
         <Checkbox
           isChecked={isEnabled}
           onCheck={
-            () => isEnabledChange(!isEnabled && !filters.every((str) => str === ""))
+            () => isEnabledChange(isEnabled )
           } // Pass the negated value of `isEnabled`
           color={"#572C5F"}
           alt="Radius Checkbox"

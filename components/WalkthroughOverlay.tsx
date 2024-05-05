@@ -22,132 +22,127 @@ interface OverlayProps {
 	center?: boolean;
 }
 
-const WalkthroughOverlay: React.FC<OverlayProps> = ({
-	visible,
-	targetMeasure,
-	content,
-	onClose,
-	center,
-}) => {
-	const windowDimensions = Dimensions.get("window");
-	const [tooltipHeight, setTooltipHeight] = React.useState(0);
-	const [tooltipWidth, setTooltipWidth] = React.useState(0);
-
-
-	// Before using targetMeasure values, check if they are valid numbers
-	const safeTargetMeasure = {
-		x: !isNaN(targetMeasure.x) ? targetMeasure.x : 0,
-		y: !isNaN(targetMeasure.y) ? targetMeasure.y : 0,
-		width: !isNaN(targetMeasure.width) ? targetMeasure.width : 0,
-		height: !isNaN(targetMeasure.height) ? targetMeasure.height : 0,
-	};
-
-	const dimmedStyles = {
-		top: {
-			top: 0,
-			left: 0,
-			right: 0,
-			height: safeTargetMeasure.y,
-		},
-		bottom: {
-			top: safeTargetMeasure.y + safeTargetMeasure.height,
-			left: 0,
-			right: 0,
-			bottom: 0,
-		},
-		left: {
-			top: safeTargetMeasure.y,
-			left: 0,
-			width: safeTargetMeasure.x,
-			height: safeTargetMeasure.height,
-		},
-		right: {
-			top: safeTargetMeasure.y,
-			right: 0,
-			width:
-				windowDimensions.width -
-				(safeTargetMeasure.x + safeTargetMeasure.width),
-			height: safeTargetMeasure.height,
-		},
-	};
-
-	// Ensure no calculation results in NaN
-	Object.keys(dimmedStyles).forEach((key) => {
-		const style = dimmedStyles[key as keyof typeof dimmedStyles];
-		Object.keys(style).forEach((prop) => {
-			const value = prop as keyof typeof style;
-			if (isNaN(style[value])) {
-				console.error(`Invalid calculation for ${key} ${value}:`, style[value]);
-				style[value] = 0; // Default to 0 if NaN
-			}
+const WalkthroughOverlay: React.FC<OverlayProps> = React.memo(
+	({ visible, targetMeasure, content, onClose, center }) => {
+		const windowDimensions = Dimensions.get("window");
+		const [tooltipDimensions, setTooltipDimensions] = React.useState({
+			height: 0,
+			width: 0,
 		});
-	});
 
-	// Determine if the tooltip should be shown above or below based on available space
-	const showTooltipAbove =
-		targetMeasure.y + targetMeasure.height + tooltipHeight >
-		windowDimensions.height;
+		const safeTargetMeasure = React.useMemo(
+			() => ({
+				x: !isNaN(targetMeasure.x) ? targetMeasure.x : 0,
+				y: !isNaN(targetMeasure.y) ? targetMeasure.y : 0,
+				width: !isNaN(targetMeasure.width) ? targetMeasure.width : 0,
+				height: !isNaN(targetMeasure.height) ? targetMeasure.height : 0,
+			}),
+			[targetMeasure]
+		);
 
-	// Adjust tooltip position dynamically
-	let tooltipStyle = {
-		top: center
-			? (windowDimensions.height - tooltipHeight) / 2
-			: showTooltipAbove
-			? targetMeasure.y - tooltipHeight - 20
-			: targetMeasure.y + targetMeasure.height + 20, // Position above if too low, else below
-		left: center
-			? (windowDimensions.width - tooltipWidth) / 2 // Centered horizontally in the window
-			: Math.max(
-				0, // Minimum left padding to keep tooltip inside screen bounds
-			Math.min(
-			targetMeasure.x + targetMeasure.width / 2 - tooltipWidth / 2,
-			windowDimensions.width - tooltipWidth - 20 // Maximum right position to keep tooltip inside screen bounds
-			)
-		)
-	};
+		const dimmedStyles = React.useMemo(
+			() => ({
+				top: {
+					top: 0,
+					left: 0,
+					right: 0,
+					height: safeTargetMeasure.y,
+				},
+				bottom: {
+					top: safeTargetMeasure.y + safeTargetMeasure.height,
+					left: 0,
+					right: 0,
+					bottom: 0,
+				},
+				left: {
+					top: safeTargetMeasure.y,
+					left: 0,
+					width: safeTargetMeasure.x,
+					height: safeTargetMeasure.height,
+				},
+				right: {
+					top: safeTargetMeasure.y,
+					right: 0,
+					width:
+						windowDimensions.width -
+						(safeTargetMeasure.x + safeTargetMeasure.width),
+					height: safeTargetMeasure.height,
+				},
+			}),
+			[safeTargetMeasure, windowDimensions]
+		);
 
-	return (
-		<Modal
-			visible={visible}
-			transparent
-			animationType="fade"
-			onRequestClose={onClose}
-		>
-			<TouchableOpacity
-				style={styles.fullscreenOverlay}
-				onPress={onClose}
-				activeOpacity={1}
+		const tooltipStyle = React.useMemo(() => {
+			const showTooltipAbove =
+				safeTargetMeasure.y +
+					safeTargetMeasure.height +
+					tooltipDimensions.height >
+				windowDimensions.height;
+			return {
+				top: center
+					? (windowDimensions.height - tooltipDimensions.height) / 2
+					: showTooltipAbove
+					? safeTargetMeasure.y - tooltipDimensions.height - 20
+					: safeTargetMeasure.y + safeTargetMeasure.height + 20,
+				left: center
+					? (windowDimensions.width - tooltipDimensions.width) / 2
+					: Math.max(
+							0,
+							Math.min(
+								safeTargetMeasure.x +
+									safeTargetMeasure.width / 2 -
+									tooltipDimensions.width / 2,
+								windowDimensions.width - tooltipDimensions.width
+							)
+					  ),
+			};
+		}, [center, safeTargetMeasure, tooltipDimensions, windowDimensions]);
+
+		const handleClose = React.useCallback(() => {
+			onClose();
+		}, [onClose]);
+
+		return (
+			<Modal
+				visible={visible}
+				transparent
+				animationType="fade"
+				onRequestClose={handleClose}
 			>
-				{/* Dimmed areas */}
-				<View style={[styles.dimmedOverlay, dimmedStyles.top]} />
-				<View style={[styles.dimmedOverlay, dimmedStyles.bottom]} />
-				<View style={[styles.dimmedOverlay, dimmedStyles.left]} />
-				<View
-					style={[styles.dimmedOverlay, { ...dimmedStyles.right, right: 0 }]}
-				/>
-
-				{/* Tooltip container */}
-				<View
-					style={[styles.tooltip, tooltipStyle]}
-					onLayout={({
-						nativeEvent: {
-							layout: { height, width },
-						},
-					}) => {
-						setTooltipHeight(height + 30);
-						setTooltipWidth(width);
-					}}
+				<TouchableOpacity
+					style={styles.fullscreenOverlay}
+					onPress={handleClose}
+					activeOpacity={1}
 				>
-					<Text style={styles.title}>{content.title}</Text>
-					<Text style={styles.description}>{content.description}</Text>
-					{/* <TouchableOpacity onPress={onClose} style={styles.button}>
-						<Text>{content.buttonText}</Text>
-					</TouchableOpacity> */}
-				</View>
-			</TouchableOpacity>
-		</Modal>
-	);
-};
+					{/* Dimmed areas */}
+					<View style={[styles.dimmedOverlay, dimmedStyles.top]} />
+					<View style={[styles.dimmedOverlay, dimmedStyles.bottom]} />
+					<View style={[styles.dimmedOverlay, dimmedStyles.left]} />
+					<View style={[styles.dimmedOverlay, dimmedStyles.right]} />
+
+					{/* Tooltip container */}
+					<View
+						style={[styles.tooltip, tooltipStyle]}
+						onLayout={({
+							nativeEvent: {
+								layout: { height, width },
+							},
+						}) => {
+							setTooltipDimensions({ height: height + 30, width });
+						}}
+					>
+						<Text style={styles.title}>{content.title}</Text>
+						<Text style={styles.description}>{content.description}</Text>
+						{/* Button can be uncommented and used as needed */}
+						{/* <TouchableOpacity onPress={handleClose} style={styles.button}>
+            <Text>{content.buttonText}</Text>
+          </TouchableOpacity> */}
+					</View>
+				</TouchableOpacity>
+			</Modal>
+		);
+	}
+);
 
 const styles = StyleSheet.create({
 	fullscreenOverlay: {
@@ -169,8 +164,6 @@ const styles = StyleSheet.create({
 		zIndex: 5,
 		borderWidth: 1,
 		borderColor: "#ddd",
-		// Ensure the tooltip is centered and does not go off-screen
-		// maxWidth: "80%",
 	},
 	title: {
 		fontSize: 18,

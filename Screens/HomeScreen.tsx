@@ -17,7 +17,6 @@ import { LocationContext, WalkthroughContext } from "../util/globalvars";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const screenHeight = Dimensions.get("window").height;
 
 interface StepInfo {
@@ -29,7 +28,29 @@ interface StepInfo {
 	};
 }
 
-export default function HomeScreen({navigation} : any) {
+interface ButtonMenuItemProps {
+	title: string;
+	styles: any;
+	ref: React.RefObject<View>;
+	url: string;
+}
+
+const ButtonMenuItem = ({ title, styles, ref, url }: ButtonMenuItemProps) => {
+	return (
+		<View style={styles.menu} ref={ref} collapsable={false}>
+			<TouchableOpacity
+				style={styles.menuItem}
+				onPress={async () => {
+					Linking.openURL(url);
+				}}
+			>
+				<Text style={styles.menuText}>{title}</Text>
+			</TouchableOpacity>
+		</View>
+	);
+};
+
+export default function HomeScreen({ navigation }: any) {
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
 	const currentLocation = useContext(LocationContext);
@@ -206,7 +227,7 @@ export default function HomeScreen({navigation} : any) {
 			setOverlayVisible(true);
 			setCentered(false);
 		} else {
-			alert("Please enable location services to start the walkthrough.")
+			alert("Please enable location services to start the walkthrough.");
 		}
 	};
 
@@ -251,56 +272,36 @@ export default function HomeScreen({navigation} : any) {
 			>
 				<Carousel />
 			</View>
-			<View style={styles.menu} ref={aboutUsRef} collapsable={false}>
-				<TouchableOpacity
-					style={styles.menuItem}
-					onPress={async () => {
-						Linking.openURL("https://bianj.org/about-us/");
-					}}
-				>
-					<Text style={styles.menuText}>About Us</Text>
-				</TouchableOpacity>
-			</View>
-			<View style={styles.menu} ref={getInvolvedRef} collapsable={false}>
-				<TouchableOpacity
-					style={styles.menuItem}
-					onPress={async () => {
-						Linking.openURL("https://bianj.org/upcoming-events/");
-					}}
-				>
-					<Text style={styles.menuText}>Get Involved</Text>
-				</TouchableOpacity>
-			</View>
-			<View style={styles.menu} ref={resourcesRef} collapsable={false}>
-				<TouchableOpacity
-					style={styles.menuItem}
-					onPress={async () => {
-						Linking.openURL("https://bianj.org/resources/");
-					}}
-				>
-					<Text style={styles.menuText}>Resources</Text>
-				</TouchableOpacity>
-			</View>
-			<View style={styles.menu} ref={donateRef} collapsable={false}>
-				<TouchableOpacity
-					style={styles.menuItem}
-					onPress={async () => {
-						Linking.openURL("https://bianj.org/donate/");
-					}}
-				>
-					<Text style={styles.menuText}>Donate</Text>
-				</TouchableOpacity>
-			</View>
-			<View style={styles.menu} ref={contactUsRef} collapsable={false}>
-				<TouchableOpacity
-					style={styles.menuItem}
-					onPress={async () => {
-						Linking.openURL("https://bianj.org/contact-us/");
-					}}
-				>
-					<Text style={styles.menuText}>Contact Us</Text>
-				</TouchableOpacity>
-			</View>
+			<ButtonMenuItem
+				title="About Us"
+				styles={styles}
+				ref={aboutUsRef}
+				url="https://bianj.org/about-us/"
+			/>
+			<ButtonMenuItem
+				title="Get Involved"
+				styles={styles}
+				ref={getInvolvedRef}
+				url="https://bianj.org/get-involved/"
+			/>
+			<ButtonMenuItem
+				title="Resources"
+				styles={styles}
+				ref={resourcesRef}
+				url="https://bianj.org/resources/"
+			/>
+			<ButtonMenuItem
+				title="Donate"
+				styles={styles}
+				ref={donateRef}
+				url="https://bianj.org/donate/"
+			/>
+			<ButtonMenuItem
+				title="Contact Us"
+				styles={styles}
+				ref={contactUsRef}
+				url="https://bianj.org/contact-us/"
+			/>
 			<LogoTitle />
 
 			<View
@@ -309,7 +310,7 @@ export default function HomeScreen({navigation} : any) {
 				style={{
 					position: "absolute",
 					zIndex: 10,
-					top: 0.015 * screenHeight + insets.top,
+					top: insets.top,
 					left: 20,
 				}}
 				accessibilityLabel="Reload Walkthrough Button"

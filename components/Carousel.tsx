@@ -45,30 +45,30 @@ export default class App extends React.Component<{}, AppState> {
 					title: "Item 2",
 					text: "Text 2",
 				},
-                {
-                    title: "Item 3",
-                    text: "Text 3",
-                },
-                {
-                    title: "Item 4",
-                    text: "Text 4",
-                },
-                {
-                    title: "Item 5",
-                    text: "Text 5",
-                },
-                {
-                    title: "Item 6",
-                    text: "Text 6",
-                },
-                {
-                    title: "Item 7",
-                    text: "Text 7",
-                },
-                {
-                    title: "Item 8",
-                    text: "Text 8",
-                },
+				{
+					title: "Item 3",
+					text: "Text 3",
+				},
+				{
+					title: "Item 4",
+					text: "Text 4",
+				},
+				{
+					title: "Item 5",
+					text: "Text 5",
+				},
+				{
+					title: "Item 6",
+					text: "Text 6",
+				},
+				{
+					title: "Item 7",
+					text: "Text 7",
+				},
+				{
+					title: "Item 8",
+					text: "Text 8",
+				},
 			],
 		};
 	}

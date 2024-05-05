@@ -23,6 +23,7 @@
     "babel-plugin-module-resolver": "^5.0.0",
     "deprecated-react-native-prop-types": "5.0.0",
     "dimensions": "^0.1.0",
+    "eas-cli": "latest",
     "expo": "^50.0.6",
     "expo-asset": "^9.0.2",
     "expo-blur": "~12.9.2",

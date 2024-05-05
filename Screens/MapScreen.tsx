@@ -22,11 +22,10 @@ import {
 import { AddressInput } from "../components/AddressInput";
 import LogoTitle from "../components/LogoTitle";
 import { Platform } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useFocusEffect, useTheme } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { Filter } from "../components/Filter";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
-import { useFocus } from "native-base/lib/typescript/components/primitives";
+import { MarkerReact } from "../components/Marker";
 
 interface StepInfo {
 	ref: React.RefObject<View>[];
@@ -37,14 +36,11 @@ interface StepInfo {
 	};
 }
 
-const screenHeight = Dimensions.get("window").height;
-
 export default function MapScreen({ navigation }: { navigation: any }) {
 	const data = useContext(PlacesContext);
 	const [sliderValue, setSliderValue] = useState<number>(10);
-	const currentLocation = useContext(LocationContext);
-	// @ts-ignore
-	const [isEnabled, setIsEnabled] = useState(false);
+	const currentLocation = useContext(LocationContext) ?? [null, false, false];
+	const [isRadiusEnabled, setIsRadiusEnabled] = useState(false);
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
 	const screenWidth = Dimensions.get("window").width;
 	const [mapHeight, setMapHeight] = useState(0);
@@ -60,9 +56,6 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 	const [bottomBarExpanded, setBottomBarExpanded] = useState(true);
 	const rotAnim = React.useRef(new Animated.Value(1)).current;
 	const [bottomBarHeight, setBottomBarHeight] = useState(0);
-	const insets = useSafeAreaInsets();
-	const { colors: Colors } = useTheme();
-	const colorScheme = Colors.background === "white" ? "light" : "dark";
 	const mapRef = React.useRef(null);
 	const filterRef = React.useRef(null);
 	const filterMenuRef = React.useRef(null);
@@ -76,6 +69,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 	// State to manage the current step, overlay visibility, and target element position
 	const [currentStep, setCurrentStep] = useState<number>(0);
 	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
+	const [centered, setCentered] = useState(false);
 	const updateVisibility = () => {
 		setOverlayVisible(walkthrough !== 0 && navigation.isFocused());
 	};
@@ -185,13 +179,6 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 			steps[currentStep].ref.forEach((ref) => {
 				if (ref.current) {
 					ref.current.measureInWindow((x, y, width, height) => {
-						// console.log(
-						// 	`Measurements for step ${currentStep}:`,
-						// 	x,
-						// 	y,
-						// 	width,
-						// 	height
-						// ); // Debugging log
 						if (!isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)) {
 							minX = Math.min(minX, x);
 							minY = Math.min(minY, y);
@@ -233,26 +220,25 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 			setTimeout(() => {
 				setCurrentStep(currentStep + 1);
 			}, 0);
+			setCentered(true);
 		} else if (currentStep < steps.length - 1) {
+			setCentered(false);
 			setCurrentStep(currentStep + 1);
 		} else {
 			navigation.navigate("List");
 			setCurrentStep(0);
 			setOverlayVisible(false);
-			setWalkthrough(currentStep + 1);
-			
+			setWalkthrough(2);
 		}
 	};
 
 	useFocusEffect(() => {
-		{
-			if (walkthrough !== 0 && !bottomBarExpanded) {
-				handleClose();
-			}
-			setTimeout(() => {
-				updateVisibility();
-			}, 100);
+		if (walkthrough !== 0 && !bottomBarExpanded) {
+			handleClose();
 		}
+		setTimeout(() => {
+			updateVisibility();
+		}, 100);
 	});
 
 	const handleClose = () => {
@@ -269,8 +255,8 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 		setSliderValue(newValue);
 	};
 	const handleEnabledChange = (isRadiusEnabled: boolean) => {
-		if (isRadiusEnabled || isEnabled) {
-			setIsEnabled(!isEnabled);
+		if (categoriesEnabled.some((category) => category !== "")){
+			setIsRadiusEnabled(!isRadiusEnabled);
 		} else {
 			alert("Please enable filters to use the radius selector");
 		}
@@ -281,12 +267,20 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 		setFiltersExpanded(!filtersExpanded); // This would be your state to control the button size.
 	};
-	const [markers, setMarkers] = useState([]);
+	const [markers, setMarkers] = useState<
+		{
+			marker: React.ReactElement | null;
+			distance: number;
+			typeOfPlace: string;
+		}[]
+	>([]);
 	function updateMarkers() {
-		// @ts-ignore
-		const newMarkers = Markers(data, categoriesEnabled, currentLocation[0]);
-		// @ts-ignore
-		setMarkers(newMarkers[0]);
+		const newMarkers = Markers({
+			data: data,
+			categoriesEnabled: categoriesEnabled,
+			userLocation: currentLocation[0],
+		});
+		setMarkers(newMarkers.markers);
 	} // Dependencies
 	useEffect(() => {
 		updateMarkers();
@@ -295,7 +289,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 	function changeCategoriesEnbaled(categories: string[]) {
 		setCategoriesEnabled(categories);
 		if (categories.every((category) => category === "")) {
-			setIsEnabled(false);
+			setIsRadiusEnabled(false);
 		}
 	}
 
@@ -310,6 +304,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 				targetMeasure={targetMeasure}
 				content={steps[currentStep].content}
 				onClose={nextStep}
+				center={centered}
 			/>
 			<View ref={mapRef} collapsable={false} style={{ flex: 1 }}>
 				<MapView
@@ -332,14 +327,14 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 					}}
 				>
 					{markers.map((marker) =>
-						((marker[1] <= sliderValue / 1.60934 || !isEnabled) &&
-							categoriesEnabled.indexOf(marker[2]) !== -1) ||
-						(!currentLocation && categoriesEnabled.indexOf(marker[2]) !== -1)
-							// || true
-							? marker[0]
+						((marker.distance <= sliderValue / 1.60934 || !isRadiusEnabled) &&
+							categoriesEnabled.indexOf(marker.typeOfPlace) !== -1) ||
+						(!currentLocation && categoriesEnabled.indexOf(marker.typeOfPlace) !== -1)
+							? // || true
+							  marker.marker
 							: null
 					)}
-					{currentLocation && currentLocation[0] && isEnabled && (
+					{currentLocation && currentLocation[0] && isRadiusEnabled && (
 						<Circle
 							center={{
 								latitude:
@@ -385,7 +380,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 					{currentLocation && currentLocation[0] && (
 						<View ref={radiusRef} collapsable={false}>
 							<Slider
-								isEnabled={isEnabled}
+								isEnabled={isRadiusEnabled}
 								value={sliderValue}
 								onValueChange={handleSliderChange}
 								isEnabledChange={handleEnabledChange}
@@ -415,10 +410,6 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 				setCategoriesEnabled={changeCategoriesEnbaled}
 				categories={categories}
 				onPressFilters={onPress}
-				colorScheme={colorScheme}
-				insets={insets}
-				screenWidth={screenWidth}
-				screenHeight={screenHeight}
 				nextCategory={nextCategory}
 				setNextCategory={setNextCategory}
 				map

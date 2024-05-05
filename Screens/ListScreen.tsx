@@ -16,7 +16,6 @@ import { SortBy } from "../components/SortBy";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const sortBys = ["Alphabetical", "Category", "Distance"];
 
 const screenHeight = Dimensions.get("window").height;
@@ -49,18 +48,15 @@ const getDistance = (
 	return (R * c) / 1.609;
 };
 
-
 export default function ListScreen(
 	{ route, navigation }: any = { route: { params: {} }, navigation: null }
 ) {
 	const values = useContext(PlacesContext);
-	const [sortByEnabled, setSortByEnabled] = useState(
-		"Category"
-	);
+	const [sortByEnabled, setSortByEnabled] = useState("Category");
 	const currentLocation = useContext(LocationContext);
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
 	const [sortByExpanded, setSortByExpanded] = useState(false);
-	const [categoriesEnabled, setCategoriesEnabled] = useState([]);
+	const [categoriesEnabled, setCategoriesEnabled] = useState<string[]>([]);
 	const categories = useContext(CategoriesContext);
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
@@ -91,6 +87,7 @@ export default function ListScreen(
 	const [currentStep, setCurrentStep] = useState<number>(0);
 	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
 	const updateVisibility = () => {
+		console.log(walkthrough);
 		setOverlayVisible(walkthrough !== 0);
 	};
 
@@ -214,64 +211,61 @@ export default function ListScreen(
 		}
 	};
 
-	useEffect(() => 
-		{
-			updateVisibility();
-			setSortByEnabled(route.params ? route.params.sortBy : sortByEnabled);
-			setCategoriesEnabled(
-				route.params ? route.params.categoriesEnabled : categoriesEnabled
-			);
-		}
-	, [route.params]);
+	useFocusEffect(() => {
+		updateVisibility();
+	});
 
-
+	useEffect(() => {
+		setSortByEnabled(route.params ? route.params.sortBy : sortByEnabled);
+		setCategoriesEnabled(
+			route.params ? route.params.categoriesEnabled : categoriesEnabled
+		);
+	}, [route.params]);
 
 	const sortedValues = useMemo(() => {
-			let sortedValues = [];
-			// Convert to JSON and apply the sorting logic
-			sortedValues = values.sort((a, b) => {
-				switch (sortByEnabled) {
-					case "Alphabetical":
-						// @ts-ignore
-						return a.name.localeCompare(b.name);
-					case "Category":
-						// @ts-ignore
-						return a.typeOfPlace.localeCompare(b.typeOfPlace);
-					case "Distance":
-						// @ts-ignore
-						if (currentLocation[0]) {
-							// @ts-ignore
-							return (
-								getDistance(
-									a.lat,
-									a.long,
-									currentLocation![0].lat,
-									currentLocation![0].long
-								) -
-								// @ts-ignore
-								getDistance(
-									b.lat,
-									b.long,
-									currentLocation![0].lat,
-									currentLocation![0].long
-								)
-							);
-						}
-						return 0;
-					default:
-						return 0;
-				}
-			});
-			if (categoriesEnabled.length !== 0) {
-				sortedValues = sortedValues.filter((value) => {
+		let sortedValues = [];
+		// Convert to JSON and apply the sorting logic
+		sortedValues = values.sort((a, b) => {
+			switch (sortByEnabled) {
+				case "Alphabetical":
 					// @ts-ignore
-					return categoriesEnabled.indexOf(value.typeOfPlace) !== -1;
-				});
+					return a.name.localeCompare(b.name);
+				case "Category":
+					// @ts-ignore
+					return a.typeOfPlace.localeCompare(b.typeOfPlace);
+				case "Distance":
+					// @ts-ignore
+					if (currentLocation[0]) {
+						// @ts-ignore
+						return (
+							getDistance(
+								a.lat,
+								a.long,
+								currentLocation![0].lat,
+								currentLocation![0].long
+							) -
+							// @ts-ignore
+							getDistance(
+								b.lat,
+								b.long,
+								currentLocation![0].lat,
+								currentLocation![0].long
+							)
+						);
+					}
+					return 0;
+				default:
+					return 0;
 			}
-			return sortedValues;
+		});
+		if (categoriesEnabled.length !== 0) {
+			sortedValues = sortedValues.filter((value) => {
+				// @ts-ignore
+				return categoriesEnabled.indexOf(value.typeOfPlace) !== -1;
+			});
+		}
+		return sortedValues;
 	}, [sortByEnabled, categoriesEnabled, values, currentLocation]);
-
-	
 
 	useFocusEffect(
 		React.useCallback(() => {
@@ -281,7 +275,6 @@ export default function ListScreen(
 			};
 		}, [])
 	);
-
 
 	return (
 		<View>
@@ -313,13 +306,9 @@ export default function ListScreen(
 				categoriesEnabled={categoriesEnabled}
 				setCategoriesEnabled={setCategoriesEnabled}
 				categories={categories}
-				colorScheme={colorScheme}
-				insets={insets}
-				screenWidth={screenWidth}
 				update={update}
 				setUpdate={setUpdate}
 				onPressFilters={onPressFilters}
-				screenHeight={screenHeight}
 				nextCategory={nextCategory}
 				setNextCategory={setNextCategory}
 			/>

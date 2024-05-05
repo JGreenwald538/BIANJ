@@ -1,13 +1,11 @@
-import { useTheme } from "@react-navigation/native";
 import React from "react";
 import { Linking, Platform } from "react-native";
 import { Marker, Callout } from "react-native-maps";
 import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SaveIcon from "../assets/SVGs/download-outline.svg";
-import { parse } from "react-native-svg";
 
-interface MarkerProps {
+export interface MarkerProps {
 	data: any;
 	categories: string[];
 	colors: string[];
