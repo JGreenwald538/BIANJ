@@ -129,6 +129,7 @@ const MileSlider: React.FC<MileSliderProps> = ({
           showLabel={false} // Disable the built-in label
           trackStyle={{width: "100%"}}
           alt = "Radius Slider"
+          accessibilityLabel={"Radius Slider" + (isEnabled ? "Enabled" : "Disabled: Select Filters to Enable")}
         />
         {isEnabled ? <Text style={styles.sliderLabel}>
             {`Distance: ${value} miles`}

@@ -81,7 +81,6 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 			<Marker
 				coordinate={{ latitude: lat, longitude: long }}
 				title={name}
-				description="This is a custom info window."
 				key={i}
 				pinColor={color}
 			>
@@ -128,7 +127,6 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 									>
 										<Image
 											source={require("../assets/logos/nav.png")}
-											alt={"logo"}
 											style={{
 												resizeMode: "contain",
 												height: iconSize,
@@ -156,7 +154,6 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 									>
 										<Image
 											source={require("../assets/logos/phoneIcon.png")}
-											alt={"Phone Button"}
 											style={{
 												resizeMode: "contain",
 												height: iconSize,
@@ -195,7 +192,6 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 									>
 										<Image
 											source={require("../assets/logos/webIcon.png")}
-											alt={"logo"}
 											style={{
 												resizeMode: "contain",
 												height: iconSize,

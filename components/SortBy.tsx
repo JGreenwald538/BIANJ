@@ -43,7 +43,7 @@ export const SortBy: React.FC<FilterProps> = ({
 	return (
 		<>
 			{sortByExpanded && (
-				<TouchableWithoutFeedback onPress={onPressSortBy}>
+				<TouchableWithoutFeedback onPress={onPressSortBy} accessibilityLabel="Close Sort By Menu Button">
 					<View
 						style={{
 							position: "absolute",
@@ -101,6 +101,7 @@ export const SortBy: React.FC<FilterProps> = ({
 										? true
 										: false
 								}
+								accessibilityLabel={sortBy + " Sort By Select"}
 							/>
 							<TouchableOpacity onPress={() => setSortByEnabled(sortBy)}>
 								<Text
@@ -110,6 +111,7 @@ export const SortBy: React.FC<FilterProps> = ({
 										paddingTop: 6,
 										color: colorScheme === "light" ? "black" : "white",
 									}}
+									accessibilityLabel={sortBy + " Sort By Select." + (sortByEnabled === sortBy ? "checked" : "unchecked")}
 								>
 									{sortBy}
 								</Text>
@@ -143,7 +145,7 @@ export const SortBy: React.FC<FilterProps> = ({
 				>
 					<Text
 						accessibilityLabel={
-							sortByExpanded ? "Close Button" : "Sort By Button"
+							sortByExpanded ? "Close Menu Button" : "Sort By Menu Button"
 						}
 						style={{
 							fontSize: sortByExpanded ? 25 : 19,

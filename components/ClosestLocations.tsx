@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
+import { LocationContext } from '../util/globalvars';
 
 
 // Define a type for the location objects
@@ -8,14 +9,13 @@ type Location = {
     lat: number;
     long: number;
     name: string;
-    typeOfPlace: any;
+    typeOfPlace: string;
 };
 
 // Define a type for the component props
 type ClosestLocationComponentProps = {
     locations: Location[];
-    currentLocation: any;
-    categories: any;
+    categories: [string[], string[]];
 	setFiltersExpanded: (filtersExpanded: boolean) => void;
 	ref?: any;
 };
@@ -33,9 +33,10 @@ const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): nu
     return R * c / 1.609; // Distance in km
 };
 
-const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ locations, currentLocation, categories, ref, setFiltersExpanded }) => {
+const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ locations, categories, ref, setFiltersExpanded }) => {
     const {colors} = useTheme();
     const colorScheme = colors.background === "white" ? "light" : "dark";
+	const currentLocation = useContext(LocationContext);
     const styles = StyleSheet.create({
         container: {
           backgroundColor: colorScheme === "light" ? '#e2cbe7' : "#70387a", // 
@@ -51,20 +52,24 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
         },
     });
     const navigation = useNavigation();
-    if(!currentLocation[0] || !locations) {
-        return null;
-    }
-    const sortedLocations = locations
-        .filter(location => {
-            return categories[1].indexOf(location.typeOfPlace) !== -1;
-        }
-            )
-        .map(location => ({
-            name: location.name,
-            distance: getDistance(currentLocation[0].lat, currentLocation[0].long, location.lat, location.long)
-        }))
-        .sort((a, b) => a.distance - b.distance)
-        .slice(0, 3); // Get top 3 locations
+	if (currentLocation) {
+		if(!currentLocation[0] || !locations) {
+			return null;
+		}
+	} else {
+		return null
+	}
+	const sortedLocations = locations
+		.filter(location => {
+			return categories[1].indexOf(location.typeOfPlace) !== -1;
+		}
+			)
+		.map(location => ({
+			name: location.name,
+			distance: currentLocation[0] ? getDistance(currentLocation[0].lat, currentLocation[0].long, location.lat, location.long) : 0
+		}))
+		.sort((a, b) => a.distance - b.distance)
+		.slice(0, 3); // Get top 3 locations
 
 	const categoriesEmpty = categories[1].every((category: string) => category === "");
     return (

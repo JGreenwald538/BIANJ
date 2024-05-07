@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Dimensions, ScrollView, View, LayoutAnimation } from "react-native";
-import { Place, PlaceList } from "../components/Place";
+import { Place, PlaceList } from "../components/Places";
 import {
 	CategoriesContext,
 	LocationContext,
@@ -15,6 +15,7 @@ import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PlaceInvisible from "../components/PlaceInvisible";
 
 const sortBys = ["Alphabetical", "Category", "Distance"];
 
@@ -287,7 +288,7 @@ export default function ListScreen(
 				center={centered}
 			/>
 			<ScrollView style={{ height: "100%" }}>
-				<Place invisible />
+				<PlaceInvisible />
 				<WalkthroughListScreenContext.Provider
 					value={[placeEnabled, setPlaceEnabled]}
 				>
@@ -298,6 +299,8 @@ export default function ListScreen(
 						buttonRef={buttonRef}
 						containerRef={containerRef}
 						useRef={true}
+						save
+						
 					/>
 				</WalkthroughListScreenContext.Provider>
 			</ScrollView>

@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import {
 	View,
 	TouchableOpacity,
-	StyleSheet,
 	Animated,
 	Text,
-	Modal,
 	TouchableWithoutFeedback,
 	Platform,
 	Dimensions,
@@ -55,7 +53,10 @@ export const Filter: React.FC<FilterProps> = ({
 	return (
 		<>
 			{filtersExpanded && (
-				<TouchableWithoutFeedback onPress={onPressFilters}>
+				<TouchableWithoutFeedback
+					onPress={onPressFilters}
+					accessibilityLabel="Close Filters Menu Button"
+				>
 					<View
 						style={{
 							position: "absolute",
@@ -172,7 +173,6 @@ export const Filter: React.FC<FilterProps> = ({
 									}
 								}}
 								color={
-									
 									map && Platform.OS === "ios"
 										? colors[categoriesEnabled.indexOf(category)] ?? "black"
 										: colorScheme === "light"
@@ -180,7 +180,7 @@ export const Filter: React.FC<FilterProps> = ({
 										: "white"
 								}
 								uncheckedColor={colorScheme === "light" ? "black" : "white"}
-								alt={category + " Checkbox"}
+								alt={category + " Checkbox Button" + (categoriesEnabled.indexOf(category) !== -1 ? "checked" : "unchecked")}
 							/>
 							<Text
 								style={{
@@ -188,6 +188,7 @@ export const Filter: React.FC<FilterProps> = ({
 									paddingLeft: 7,
 									color: colorScheme === "light" ? "black" : "white",
 								}}
+								accessibilityLabel=""
 							>
 								{category}
 							</Text>
@@ -225,7 +226,7 @@ export const Filter: React.FC<FilterProps> = ({
 				>
 					<Text
 						accessibilityLabel={
-							filtersExpanded ? "Close Button" : "Filters Button"
+							filtersExpanded ? "Close Menu Button" : "Filters Menu Button"
 						}
 						style={{
 							fontSize: filtersExpanded ? 25 : 19,

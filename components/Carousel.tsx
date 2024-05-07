@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Dimensions, Image } from "react-native";
+import { View, Dimensions, Image, ImageSourcePropType } from "react-native";
 import Carousel from "react-native-snap-carousel";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
@@ -7,6 +7,7 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 interface CarouselItem {
 	title: string;
 	text: string;
+	accessibilityLabel: string; // Accessibility label for each image
 }
 
 interface AppState {
@@ -14,7 +15,11 @@ interface AppState {
 	carouselItems: CarouselItem[];
 }
 
-const carouselImages: Record<number, any> = {
+interface CarouselImageMap {
+	[index: number]: ImageSourcePropType;
+}
+
+const carouselImages: CarouselImageMap = {
 	0: require("../assets/CarouselImages/Carousel1.jpg"),
 	1: require("../assets/CarouselImages/Carousel4.jpg"),
 	2: require("../assets/CarouselImages/Carousel5.jpg"),
@@ -29,51 +34,59 @@ const carouselImages: Record<number, any> = {
 const scale = 0.25;
 
 export default class App extends React.Component<{}, AppState> {
-	private carousel: React.RefObject<Carousel<any>>;
+	private carousel: React.RefObject<Carousel<CarouselItem>>;
 
 	constructor(props: {}) {
 		super(props);
-		this.carousel = React.createRef();
+		this.carousel = React.createRef<Carousel<CarouselItem>>();
 		this.state = {
 			activeIndex: 0,
 			carouselItems: [
 				{
 					title: "Item 1",
 					text: "Text 1",
+					accessibilityLabel: "Carousel of BIANJ Images",
 				},
 				{
 					title: "Item 2",
 					text: "Text 2",
+					accessibilityLabel: "Carousel of BIANJ Images",
 				},
 				{
 					title: "Item 3",
 					text: "Text 3",
+					accessibilityLabel: "Carousel of BIANJ Images",
 				},
 				{
 					title: "Item 4",
 					text: "Text 4",
+					accessibilityLabel: "Carousel of BIANJ Images",
 				},
 				{
 					title: "Item 5",
 					text: "Text 5",
+					accessibilityLabel: "Carousel of BIANJ Images",
 				},
 				{
 					title: "Item 6",
 					text: "Text 6",
+					accessibilityLabel: "Carousel of BIANJ Images",
 				},
 				{
 					title: "Item 7",
 					text: "Text 7",
+					accessibilityLabel: "Carousel of BIANJ Images",
 				},
 				{
 					title: "Item 8",
 					text: "Text 8",
+					accessibilityLabel: "Carousel of BIANJ Images",
 				},
 			],
 		};
 	}
 
-	_renderItem = ({ index }: { index: number }) => {
+	_renderItem = ({ item, index }: { item: CarouselItem; index: number }) => {
 		return (
 			<View
 				style={{
@@ -90,6 +103,8 @@ export default class App extends React.Component<{}, AppState> {
 						width: screenHeight * scale,
 						height: screenHeight * scale,
 					}}
+					accessible={true}
+					accessibilityLabel={item.accessibilityLabel}
 				/>
 			</View>
 		);

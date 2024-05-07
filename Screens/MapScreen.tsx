@@ -393,7 +393,6 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 						<View ref={closestLocationsRef} collapsable={false}>
 							<ClosestLocations
 								locations={data}
-								currentLocation={currentLocation}
 								categories={[categories, categoriesEnabled]}
 								setFiltersExpanded={setFiltersExpanded}
 							/>
@@ -455,7 +454,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 				>
 					<Image
 						source={require("../assets/logos/arrowIcon.png")}
-						alt={"Close Bottom Bar Button"}
+						alt={bottomBarExpanded ? "Close Bottom Bar Button" : "Open Bottom Bar Button"}
 						style={{
 							height: 30,
 							resizeMode: "contain",

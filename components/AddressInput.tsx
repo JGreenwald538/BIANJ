@@ -11,18 +11,14 @@ import { LocationContext } from "../util/globalvars";
 import { useTheme } from "@react-navigation/native";
 
 interface AddressInputProps {
-	ref?: any;
+	ref?: React.RefObject<View>;
 }
 
 export const AddressInput: React.FC<AddressInputProps> = ({ ref }) => {
 	const [input, setInput] = useState("");
-	// @ts-ignore
-	const [
-		currentLocation,
-		setCurrentLocation,
-		isRealLocation,
-		setIsRealLocation,
-	] = useContext(LocationContext);
+	const LocationContextList = useContext(LocationContext);
+	const setCurrentLocation = LocationContextList ? LocationContextList[1] : null;
+	const setIsRealLocation = LocationContextList ? LocationContextList[3] : null;
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
 	const styles = StyleSheet.create({
@@ -50,8 +46,12 @@ export const AddressInput: React.FC<AddressInputProps> = ({ ref }) => {
 
 				if (data && data.length > 0) {
 					const { lat, lon } = data[0];
-					setCurrentLocation({ lat: parseFloat(lat), long: parseFloat(lon) });
-					setIsRealLocation(false);
+					if (setCurrentLocation) {
+						setCurrentLocation({ lat: parseFloat(lat), long: parseFloat(lon) });
+					}
+					if (setIsRealLocation) {
+						setIsRealLocation(false);
+					}
 				} else {
 					throw new Error("No location found");
 				}
@@ -119,6 +119,9 @@ export const AddressInput: React.FC<AddressInputProps> = ({ ref }) => {
 								textAlign: "center",
 								paddingHorizontal: 5,
 							}}
+							accessibilityLabel={
+								input ? "Submit Button" : "Enter address to submit"
+							}
 						>
 							Submit
 						</Text>

@@ -7,18 +7,20 @@ import {
 	Dimensions,
 	LayoutAnimation,
 } from "react-native";
-import { Place, PlaceList } from "../components/Place";
+import { Place, PlaceList } from "../components/Places";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-	LocationContext,
-	WalkthroughContext,
-} from "../util/globalvars";
+import { LocationContext, WalkthroughContext } from "../util/globalvars";
 import LogoTitle from "../components/LogoTitle";
-import { NavigationProp, useFocusEffect, useTheme } from "@react-navigation/native";
+import {
+	NavigationProp,
+	useFocusEffect,
+	useTheme,
+} from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
+import PlaceInvisible from "../components/PlaceInvisible";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -58,8 +60,14 @@ interface StepInfo {
 	};
 }
 
-export default function SavedScreen({ navigation }: { navigation: NavigationProp<any> }) {
-	const currentLocation = useContext(LocationContext) ?? [{lat: null, long: null}];
+export default function SavedScreen({
+	navigation,
+}: {
+	navigation: NavigationProp<any>;
+}) {
+	const currentLocation = useContext(LocationContext) ?? [
+		{ lat: null, long: null },
+	];
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
 	const [sortByExpanded, setSortByExpanded] = useState(false);
 	const [categoriesEnabled, setCategoriesEnabled] = useState<string[]>([]);
@@ -153,7 +161,6 @@ export default function SavedScreen({ navigation }: { navigation: NavigationProp
 				const places = PlaceList({
 					items: sortedValues,
 					save: false,
-					deleteIcon: true,
 					update,
 					setUpdate,
 				});
@@ -280,7 +287,7 @@ export default function SavedScreen({ navigation }: { navigation: NavigationProp
 				center={true}
 			/>
 			<ScrollView style={{ height: "100%" }}>
-				<Place invisible />
+				<PlaceInvisible />
 				{!places && (
 					<View
 						style={{

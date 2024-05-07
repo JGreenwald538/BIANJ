@@ -15,6 +15,7 @@ import {
 	WalkthroughContext,
 } from "./util/globalvars";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Place } from "./lib/place.ts";
 
 SplashScreen.preventAutoHideAsync();
 setTimeout(SplashScreen.hideAsync, 1000);
@@ -48,7 +49,7 @@ export default function App() {
 	} | null>(null);
 	const [isRealLocation, setIsRealLocation] = useState(true);
 	const colorScheme = useColorScheme();
-	const [places, setPlaces] = useState<any[]>([]);
+	const [places, setPlaces] = useState<Place[]>([]);
 	const [walkthrough, setWalkthrough] = useState(0);
 
 	useEffect(() => {

@@ -313,28 +313,33 @@ export default function HomeScreen({ navigation }: any) {
 					top: insets.top,
 					left: 20,
 				}}
-				accessibilityLabel="Reload Walkthrough Button"
 			>
-				<View style={{ alignItems: "center" }}>
-					<TouchableOpacity onPress={startWalkthrough}>
+				<View
+					accessibilityLabel="Reload Walkthrough Button"
+				>
+					<TouchableOpacity
+						onPress={startWalkthrough}
+						accessibilityLabel="Reload Walkthrough Button"
+						style={{ alignItems: "center" }}
+					>
 						<ReloadIcon
 							color={colorScheme === "light" ? "#e2cbe7" : "#70387a"}
 							width={30}
 							height={30}
 						/>
+						<Text
+							style={{ color: colorScheme === "light" ? "#e2cbe7" : "#70387a" }}
+							numberOfLines={2}
+						>
+							Reload
+						</Text>
+						<Text
+							style={{ color: colorScheme === "light" ? "#e2cbe7" : "#70387a" }}
+							numberOfLines={2}
+						>
+							Walkthrough
+						</Text>
 					</TouchableOpacity>
-					<Text
-						style={{ color: colorScheme === "light" ? "#e2cbe7" : "#70387a" }}
-						numberOfLines={2}
-					>
-						Reload
-					</Text>
-					<Text
-						style={{ color: colorScheme === "light" ? "#e2cbe7" : "#70387a" }}
-						numberOfLines={2}
-					>
-						Walkthrough
-					</Text>
 				</View>
 			</View>
 		</View>
