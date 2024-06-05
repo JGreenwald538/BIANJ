@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useRef } from "react";
 import {
 	Animated,
 	Dimensions,
@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "@react-navigation/native";
-import DropdownIcon from "../assets/SVGs/caret-down-circle-outline.svg"; // Ensure these SVG imports work in your setup
+import DropdownIcon from "../assets/SVGs/caret-down-circle-outline.svg";
 import DeleteIcon from "../assets/SVGs/close-circle-outline.svg";
 import SaveIcon from "../assets/SVGs/download-outline.svg";
 
@@ -362,9 +362,7 @@ const Place: React.FC<PlaceProps> = React.memo(
 									if (value === null) {
 										await AsyncStorage.setItem(name, JSON.stringify(object));
 										alert("Saved!");
-										// activateAlert("Saved!");
 									} else {
-										// activateAlert("Already Saved!");
 										alert("Already saved!");
 									}
 								} catch (e) {
@@ -440,7 +438,7 @@ const Place: React.FC<PlaceProps> = React.memo(
 								{placeEnabled && (
 									<Text
 										style={{
-											fontSize: 12, // Consider using a scalable unit or responsive size here
+											fontSize: 12,
 											textAlign: "center",
 											color: colorScheme === "light" ? "#471f7d" : "white",
 											marginTop: 2,

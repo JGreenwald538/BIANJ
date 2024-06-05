@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import LogoTitle from "../components/LogoTitle";
 import Carousel from "../components/Carousel";
-import { useFocusEffect, useTheme } from "@react-navigation/native";
+import { NavigationProp, useFocusEffect, useTheme } from "@react-navigation/native";
 import { useContext, useEffect, useRef, useState } from "react";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import ReloadIcon from "../assets/SVGs/reload-circle-outline.svg";
-import { LocationContext, WalkthroughContext } from "../util/globalvars";
+import { LocationContext, NavigationParamsList, WalkthroughContext } from "../util/globalvars";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -30,12 +30,55 @@ interface StepInfo {
 
 interface ButtonMenuItemProps {
 	title: string;
-	styles: any;
-	ref: React.RefObject<View>;
+	ref: React.ForwardedRef<View>;
 	url: string;
 }
 
-const ButtonMenuItem = ({ title, styles, ref, url }: ButtonMenuItemProps) => {
+const ButtonMenuItem = React.forwardRef(({title, ref, url }: ButtonMenuItemProps) => {
+	const { colors } = useTheme();
+	const colorScheme = colors.background === "white" ? "light" : "dark";
+	const styles = StyleSheet.create({
+		container: {
+			flex: 1,
+		},
+		header: {
+			alignItems: "center", // Center items horizontally in the container
+			justifyContent: "flex-end", // Center items vertically in the container
+			flex: 3, // You can adjust the height as needed
+			marginBottom: 15,
+		},
+		title: {
+			// Styles for the title
+			marginBottom: 10,
+			color: colorScheme !== "dark" ? "black" : "white",
+			fontSize: 0.025 * screenHeight,
+			textAlign: "center",
+			fontWeight: "bold",
+			width: "90%",
+		},
+		menu: {
+			alignItems: "center", // Center menu items horizontally
+			flex: 1,
+			paddingHorizontal: 40,
+			justifyContent: "center", // Center menu items vertically
+		},
+		menuItem: {
+			// Styles for menu items
+			backgroundColor: colorScheme === "light" ? "#e2cbe7" : "#70387a",
+			width: "100%",
+			height: "70%",
+			justifyContent: "center",
+			borderRadius: 10,
+		},
+		menuText: {
+			// Styles for text inside menu items
+			textAlign: "center",
+			fontSize: 18,
+			fontWeight: "500",
+			color: colorScheme === "light" ? "black" : "white",
+		},
+		// Add any additional styles you might need
+	});
 	return (
 		<View style={styles.menu} ref={ref} collapsable={false}>
 			<TouchableOpacity
@@ -48,9 +91,9 @@ const ButtonMenuItem = ({ title, styles, ref, url }: ButtonMenuItemProps) => {
 			</TouchableOpacity>
 		</View>
 	);
-};
+});
 
-export default function HomeScreen({ navigation }: any) {
+export default function HomeScreen({ navigation }: {navigation: NavigationProp<NavigationParamsList>}) {
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
 	const currentLocation = useContext(LocationContext);
@@ -274,31 +317,26 @@ export default function HomeScreen({ navigation }: any) {
 			</View>
 			<ButtonMenuItem
 				title="About Us"
-				styles={styles}
 				ref={aboutUsRef}
 				url="https://bianj.org/about-us/"
 			/>
 			<ButtonMenuItem
 				title="Get Involved"
-				styles={styles}
 				ref={getInvolvedRef}
 				url="https://bianj.org/get-involved/"
 			/>
 			<ButtonMenuItem
 				title="Resources"
-				styles={styles}
 				ref={resourcesRef}
 				url="https://bianj.org/resources/"
 			/>
 			<ButtonMenuItem
 				title="Donate"
-				styles={styles}
 				ref={donateRef}
 				url="https://bianj.org/donate/"
 			/>
 			<ButtonMenuItem
 				title="Contact Us"
-				styles={styles}
 				ref={contactUsRef}
 				url="https://bianj.org/contact-us/"
 			/>

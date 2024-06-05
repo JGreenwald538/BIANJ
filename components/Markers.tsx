@@ -1,46 +1,23 @@
 import React from "react";
 import { MarkerProps, MarkerReact } from "./Marker";
+import { Place } from "../lib/place";
+import getDistance from "../lib/distance";
 
 interface MarkersProps {
-	data: any;
-	categoriesEnabled: any;
-	userLocation: any;
+	data: Place[];
+	categoriesEnabled: string[];
+	userLocation: { lat: number; long: number } | null;
 }
 
 const colors: string[] = ["red", "green", "blue", "yellow", "orange"];
 
-function toRadians(degrees: number): number {
-	return (degrees * Math.PI) / 180;
-}
-
-function haversineDistance(
-	lat1: number,
-	lon1: number,
-	lat2: number,
-	lon2: number
-): number {
-	const R = 6371; // Earth's radius in kilometers
-	const dLat = toRadians(lat2 - lat1);
-	const dLon = toRadians(lon2 - lon1);
-	const rLat1 = toRadians(lat1);
-	const rLat2 = toRadians(lat2);
-
-	const a =
-		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.cos(rLat1) * Math.cos(rLat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-	return (R * c) / 1.609;
-}
-
-// Function to calculate the distance between two coordinates using Bing Maps API
 function getDistanceTwoPoints(
 	userLocation: { lat: number; long: number },
 	targetLocations: { lat: number; long: number }[]
 ) {
-	let distances: any = [];
+	let distances = [];
 	for (let i = 0; i < targetLocations.length; i++) {
-		const data = haversineDistance(
+		const data = getDistance(
 			userLocation.lat,
 			userLocation.long,
 			targetLocations[i].lat,
@@ -53,22 +30,22 @@ function getDistanceTwoPoints(
 
 // Function to check if a coordinate is within a certain radius from the user
 function isCoordinateWithinRadius(
-	targetLocations: { lat: any; long: any }[],
-	userLocation: { lat: any; long: any } | null
+	targetLocations: { lat: number; long: number }[],
+	userLocation: { lat: number; long: number } | null
 ) {
 	if (userLocation === null) {
-		return [-1];
+		return null;
 	}
 	const distances = getDistanceTwoPoints(userLocation, targetLocations);
 	if (distances === null) {
-		return -1;
+		return null;
 	}
 
 	return distances;
 }
 
 export default function Markers({data, categoriesEnabled, userLocation}: MarkersProps ) {
-	let distances = [];
+	let distances: number[] | null = [];
 	if (userLocation !== null) {
 		distances = isCoordinateWithinRadius(data, userLocation);
 	}
@@ -78,6 +55,9 @@ export default function Markers({data, categoriesEnabled, userLocation}: Markers
 		typeOfPlace: string;
 	}[] = [];
 	const categories: string[] = [];
+	if(distances === null) {
+		return {markers: [], categories: []};
+	}
 	for (let i = 0; i < data.length; i++) {
 		const {
 			typeOfPlace,

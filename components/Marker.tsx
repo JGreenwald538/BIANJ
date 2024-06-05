@@ -4,9 +4,10 @@ import { Marker, Callout } from "react-native-maps";
 import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SaveIcon from "../assets/SVGs/download-outline.svg";
+import { Place } from "../lib/place";
 
 export interface MarkerProps {
-	data: any;
+	data: Place;
 	categories: string[];
 	colors: string[];
 	categoriesEnabled: string[];
@@ -74,12 +75,12 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 	const color = colors[categoriesEnabled.indexOf(typeOfPlace)];
 	const device = Platform.OS;
 	const iconSize = 25;
-	lat = parseFloat(lat);
-	long = parseFloat(long);
+	const latFloat = lat;
+	const longFloat = long;
 	if (device === "ios") {
 		return (
 			<Marker
-				coordinate={{ latitude: lat, longitude: long }}
+				coordinate={{ latitude: latFloat, longitude: longFloat }}
 				title={name}
 				key={i}
 				pinColor={color}
@@ -207,7 +208,7 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 										try {
 											await AsyncStorage.setItem(
 												i.toString(),
-												JSON.stringify(data[i])
+												JSON.stringify(data)
 											);
 											alert("Saved!");
 										} catch (e) {
@@ -247,7 +248,7 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 	} else {
 		return (
 			<Marker
-				coordinate={{ latitude: lat, longitude: long }}
+				coordinate={{ latitude: latFloat, longitude: longFloat }}
 				title={name}
 				description="This is a custom info window."
 				key={i}

@@ -4,8 +4,8 @@ export interface Place extends Document {
   streetAddress: string;
   city: string;
   zip: string;
-  long: number; // Assuming this is for longitude
-  lat: number;  // Assuming this is for latitude
+  long: number;
+  lat: number;
   website: string;
   phone: string;
   image: string;

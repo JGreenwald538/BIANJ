@@ -6,12 +6,12 @@ import { useTheme } from "@react-navigation/native";
 
 interface MileSliderProps {
 	isEnabled: boolean;
-	value: number | string;
+	value: number;
 	onValueChange: (value: number) => void;
 	isEnabledChange: (isEnabled: boolean) => void;
 	filters: string[];
 	setFiltersExpanded: (expanded: boolean) => void;
-	ref?: any;
+	ref?: React.RefObject<View>;
 }
 
 const MileSlider: React.FC<MileSliderProps> = ({
@@ -29,7 +29,7 @@ const MileSlider: React.FC<MileSliderProps> = ({
     }
   };
   if (!isEnabled) {
-    value = "N/A";
+    value = -1;
   }
   const { colors } = useTheme();
   const colorScheme = colors.background === "white" ? "light" : "dark";
@@ -101,7 +101,6 @@ const MileSlider: React.FC<MileSliderProps> = ({
       marginLeft: 5,
     },
   });
-  console.log(isEnabled);
   return (
     <View style={styles.container} ref={ref}>
       <View style={{flexDirection: "column", justifyContent: "center" }}>
@@ -122,13 +121,11 @@ const MileSlider: React.FC<MileSliderProps> = ({
           style={isEnabled ? styles.sliderEnabled : styles.sliderDisabled}
           min={1}
           max={150}
-          // @ts-ignore
           values={[value]}
           onChange={handleChange}
           markerColor={isEnabled ? "#572C5F" : "#d3d3d3"}
           showLabel={false} // Disable the built-in label
           trackStyle={{width: "100%"}}
-          alt = "Radius Slider"
           accessibilityLabel={"Radius Slider" + (isEnabled ? "Enabled" : "Disabled: Select Filters to Enable")}
         />
         {isEnabled ? <Text style={styles.sliderLabel}>

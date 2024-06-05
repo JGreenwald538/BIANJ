@@ -99,7 +99,6 @@ function PlaceList({
 	return (
 		<View key={0} style={{ alignItems: "center" }}>
 			{items.map((item, index) => {
-				// if(index !== 0) {
 				return (
 					<Place
 						key={index}
@@ -131,7 +130,6 @@ export { Place, PlaceList };
 export function getCategoriesForItems(items: Place[]) {
 	const categories: string[] = [];
 	for (let i = 0; i < items.length; i++) {
-		// @ts-ignore
 		if (!categories.includes(items[i].typeOfPlace)) {
 			categories.push(items[i].typeOfPlace);
 		}

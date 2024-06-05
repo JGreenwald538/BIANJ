@@ -16,16 +16,16 @@ import ClosestLocations from "../components/ClosestLocations";
 import {
 	CategoriesContext,
 	LocationContext,
+	NavigationParamsList,
 	PlacesContext,
 	WalkthroughContext,
 } from "../util/globalvars";
 import { AddressInput } from "../components/AddressInput";
 import LogoTitle from "../components/LogoTitle";
 import { Platform } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { NavigationProp, useFocusEffect } from "@react-navigation/native";
 import { Filter } from "../components/Filter";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
-import { MarkerReact } from "../components/Marker";
 
 interface StepInfo {
 	ref: React.RefObject<View>[];
@@ -36,7 +36,11 @@ interface StepInfo {
 	};
 }
 
-export default function MapScreen({ navigation }: { navigation: any }) {
+export default function MapScreen({
+	navigation,
+}: {
+	navigation: NavigationProp<NavigationParamsList>;
+}) {
 	const data = useContext(PlacesContext);
 	const [sliderValue, setSliderValue] = useState<number>(10);
 	const currentLocation = useContext(LocationContext) ?? [null, false, false];
@@ -225,7 +229,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 			setCentered(false);
 			setCurrentStep(currentStep + 1);
 		} else {
-			navigation.navigate("List");
+			navigation.navigate({ name: "List", key: "List" });
 			setCurrentStep(0);
 			setOverlayVisible(false);
 			setWalkthrough(2);
@@ -255,7 +259,7 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 		setSliderValue(newValue);
 	};
 	const handleEnabledChange = (isRadiusEnabled: boolean) => {
-		if (categoriesEnabled.some((category) => category !== "")){
+		if (categoriesEnabled.some((category) => category !== "")) {
 			setIsRadiusEnabled(!isRadiusEnabled);
 		} else {
 			alert("Please enable filters to use the radius selector");
@@ -329,7 +333,8 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 					{markers.map((marker) =>
 						((marker.distance <= sliderValue / 1.60934 || !isRadiusEnabled) &&
 							categoriesEnabled.indexOf(marker.typeOfPlace) !== -1) ||
-						(!currentLocation && categoriesEnabled.indexOf(marker.typeOfPlace) !== -1)
+						(!currentLocation &&
+							categoriesEnabled.indexOf(marker.typeOfPlace) !== -1)
 							? // || true
 							  marker.marker
 							: null
@@ -454,7 +459,11 @@ export default function MapScreen({ navigation }: { navigation: any }) {
 				>
 					<Image
 						source={require("../assets/logos/arrowIcon.png")}
-						alt={bottomBarExpanded ? "Close Bottom Bar Button" : "Open Bottom Bar Button"}
+						alt={
+							bottomBarExpanded
+								? "Close Bottom Bar Button"
+								: "Open Bottom Bar Button"
+						}
 						style={{
 							height: 30,
 							resizeMode: "contain",

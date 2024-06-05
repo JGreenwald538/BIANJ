@@ -2,36 +2,18 @@ import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { LocationContext } from '../util/globalvars';
+import getDistance from '../lib/distance';
+import { Place } from '../lib/place';
 
-
-// Define a type for the location objects
-type Location = {
-    lat: number;
-    long: number;
-    name: string;
-    typeOfPlace: string;
-};
 
 // Define a type for the component props
 type ClosestLocationComponentProps = {
-    locations: Location[];
+    locations: Place[];
     categories: [string[], string[]];
 	setFiltersExpanded: (filtersExpanded: boolean) => void;
-	ref?: any;
+	ref?: React.RefObject<View>;
 };
 
-const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    // Haversine formula to calculate the distance
-    const R = 6371; // Radius of the Earth in km
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a = 
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c / 1.609; // Distance in km
-};
 
 const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ locations, categories, ref, setFiltersExpanded }) => {
     const {colors} = useTheme();
@@ -128,8 +110,9 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
 							opacity: !categoriesEmpty ? 1 : 0.75,
 						}}
 						onPress={() => {
+							
 							if (!categoriesEmpty) {
-								// @ts-ignore
+								// @ts-expect-error
 								navigation.navigate("List", {
 									sortBy: "Distance",
 									categoriesEnabled: categories[1],

@@ -7,7 +7,6 @@ interface LogoTitleProps {
   left?: boolean;
 }
 
-
 let screenWidth = Dimensions.get('window').width;
 
 const LogoTitle: React.FC<LogoTitleProps> = ({left}) => {

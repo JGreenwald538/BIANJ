@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, Dispatch, SetStateAction } from "react";
 import {
 	View,
 	TouchableOpacity,
@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Place, PlaceList } from "../components/Places";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LocationContext, WalkthroughContext } from "../util/globalvars";
+import { LocationContext, NavigationParamsList, sortBys, WalkthroughContext } from "../util/globalvars";
 import LogoTitle from "../components/LogoTitle";
 import {
 	NavigationProp,
@@ -21,35 +21,9 @@ import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import PlaceInvisible from "../components/PlaceInvisible";
+import getDistance from "../lib/distance";
 
-const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
-
-const getDistance = (
-	lat1: number | null,
-	lon1: number | null,
-	lat2: number | null,
-	lon2: number | null
-): number => {
-	if (lat1 && lon1 && lat2 && lon2) {
-		// Haversine formula to calculate the distance
-		const R = 6371; // Radius of the Earth in km
-		const dLat = (lat2 - lat1) * (Math.PI / 180);
-		const dLon = (lon2 - lon1) * (Math.PI / 180);
-		const a =
-			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-			Math.cos(lat1 * (Math.PI / 180)) *
-				Math.cos(lat2 * (Math.PI / 180)) *
-				Math.sin(dLon / 2) *
-				Math.sin(dLon / 2);
-		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		return (R * c) / 1.609; // Distance in mi
-	} else {
-		return 0;
-	}
-};
-
-const sortBys = ["Alphabetical", "Category", "Distance"];
 
 interface StepInfo {
 	ref: React.RefObject<View>[];
@@ -63,17 +37,15 @@ interface StepInfo {
 export default function SavedScreen({
 	navigation,
 }: {
-	navigation: NavigationProp<any>;
+	navigation: NavigationProp<NavigationParamsList>;
 }) {
-	const currentLocation = useContext(LocationContext) ?? [
-		{ lat: null, long: null },
-	];
+	const currentLocation = useContext(LocationContext);
 	const [filtersExpanded, setFiltersExpanded] = useState(false);
 	const [sortByExpanded, setSortByExpanded] = useState(false);
 	const [categoriesEnabled, setCategoriesEnabled] = useState<string[]>([]);
 	const [categories, setCategories] = useState<string[]>([]);
 	const [sortByEnabled, setSortByEnabled] = useState("Category");
-	const [places, setPlaces] = useState([]);
+	const [places, setPlaces] = useState<Element | null>(null);
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
 	const insets = useSafeAreaInsets();
@@ -125,6 +97,10 @@ export default function SavedScreen({
 					})
 
 					.sort((a, b) => {
+						if (!currentLocation) {
+							setSortByEnabled("Alphabetical");
+							return a.name.localeCompare(b.name);
+						}
 						switch (sortByEnabled) {
 							case "Alphabetical":
 								return a.name.localeCompare(b.name);
@@ -158,24 +134,11 @@ export default function SavedScreen({
 						return categoriesEnabled.includes(value.typeOfPlace);
 					});
 				}
-				const places = PlaceList({
-					items: sortedValues,
-					save: false,
-					update,
-					setUpdate,
-				});
-				if (sortedValues.length !== 0) {
-					// @ts-ignore
-					setPlaces(places);
-				} else {
-					// @ts-ignore
-					setPlaces(null);
-				}
+				setPlaces(places as Element);
 			};
 
 			sortData();
-			// @ts-ignore
-		}, [sortByEnabled, currentLocation[0], update, categoriesEnabled])
+		}, [sortByEnabled, currentLocation?.[0], update, categoriesEnabled])
 	);
 	useFocusEffect(
 		React.useCallback(() => {
@@ -226,13 +189,6 @@ export default function SavedScreen({
 			steps[currentStep].ref.forEach((ref) => {
 				if (ref.current) {
 					ref.current.measureInWindow((x, y, width, height) => {
-						// console.log(
-						// 	`Measurements for step ${currentStep}:`,
-						// 	x,
-						// 	y,
-						// 	width,
-						// 	height
-						// ); // Debugging log
 						if (!isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)) {
 							minX = Math.min(minX, x);
 							minY = Math.min(minY, y);
@@ -307,7 +263,7 @@ export default function SavedScreen({
 						</Text>
 					</View>
 				)}
-				{places}
+				<>{places}</>
 				{places && (
 					<View style={{ paddingHorizontal: 40 }}>
 						<TouchableOpacity
@@ -367,13 +323,9 @@ export default function SavedScreen({
 					colorScheme={colorScheme}
 					sortByExpanded={sortByExpanded}
 					onPressSortBy={onPressSortBy}
-					screenWidth={screenWidth}
-					screenHeight={screenHeight}
-					insets={insets}
 					sortByEnabled={sortByEnabled}
 					setSortByEnabled={setSortByEnabled}
 					currentLocation={currentLocation}
-					sortBys={sortBys}
 					setSortByExpanded={setSortByExpanded}
 				/>
 			)}

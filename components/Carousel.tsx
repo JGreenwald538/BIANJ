@@ -19,6 +19,12 @@ interface CarouselImageMap {
 	[index: number]: ImageSourcePropType;
 }
 
+// To add more images to the carousel, follow this:
+// 1. Format the image as a square
+// 2. Add the image to the CarouselImages folder
+// 3. Import the image in the carouselImages object below
+// 4. Add one more item to the carouselItems array(starts at line 50) in the state
+
 const carouselImages: CarouselImageMap = {
 	0: require("../assets/CarouselImages/Carousel1.jpg"),
 	1: require("../assets/CarouselImages/Carousel4.jpg"),

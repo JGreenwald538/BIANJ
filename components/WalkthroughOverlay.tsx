@@ -133,10 +133,6 @@ const WalkthroughOverlay: React.FC<OverlayProps> = React.memo(
 					>
 						<Text style={styles.title}>{content.title}</Text>
 						<Text style={styles.description}>{content.description}</Text>
-						{/* Button can be uncommented and used as needed */}
-						{/* <TouchableOpacity onPress={handleClose} style={styles.button}>
-            <Text>{content.buttonText}</Text>
-          </TouchableOpacity> */}
 					</View>
 				</TouchableOpacity>
 			</Modal>

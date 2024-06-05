@@ -25,7 +25,7 @@ interface FilterProps {
 	update?: boolean;
 	setUpdate?: (update: boolean) => void;
 	nextCategory: number;
-	setNextCategory: any;
+	setNextCategory: (nextCategory: number) => void;
 	map?: boolean;
 	buttonRef?: React.RefObject<TouchableOpacity>;
 	menuRef?: React.RefObject<ScrollView>;
@@ -49,7 +49,6 @@ export const Filter: React.FC<FilterProps> = ({
 	const colorScheme = colorsList.background === "white" ? "light" : "dark";
 	const insets = useSafeAreaInsets();
 	const {width: screenWidth, height: screenHeight} = Dimensions.get("window");
-	console.log(categoriesEnabled);
 	return (
 		<>
 			{filtersExpanded && (
@@ -144,7 +143,6 @@ export const Filter: React.FC<FilterProps> = ({
 							}} // Pass the negated value of `isEnabled`
 						>
 							<Checkbox
-								// @ts-ignore
 								isChecked={categoriesEnabled.indexOf(category) !== -1}
 								onCheck={() => {
 									if (map) {

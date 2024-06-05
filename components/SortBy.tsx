@@ -1,49 +1,48 @@
-import React, { useState } from "react";
+import React from "react";
 import {
 	View,
 	TouchableOpacity,
-	StyleSheet,
 	Animated,
 	Text,
 	TouchableWithoutFeedback,
+	Dimensions,
 } from "react-native";
-import Checkbox from "./Checkbox";
 import { AddressInput } from "./AddressInput";
 import { RadioButton } from "react-native-paper";
+import { LocationContext, sortBys } from "../util/globalvars";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// Define props for the Filter component
+
 interface FilterProps {
 	categories: string[];
 	colorScheme: string;
 	sortByExpanded: boolean;
 	onPressSortBy: () => void;
-	screenWidth: number;
-	screenHeight: number;
-	insets: any;
 	sortByEnabled: string;
-	setSortByEnabled: any;
-	currentLocation: any;
-	sortBys: string[];
-	setSortByExpanded: any;
+	setSortByEnabled: (sortBy: string) => void;
+	currentLocation: LocationContext;
+	setSortByExpanded: (sortByExpanded: boolean) => void;
 }
 
 export const SortBy: React.FC<FilterProps> = ({
 	categories,
 	colorScheme,
 	onPressSortBy,
-	screenWidth,
-	screenHeight,
-	insets,
 	sortByExpanded,
 	sortByEnabled,
 	setSortByEnabled,
 	currentLocation,
-	sortBys,
 }) => {
+	const screenWidth = Dimensions.get("window").width;
+	const screenHeight = Dimensions.get("window").height;
+	const insets = useSafeAreaInsets();
 	return (
 		<>
 			{sortByExpanded && (
-				<TouchableWithoutFeedback onPress={onPressSortBy} accessibilityLabel="Close Sort By Menu Button">
+				<TouchableWithoutFeedback
+					onPress={onPressSortBy}
+					accessibilityLabel="Close Sort By Menu Button"
+				>
 					<View
 						style={{
 							position: "absolute",
@@ -61,7 +60,7 @@ export const SortBy: React.FC<FilterProps> = ({
 					position: "absolute",
 					top: 0.14 * screenHeight,
 					right: 20,
-					width: screenWidth - 40, // 'auto' to fit content, or you could calculate the width based on the content size, // Same as width, 'auto' or a calculated value
+					width: screenWidth - 40,
 					backgroundColor: colorScheme === "light" ? "#e2cbe7" : "#70387a",
 					borderRadius: 10,
 					shadowColor: "#171717",
@@ -111,7 +110,11 @@ export const SortBy: React.FC<FilterProps> = ({
 										paddingTop: 6,
 										color: colorScheme === "light" ? "black" : "white",
 									}}
-									accessibilityLabel={sortBy + " Sort By Select." + (sortByEnabled === sortBy ? "checked" : "unchecked")}
+									accessibilityLabel={
+										sortBy +
+										" Sort By Select." +
+										(sortByEnabled === sortBy ? "checked" : "unchecked")
+									}
 								>
 									{sortBy}
 								</Text>

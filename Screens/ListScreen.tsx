@@ -4,22 +4,20 @@ import { Place, PlaceList } from "../components/Places";
 import {
 	CategoriesContext,
 	LocationContext,
+	NavigationParamsList,
 	PlacesContext,
 	WalkthroughContext,
 	WalkthroughListScreenContext,
 } from "../util/globalvars";
 import LogoTitle from "../components/LogoTitle";
-import { useFocusEffect, useTheme } from "@react-navigation/native";
+import { useFocusEffect, useTheme, NavigationProp } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Filter } from "../components/Filter";
 import { SortBy } from "../components/SortBy";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PlaceInvisible from "../components/PlaceInvisible";
-
-const sortBys = ["Alphabetical", "Category", "Distance"];
-
-const screenHeight = Dimensions.get("window").height;
+import getDistance from "../lib/distance";
 
 interface StepInfo {
 	ref: React.RefObject<View>[];
@@ -30,27 +28,12 @@ interface StepInfo {
 	};
 }
 
-const getDistance = (
-	lat1: number,
-	lon1: number,
-	lat2: number,
-	lon2: number
-): number => {
-	const R = 6371;
-	const dLat = (lat2 - lat1) * (Math.PI / 180);
-	const dLon = (lon2 - lon1) * (Math.PI / 180);
-	const a =
-		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.cos(lat1 * (Math.PI / 180)) *
-			Math.cos(lat2 * (Math.PI / 180)) *
-			Math.sin(dLon / 2) *
-			Math.sin(dLon / 2);
-	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	return (R * c) / 1.609;
-};
 
 export default function ListScreen(
-	{ route, navigation }: any = { route: { params: {} }, navigation: null }
+	{
+		route = { params: { sortBy: "Category", categoriesEnabled: [] } },
+		navigation,
+	}: { route?: { params: {sortBy: string, categoriesEnabled: string[] } }; navigation: NavigationProp<NavigationParamsList> } 
 ) {
 	const values = useContext(PlacesContext);
 	const [sortByEnabled, setSortByEnabled] = useState("Category");
@@ -61,7 +44,6 @@ export default function ListScreen(
 	const categories = useContext(CategoriesContext);
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
-	const insets = useSafeAreaInsets();
 	const [update, setUpdate] = useState(false);
 	const [nextCategory, setNextCategory] = useState(0);
 
@@ -81,14 +63,11 @@ export default function ListScreen(
 		}
 	};
 
-	const screenWidth = Dimensions.get("window").width;
-
 	const [walkthrough, setWalkthrough] = useContext(WalkthroughContext);
 
 	const [currentStep, setCurrentStep] = useState<number>(0);
 	const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
 	const updateVisibility = () => {
-		console.log(walkthrough);
 		setOverlayVisible(walkthrough !== 0);
 	};
 
@@ -216,6 +195,8 @@ export default function ListScreen(
 		updateVisibility();
 	});
 
+	
+
 	useEffect(() => {
 		setSortByEnabled(route.params ? route.params.sortBy : sortByEnabled);
 		setCategoriesEnabled(
@@ -229,15 +210,11 @@ export default function ListScreen(
 		sortedValues = values.sort((a, b) => {
 			switch (sortByEnabled) {
 				case "Alphabetical":
-					// @ts-ignore
 					return a.name.localeCompare(b.name);
 				case "Category":
-					// @ts-ignore
 					return a.typeOfPlace.localeCompare(b.typeOfPlace);
 				case "Distance":
-					// @ts-ignore
-					if (currentLocation[0]) {
-						// @ts-ignore
+					if (currentLocation && currentLocation[0]) {
 						return (
 							getDistance(
 								a.lat,
@@ -245,7 +222,6 @@ export default function ListScreen(
 								currentLocation![0].lat,
 								currentLocation![0].long
 							) -
-							// @ts-ignore
 							getDistance(
 								b.lat,
 								b.long,
@@ -261,7 +237,6 @@ export default function ListScreen(
 		});
 		if (categoriesEnabled.length !== 0) {
 			sortedValues = sortedValues.filter((value) => {
-				// @ts-ignore
 				return categoriesEnabled.indexOf(value.typeOfPlace) !== -1;
 			});
 		}
@@ -300,7 +275,6 @@ export default function ListScreen(
 						containerRef={containerRef}
 						useRef={true}
 						save
-						
 					/>
 				</WalkthroughListScreenContext.Provider>
 			</ScrollView>
@@ -320,13 +294,9 @@ export default function ListScreen(
 				colorScheme={colorScheme}
 				sortByExpanded={sortByExpanded}
 				onPressSortBy={onPressSortBy}
-				screenWidth={screenWidth}
-				screenHeight={screenHeight}
-				insets={insets}
 				sortByEnabled={sortByEnabled}
 				setSortByEnabled={setSortByEnabled}
 				currentLocation={currentLocation}
-				sortBys={sortBys}
 				setSortByExpanded={setSortByExpanded}
 			/>
 			<LogoTitle />
