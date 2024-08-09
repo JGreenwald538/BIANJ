@@ -54,7 +54,8 @@
           "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) access to your location to allow you to find nearby resources. Example: The map will use your location to create a radius of resources a certain distance from you.",
           "NSPrivacyAccessedAPICategoryDiskSpace": "$(PRODUCT_NAME) stores the data of different resources for brain injuries from a database."
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "runtimeVersion": {
       "policy": "appVersion"

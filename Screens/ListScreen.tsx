@@ -31,9 +31,9 @@ interface StepInfo {
 
 export default function ListScreen(
 	{
-		route = { params: { sortBy: "Category", categoriesEnabled: [] } },
+		// route = { params: { sortBy: "Category", categoriesEnabled: [] } },
 		navigation,
-	}: { route?: { params: {sortBy: string, categoriesEnabled: string[] } }; navigation: NavigationProp<NavigationParamsList> } 
+	}: any // { route?: { params: {sortBy: string, categoriesEnabled: string[] } }; navigation: NavigationProp<NavigationParamsList> } 
 ) {
 	const values = useContext(PlacesContext);
 	const [sortByEnabled, setSortByEnabled] = useState("Category");
