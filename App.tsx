@@ -68,7 +68,16 @@ export default function App() {
 				const text = await res.text();
 				const parsedData = JSON.parse(text);
 				if (parsedData && parsedData.length > 0) {
-					setPlaces(parsedData);
+					// The API sends lat/long as strings, but Place declares them as
+					// numbers and the native map requires real numbers. Normalize
+					// once here so every consumer gets the declared type.
+					setPlaces(
+						parsedData.map((place: Place) => ({
+							...place,
+							lat: Number(place.lat),
+							long: Number(place.long),
+						}))
+					);
 				} else {
 					console.error("Parsed data is empty or not an array:", parsedData);
 				}

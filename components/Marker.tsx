@@ -75,8 +75,11 @@ export const MarkerReact: React.FC<MarkerProps> = ({
 	const color = colors[categoriesEnabled.indexOf(typeOfPlace)];
 	const device = Platform.OS;
 	const iconSize = 25;
-	const latFloat = lat;
-	const longFloat = long;
+	// The API returns lat/long as strings. The old architecture coerced them
+	// silently, but Fabric requires real numbers and throws
+	// UnexpectedNativeTypeException when a Marker coordinate is a string.
+	const latFloat = Number(lat);
+	const longFloat = Number(long);
 	if (device === "ios") {
 		return (
 			<Marker
