@@ -45,7 +45,9 @@ export default function SavedScreen({
 	const [categoriesEnabled, setCategoriesEnabled] = useState<string[]>([]);
 	const [categories, setCategories] = useState<string[]>([]);
 	const [sortByEnabled, setSortByEnabled] = useState("Category");
-	const [places, setPlaces] = useState<Element | null>(null);
+	// This was typed as the DOM's Element, not React's, which is how
+	// setPlaces(places) slipped past the type checker.
+	const [places, setPlaces] = useState<React.JSX.Element | null>(null);
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
 	const insets = useSafeAreaInsets();
@@ -134,7 +136,14 @@ export default function SavedScreen({
 						return categoriesEnabled.includes(value.typeOfPlace);
 					});
 				}
-				setPlaces(places as Element);
+				// This previously read setPlaces(places), which set the state to
+				// itself and discarded the sorted list, so the screen always
+				// showed "No Saved Places".
+				setPlaces(() =>
+					sortedValues.length > 0 ? (
+						<PlaceList items={sortedValues} save update={update} setUpdate={setUpdate} />
+					) : null
+				);
 			};
 
 			sortData();
