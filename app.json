@@ -17,7 +17,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.BIANJ",
-      "buildNumber": "28",
       "entitlements": {
         "com.apple.developer.maps": true
       },
@@ -29,7 +28,6 @@
         "backgroundColor": "#572C5F"
       },
       "package": "com.anonymous.BIANJ",
-      "versionCode": 40,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyA-pBCQTZGhP1VZGd6Yd9p1zB3AWkd21fA"
