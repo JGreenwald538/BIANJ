@@ -5,23 +5,20 @@
   "exclude": [
     "./server",
     "./node_modules",
+    "./android",
+    "./ios",
+    "./dist",
+    "./babel.config.js",
+    "./metro.config.js",
+    "./react-native.config.js"
   ],
   "compilerOptions": {
-    "jsx": "react",
     "checkJs": true,
-    "module": "esnext",
-    "target": "esnext",
-    "moduleResolution": "bundler",
-    "moduleDetection": "force",
     "allowImportingTsExtensions": true,
-    "noEmit": true,
     "composite": true,
     "strict": true,
-    "downlevelIteration": true,
-    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowJs": true
+    "forceConsistentCasingInFileNames": true
   },
   "extends": "expo/tsconfig.base"
 }

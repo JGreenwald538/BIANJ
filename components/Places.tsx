@@ -15,10 +15,10 @@ interface PlaceProps extends React.ComponentPropsWithoutRef<typeof View> {
 	save: boolean;
 	setUpdate?: (value: React.SetStateAction<boolean>) => void;
 	update?: boolean;
-	titleRef?: React.RefObject<View>;
-	typeRef?: React.RefObject<View>;
-	buttonRef?: React.RefObject<View>;
-	containerRef?: React.RefObject<View>;
+	titleRef?: React.RefObject<View | null>;
+	typeRef?: React.RefObject<View | null>;
+	buttonRef?: React.RefObject<View | null>;
+	containerRef?: React.RefObject<View | null>;
 	placeEnabled: boolean
 	setPlaceEnabled: (value: React.SetStateAction<boolean>) => void;
 	first: boolean;
@@ -90,10 +90,10 @@ function PlaceList({
 	save: boolean;
 	update?: boolean;
 	setUpdate?: (value: React.SetStateAction<boolean>) => void;
-	titleRef?: React.RefObject<View>;
-	typeRef?: React.RefObject<View>;
-	buttonRef?: React.RefObject<View>;
-	containerRef?: React.RefObject<View>;
+	titleRef?: React.RefObject<View | null>;
+	typeRef?: React.RefObject<View | null>;
+	buttonRef?: React.RefObject<View | null>;
+	containerRef?: React.RefObject<View | null>;
 	useRef?: boolean;
 }) {
 	return (

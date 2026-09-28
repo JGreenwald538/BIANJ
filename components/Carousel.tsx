@@ -1,6 +1,6 @@
 import * as React from "react";
 import { View, Dimensions, Image, ImageSourcePropType } from "react-native";
-import Carousel from "react-native-snap-carousel";
+import { Carousel } from "react-native-reanimated-carousel";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -8,11 +8,6 @@ interface CarouselItem {
 	title: string;
 	text: string;
 	accessibilityLabel: string; // Accessibility label for each image
-}
-
-interface AppState {
-	activeIndex: number;
-	carouselItems: CarouselItem[];
 }
 
 interface CarouselImageMap {
@@ -23,7 +18,7 @@ interface CarouselImageMap {
 // 1. Format the image as a square
 // 2. Add the image to the CarouselImages folder
 // 3. Import the image in the carouselImages object below
-// 4. Add one more item to the carouselItems array(starts at line 50) in the state
+// 4. Add one more item to the carouselItems array below
 
 const carouselImages: CarouselImageMap = {
 	0: require("../assets/CarouselImages/Carousel1.jpg"),
@@ -38,98 +33,52 @@ const carouselImages: CarouselImageMap = {
 };
 
 const scale = 0.25;
+const itemSize = screenHeight * scale;
 
-export default class App extends React.Component<{}, AppState> {
-	private carousel: React.RefObject<Carousel<CarouselItem>>;
+const carouselItems: CarouselItem[] = [
+	{ title: "Item 1", text: "Text 1", accessibilityLabel: "Carousel of BIANJ Images" },
+	{ title: "Item 2", text: "Text 2", accessibilityLabel: "Carousel of BIANJ Images" },
+	{ title: "Item 3", text: "Text 3", accessibilityLabel: "Carousel of BIANJ Images" },
+	{ title: "Item 4", text: "Text 4", accessibilityLabel: "Carousel of BIANJ Images" },
+	{ title: "Item 5", text: "Text 5", accessibilityLabel: "Carousel of BIANJ Images" },
+	{ title: "Item 6", text: "Text 6", accessibilityLabel: "Carousel of BIANJ Images" },
+	{ title: "Item 7", text: "Text 7", accessibilityLabel: "Carousel of BIANJ Images" },
+	{ title: "Item 8", text: "Text 8", accessibilityLabel: "Carousel of BIANJ Images" },
+];
 
-	constructor(props: {}) {
-		super(props);
-		this.carousel = React.createRef<Carousel<CarouselItem>>();
-		this.state = {
-			activeIndex: 0,
-			carouselItems: [
-				{
-					title: "Item 1",
-					text: "Text 1",
-					accessibilityLabel: "Carousel of BIANJ Images",
-				},
-				{
-					title: "Item 2",
-					text: "Text 2",
-					accessibilityLabel: "Carousel of BIANJ Images",
-				},
-				{
-					title: "Item 3",
-					text: "Text 3",
-					accessibilityLabel: "Carousel of BIANJ Images",
-				},
-				{
-					title: "Item 4",
-					text: "Text 4",
-					accessibilityLabel: "Carousel of BIANJ Images",
-				},
-				{
-					title: "Item 5",
-					text: "Text 5",
-					accessibilityLabel: "Carousel of BIANJ Images",
-				},
-				{
-					title: "Item 6",
-					text: "Text 6",
-					accessibilityLabel: "Carousel of BIANJ Images",
-				},
-				{
-					title: "Item 7",
-					text: "Text 7",
-					accessibilityLabel: "Carousel of BIANJ Images",
-				},
-				{
-					title: "Item 8",
-					text: "Text 8",
-					accessibilityLabel: "Carousel of BIANJ Images",
-				},
-			],
-		};
-	}
-
-	_renderItem = ({ item, index }: { item: CarouselItem; index: number }) => {
-		return (
-			<View
+export default function AppCarousel() {
+	const renderItem = ({ item, index }: { item: CarouselItem; index: number }) => (
+		<View
+			style={{
+				height: itemSize,
+				width: itemSize,
+				overflow: "hidden",
+			}}
+		>
+			<Image
+				source={carouselImages[index]}
 				style={{
-					height: screenHeight * scale,
-					width: screenHeight * scale,
-					overflow: "hidden",
+					resizeMode: "stretch",
+					borderRadius: 20,
+					width: itemSize,
+					height: itemSize,
 				}}
-			>
-				<Image
-					source={carouselImages[index]}
-					style={{
-						resizeMode: "stretch",
-						borderRadius: 20,
-						width: screenHeight * scale,
-						height: screenHeight * scale,
-					}}
-					accessible={true}
-					accessibilityLabel={item.accessibilityLabel}
-				/>
-			</View>
-		);
-	};
-
-	render() {
-		return (
-			<Carousel
-				layout={"default"}
-				ref={this.carousel}
-				data={this.state.carouselItems}
-				sliderWidth={screenWidth}
-				itemWidth={screenHeight * scale}
-				renderItem={this._renderItem}
-				onSnapToItem={(index) => this.setState({ activeIndex: index })}
-				vertical={false}
-				autoplay={true}
-				autoplayInterval={5000}
+				accessible={true}
+				accessibilityLabel={item.accessibilityLabel}
 			/>
-		);
-	}
+		</View>
+	);
+
+	return (
+		<Carousel
+			data={carouselItems}
+			renderItem={renderItem}
+			itemSize={itemSize}
+			style={{ width: screenWidth, height: itemSize }}
+			orientation="horizontal"
+			loop={true}
+			autoplay={true}
+			autoplayInterval={5000}
+		/>
+	);
 }

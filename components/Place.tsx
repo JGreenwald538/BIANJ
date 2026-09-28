@@ -30,10 +30,10 @@ interface PlaceProps {
 	update?: boolean;
 	placeEnabled: boolean;
 	setPlaceEnabled: (enabled: boolean) => void;
-	titleRef: React.RefObject<View> | undefined;
-	typeRef: React.RefObject<View> | undefined;
-	buttonRef: React.RefObject<View> | undefined;
-	containerRef: React.RefObject<View> | undefined;
+	titleRef: React.RefObject<View | null> | undefined;
+	typeRef: React.RefObject<View | null> | undefined;
+	buttonRef: React.RefObject<View | null> | undefined;
+	containerRef: React.RefObject<View | null> | undefined;
 }
 
 const { width } = Dimensions.get("window");

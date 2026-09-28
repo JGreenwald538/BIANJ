@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
-import { LocationContext } from '../util/globalvars';
+import { NavigationProp, useNavigation, useTheme } from '@react-navigation/native';
+import { LocationContext, NavigationParamsList } from '../util/globalvars';
 import getDistance from '../lib/distance';
 import { Place } from '../lib/place';
 
@@ -11,7 +11,7 @@ type ClosestLocationComponentProps = {
     locations: Place[];
     categories: [string[], string[]];
 	setFiltersExpanded: (filtersExpanded: boolean) => void;
-	ref?: React.RefObject<View>;
+	ref?: React.RefObject<View | null>;
 };
 
 
@@ -33,7 +33,7 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
           flexDirection: 'column',
         },
     });
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<NavigationParamsList>>();
 	if (currentLocation) {
 		if(!currentLocation[0] || !locations) {
 			return null;
@@ -112,7 +112,6 @@ const ClosestLocationComponent: React.FC<ClosestLocationComponentProps> = ({ loc
 						onPress={() => {
 							
 							if (!categoriesEmpty) {
-								// @ts-expect-error
 								navigation.navigate("List", {
 									sortBy: "Distance",
 									categoriesEnabled: categories[1],

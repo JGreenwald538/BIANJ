@@ -11,7 +11,7 @@ import { LocationContext } from "../util/globalvars";
 import { useTheme } from "@react-navigation/native";
 
 interface AddressInputProps {
-	ref?: React.RefObject<View>;
+	ref?: React.RefObject<View | null>;
 }
 
 export const AddressInput: React.FC<AddressInputProps> = ({ ref }) => {

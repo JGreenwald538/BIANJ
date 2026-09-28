@@ -28,7 +28,7 @@ import { Filter } from "../components/Filter";
 import WalkthroughOverlay from "../components/WalkthroughOverlay";
 
 interface StepInfo {
-	ref: React.RefObject<View>[];
+	ref: React.RefObject<View | null>[];
 	content: {
 		title: string;
 		description: string;
@@ -229,7 +229,7 @@ export default function MapScreen({
 			setCentered(false);
 			setCurrentStep(currentStep + 1);
 		} else {
-			navigation.navigate({ name: "List", key: "List" });
+			navigation.navigate("List");
 			setCurrentStep(0);
 			setOverlayVisible(false);
 			setWalkthrough(2);

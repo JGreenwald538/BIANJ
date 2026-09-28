@@ -11,7 +11,7 @@ interface MileSliderProps {
 	isEnabledChange: (isEnabled: boolean) => void;
 	filters: string[];
 	setFiltersExpanded: (expanded: boolean) => void;
-	ref?: React.RefObject<View>;
+	ref?: React.RefObject<View | null>;
 }
 
 const MileSlider: React.FC<MileSliderProps> = ({

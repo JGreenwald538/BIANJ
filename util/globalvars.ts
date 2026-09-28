@@ -20,7 +20,9 @@ export const WalkthroughListScreenContext = createContext<
 
 export type NavigationParamsList = {
 	Home: undefined;
-	List: {params: {sortBy: string}};
+	// ListScreen reads these off route.params; both are optional because the
+	// tab can also be opened directly with no params.
+	List: { sortBy?: string; categoriesEnabled?: string[] } | undefined;
 	Map: undefined;
 	Saved: undefined;
 }

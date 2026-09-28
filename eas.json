@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": "7.8.0",
+    "version": ">= 18.0.5",
     "promptToConfigurePushNotifications": false
   },
   "build": {
@@ -20,7 +20,10 @@
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "android": {
+        "buildType": "app-bundle"
+      }
     },
     "development-simulator": {
       "developmentClient": true,

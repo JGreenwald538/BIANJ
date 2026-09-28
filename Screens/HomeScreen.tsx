@@ -20,7 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const screenHeight = Dimensions.get("window").height;
 
 interface StepInfo {
-	ref: React.RefObject<View>[];
+	ref: React.RefObject<View | null>[];
 	content: {
 		title: string;
 		description: string;
@@ -30,11 +30,13 @@ interface StepInfo {
 
 interface ButtonMenuItemProps {
 	title: string;
-	ref: React.ForwardedRef<View>;
+	// React 19 passes `ref` as a normal prop to function components,
+	// so forwardRef is no longer needed here.
+	ref?: React.Ref<View | null>;
 	url: string;
 }
 
-const ButtonMenuItem = React.forwardRef(({title, ref, url }: ButtonMenuItemProps) => {
+const ButtonMenuItem = ({ title, ref, url }: ButtonMenuItemProps) => {
 	const { colors } = useTheme();
 	const colorScheme = colors.background === "white" ? "light" : "dark";
 	const styles = StyleSheet.create({
@@ -91,7 +93,7 @@ const ButtonMenuItem = React.forwardRef(({title, ref, url }: ButtonMenuItemProps
 			</TouchableOpacity>
 		</View>
 	);
-});
+};
 
 export default function HomeScreen({ navigation }: {navigation: NavigationProp<NavigationParamsList>}) {
 	const { colors } = useTheme();

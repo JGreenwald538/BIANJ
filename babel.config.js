@@ -4,21 +4,9 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      [
-        "module-resolver",
-        {
-          extensions: [".tsx", ".ts", ".js", ".json"],
-        },
-      ],
-      "react-native-reanimated/plugin",
-      ["module:react-native-dotenv", {
-        "envName": "APP_ENV",
-        "moduleName": "@env",
-        "path": ".env.developement",
-        "safe": false,
-        "allowUndefined": true,
-        "verbose": false
-      }]
+      // Reanimated 4 moved its Babel plugin into react-native-worklets.
+      // This must stay last in the plugin list.
+      "react-native-worklets/plugin",
     ],
   };
 };

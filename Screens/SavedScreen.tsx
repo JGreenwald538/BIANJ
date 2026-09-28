@@ -26,7 +26,7 @@ import getDistance from "../lib/distance";
 const screenHeight = Dimensions.get("window").height;
 
 interface StepInfo {
-	ref: React.RefObject<View>[];
+	ref: React.RefObject<View | null>[];
 	content: {
 		title: string;
 		description: string;

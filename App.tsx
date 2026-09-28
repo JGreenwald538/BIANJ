@@ -15,13 +15,14 @@ import {
 	WalkthroughContext,
 } from "./util/globalvars";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Place } from "./lib/place.ts";
 
 SplashScreen.preventAutoHideAsync();
 setTimeout(SplashScreen.hideAsync, 1000);
 
 if (Platform.OS === "android") {
-	UIManager.setLayoutAnimationEnabledExperimental(true);
+	UIManager.setLayoutAnimationEnabledExperimental?.(true);
 }
 
 const lightTheme = {
@@ -83,6 +84,7 @@ export default function App() {
 	categories = categories.sort((a, b) => a[0].localeCompare(b[0]));
 
 	return (
+		<GestureHandlerRootView style={{ flex: 1 }}>
 		<SafeAreaProvider>
 			<WalkthroughContext.Provider value={[walkthrough, setWalkthrough]}>
 				<CategoriesContext.Provider value={categories}>
@@ -200,5 +202,6 @@ export default function App() {
 				</CategoriesContext.Provider>
 			</WalkthroughContext.Provider>
 		</SafeAreaProvider>
+		</GestureHandlerRootView>
 	);
 }

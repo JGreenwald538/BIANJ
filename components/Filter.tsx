@@ -27,8 +27,8 @@ interface FilterProps {
 	nextCategory: number;
 	setNextCategory: (nextCategory: number) => void;
 	map?: boolean;
-	buttonRef?: React.RefObject<TouchableOpacity>;
-	menuRef?: React.RefObject<ScrollView>;
+	buttonRef?: React.RefObject<React.ComponentRef<typeof TouchableOpacity> | null>;
+	menuRef?: React.RefObject<React.ComponentRef<typeof ScrollView> | null>;
 }
 
 export const Filter: React.FC<FilterProps> = ({

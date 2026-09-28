@@ -20,7 +20,7 @@ import PlaceInvisible from "../components/PlaceInvisible";
 import getDistance from "../lib/distance";
 
 interface StepInfo {
-	ref: React.RefObject<View>[];
+	ref: React.RefObject<View | null>[];
 	content: {
 		title: string;
 		description: string;
@@ -31,9 +31,9 @@ interface StepInfo {
 
 export default function ListScreen(
 	{
-		// route = { params: { sortBy: "Category", categoriesEnabled: [] } },
+		route,
 		navigation,
-	}: any // { route?: { params: {sortBy: string, categoriesEnabled: string[] } }; navigation: NavigationProp<NavigationParamsList> } 
+	}: any // { route?: { params: {sortBy: string, categoriesEnabled: string[] } }; navigation: NavigationProp<NavigationParamsList> }
 ) {
 	const values = useContext(PlacesContext);
 	const [sortByEnabled, setSortByEnabled] = useState("Category");
@@ -198,11 +198,13 @@ export default function ListScreen(
 	
 
 	useEffect(() => {
-		setSortByEnabled(route.params ? route.params.sortBy : sortByEnabled);
-		setCategoriesEnabled(
-			route.params ? route.params.categoriesEnabled : categoriesEnabled
-		);
-	}, [route.params]);
+		if (route?.params?.sortBy) {
+			setSortByEnabled(route.params.sortBy);
+		}
+		if (route?.params?.categoriesEnabled) {
+			setCategoriesEnabled(route.params.categoriesEnabled);
+		}
+	}, [route?.params]);
 
 	const sortedValues = useMemo(() => {
 		let sortedValues = [];
